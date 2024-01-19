@@ -1,0 +1,28 @@
+{% load static %}
+
+<!doctype html>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+
+    <link rel='stylesheet' href='{% static "core/style.css" %}'/>
+
+    <title>fz | {% block title %}{% endblock %}</title>
+  </head>
+
+  <body>
+    <header>
+      <img src='{% static 'core/logo.svg' %}'/>
+    </header>
+
+    <main>
+      {% block main %}{% endblock %}
+    </main>
+
+    <footer>
+      Powered by love.
+    </footer>
+  </body>
+</html>
+
