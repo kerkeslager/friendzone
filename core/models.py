@@ -1,8 +1,21 @@
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db import models, transaction
+import django.contrib.auth.models as auth_models
 
-class User(AbstractUser):
+class UserManager(auth_models.UserManager):
+    @transaction.atomic
+    def create_user(self, *args, **kwargs):
+        user = super().create_user(*args, **kwargs)
+
+        for name in ['Friends', 'Family']:
+            circle = Circle(owner=user, name=name)
+            circle.save()
+
+        return user
+
+class User(auth_models.AbstractUser):
+    objects = UserManager()
+
     name = models.CharField(max_length=256)
 
 class Invitation(models.Model):
