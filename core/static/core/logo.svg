@@ -1,0 +1,16 @@
+<svg viewBox='-4.5 -4.5 99 99' xmlns='http://www.w3.org/2000/svg'>
+  <path
+    d='M 30 90 Q 30 0 60 0'
+    fill='transparent'
+    stroke='black'
+    stroke-linecap='round'
+    stroke-linejoin='round'
+    stroke-width='9' />
+  <path
+    d='M 22.5 22.5 L 60 45 L 7.5 52.5 L 45 75'
+    fill='transparent'
+    stroke='black'
+    stroke-linecap='round'
+    stroke-linejoin='round'
+    stroke-width='9' />
+</svg>
