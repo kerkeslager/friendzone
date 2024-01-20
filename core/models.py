@@ -18,6 +18,15 @@ class User(auth_models.AbstractUser):
 
     name = models.CharField(max_length=256)
 
+    @transaction.atomic
+    def create_invitation(self, *, circles):
+        if len(circles) == 0:
+            raise Exception('Invitation must have at least one circle')
+
+        invitation = Invitation.objects.create(owner=self)
+        invitation.circles.set(circles)
+        return invitation
+
 class Invitation(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
