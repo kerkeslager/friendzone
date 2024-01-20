@@ -67,6 +67,7 @@ class Invitation(models.Model):
     )
 
 class Connection(models.Model):
+    created_utc = models.DateTimeField(auto_now_add=True)
     inviting_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
