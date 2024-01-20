@@ -107,3 +107,24 @@ class Circle(models.Model):
                 )
             )
         )
+
+class Message(models.Model):
+    connection = models.ForeignKey(
+        'Connection',
+        on_delete=models.CASCADE,
+        related_name='messages',
+    )
+    from_user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='messages',
+    )
+    read = models.BooleanField(default=False)
+    text = models.CharField(max_length=1024)
+
+class Post(models.Model):
+    circle = models.ForeignKey(
+        'Circle',
+        on_delete=models.CASCADE,
+        related_name='posts',
+    )
