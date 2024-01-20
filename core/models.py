@@ -119,6 +119,7 @@ class Message(models.Model):
         on_delete=models.CASCADE,
         related_name='messages',
     )
+    created_utc = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
     text = models.CharField(max_length=1024)
 
@@ -128,3 +129,5 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name='posts',
     )
+    created_utc = models.DateTimeField(auto_now_add=True)
+    text = models.CharField(max_length=1024)
