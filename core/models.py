@@ -20,12 +20,40 @@ class User(auth_models.AbstractUser):
 
     @transaction.atomic
     def create_invitation(self, *, circles):
-        if len(circles) == 0:
+        circles_count = circles.count()
+
+        if circles_count == 0:
             raise Exception('Invitation must have at least one circle')
 
+        if circles_count != circles.filter(owner=self).count():
+            raise Exception('Cannot invite to circle you do not own')
+
         invitation = Invitation.objects.create(owner=self)
+
         invitation.circles.set(circles)
         return invitation
+
+    @transaction.atomic
+    def accept_invitation(self, invitation, *, circles):
+        circles_count = circles.count()
+
+        if circles_count == 0:
+            raise Exception('Must accept into at least one circle')
+
+        if circles_count != circles.filter(owner=self).count():
+            raise Exception('Cannot cannot accept into circle you do not own')
+
+        connection = Connection.objects.create(
+            inviting_user=invitation.owner,
+            accepting_user=self,
+        )
+
+        for circle in invitation.circles.all():
+            connection.circles.add(circle)
+        for circle in circles.all():
+            connection.circles.add(circle)
+
+        connection.save()
 
 class Invitation(models.Model):
     owner = models.ForeignKey(
@@ -49,14 +77,9 @@ class Connection(models.Model):
         on_delete=models.CASCADE,
         related_name='+'
     )
-
-    circles_owned_by_inviting_user = models.ManyToManyField(
+    circles = models.ManyToManyField(
         'Circle',
-        related_name='+',
-    )
-    circles_owned_by_accepting_user = models.ManyToManyField(
-        'Circle',
-        related_name='+',
+        related_name='connections',
     )
 
 class Circle(models.Model):
@@ -66,3 +89,21 @@ class Circle(models.Model):
         on_delete=models.CASCADE,
         related_name='circles'
     )
+
+    @property
+    def members(self):
+        return User.objects.filter(
+            pk__in=self.connections.filter(
+                accepting_user=self.owner,
+            ).values_list(
+                'inviting_user',
+                flat=True,
+            ).union(
+                self.connections.filter(
+                    inviting_user=self.owner,
+                ).values_list(
+                    'accepting_user',
+                    flat=True,
+                )
+            )
+        )
