@@ -2,6 +2,11 @@ from django.conf import settings
 from django.db import models, transaction
 import django.contrib.auth.models as auth_models
 
+MAX_CONNECTIONS_PER_USER = 50
+
+class ConnectionLimitException(Exception):
+    pass
+
 class UserManager(auth_models.UserManager):
     @transaction.atomic
     def create_user(self, *args, **kwargs):
@@ -18,6 +23,16 @@ class User(auth_models.AbstractUser):
 
     name = models.CharField(max_length=256)
 
+    @property
+    def connections(self):
+        return Connection.objects.filter(
+            inviting_user=self,
+        ).union(
+            Connection.objects.filter(
+                accepting_user=self,
+            ),
+        )
+
     @transaction.atomic
     def create_invitation(self, *, circles):
         circles_count = circles.count()
@@ -27,6 +42,9 @@ class User(auth_models.AbstractUser):
 
         if circles_count != circles.filter(owner=self).count():
             raise Exception('Cannot invite to circle you do not own')
+
+        if self.connections.count() >= MAX_CONNECTIONS_PER_USER:
+            raise ConnectionLimitException('Connection limit reached')
 
         invitation = Invitation.objects.create(owner=self)
 
@@ -66,7 +84,26 @@ class Invitation(models.Model):
         related_name='+',
     )
 
+class ConnectionManager(models.Manager):
+    @transaction.atomic
+    def create(self, **kwargs):
+        inviting_user = kwargs.get('inviting_user')
+        if inviting_user.connections.count() >= MAX_CONNECTIONS_PER_USER:
+            raise ConnectionLimitException(
+                'Inviting user has reached connection limit',
+            )
+
+        accepting_user = kwargs.get('accepting_user')
+        if accepting_user.connections.count() >= MAX_CONNECTIONS_PER_USER:
+            raise ConnectionLimitException(
+                'Accepting user has reached connection limit',
+            )
+
+        return super().create(**kwargs)
+
 class Connection(models.Model):
+    objects = ConnectionManager()
+
     created_utc = models.DateTimeField(auto_now_add=True)
     inviting_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

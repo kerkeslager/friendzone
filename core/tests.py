@@ -26,7 +26,6 @@ class UserTests(TransactionTestCase):
         for circle in inviting_user.circles.all():
             self.assertIn(circle, invitation.circles.all())
 
-
     def test_user_create_invitation_requires_at_least_one_circle(self):
         inviting_user = models.User.objects.create_user(
             username='testuser',
@@ -54,6 +53,37 @@ class UserTests(TransactionTestCase):
             inviting_user.create_invitation(
                 circles=other_user.circles.all(),
             )
+
+    def test_user_cannot_create_invitation_if_max_connections_reached(self):
+        inviting_user = models.User.objects.create_user(
+            username='testuser',
+            password='12345',
+        )
+
+        circles = inviting_user.circles.filter(name='Friends')
+
+        for i in range(models.MAX_CONNECTIONS_PER_USER):
+            other_user = models.User.objects.create_user(
+                username=f'user_{i}',
+                password='12345',
+            )
+
+            # Half the models accepted by inviting user, half by others, to catch
+            # issues with which user invited/accepted
+            if i > models.MAX_CONNECTIONS_PER_USER // 2:
+                invitation = inviting_user.create_invitation(circles=circles)
+                other_user.accept_invitation(
+                    invitation,
+                    circles=other_user.circles.all(),
+                )
+            else:
+                invitation = other_user.create_invitation(
+                    circles=other_user.circles.all(),
+                )
+                inviting_user.accept_invitation(invitation, circles=circles)
+
+        with self.assertRaises(models.ConnectionLimitException):
+            inviting_user.create_invitation(circles=circles)
 
     def test_accepting_invitation_creates_connection(self):
         inviting_user = models.User.objects.create_user(
@@ -126,6 +156,92 @@ class UserTests(TransactionTestCase):
                 circles=other_user.circles.all(),
             )
 
+    def test_user_cannot_accept_invitation_if_inviting_user_max_connections_reached(self):
+        inviting_user = models.User.objects.create_user(
+            username='testuser',
+            password='12345',
+        )
+
+        circles = inviting_user.circles.filter(name='Friends')
+        original_invitation = inviting_user.create_invitation(circles=circles)
+
+        for i in range(models.MAX_CONNECTIONS_PER_USER):
+            other_user = models.User.objects.create_user(
+                username=f'user_{i}',
+                password='12345',
+            )
+
+            # Half the models accepted by inviting user, half by others, to catch
+            # issues with which user invited/accepted
+            if i > models.MAX_CONNECTIONS_PER_USER // 2:
+                invitation = inviting_user.create_invitation(circles=circles)
+
+                other_user.accept_invitation(
+                    invitation,
+                    circles=other_user.circles.all(),
+                )
+            else:
+                invitation = other_user.create_invitation(
+                    circles=other_user.circles.all(),
+                )
+                inviting_user.accept_invitation(invitation, circles=circles)
+
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        with self.assertRaises(models.ConnectionLimitException):
+            accepting_user.accept_invitation(
+                original_invitation,
+                circles=accepting_user.circles.all(),
+            )
+
+    def test_user_cannot_accept_invitation_if_accepting_user_max_connections_reached(self):
+        inviting_user = models.User.objects.create_user(
+            username='testuser',
+            password='12345',
+        )
+
+        original_invitation = inviting_user.create_invitation(
+            circles=inviting_user.circles.all(),
+        )
+
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+        circles = accepting_user.circles.filter(name='Friends')
+
+        for i in range(models.MAX_CONNECTIONS_PER_USER):
+            other_user = models.User.objects.create_user(
+                username=f'user_{i}',
+                password='12345',
+            )
+
+            # Half the models accepted by inviting user, half by others, to catch
+            # issues with which user invited/accepted
+            if i > models.MAX_CONNECTIONS_PER_USER // 2:
+                invitation = accepting_user.create_invitation(circles=circles)
+
+                other_user.accept_invitation(
+                    invitation,
+                    circles=other_user.circles.all(),
+                )
+            else:
+                invitation = other_user.create_invitation(
+                    circles=other_user.circles.all(),
+                )
+                accepting_user.accept_invitation(
+                    invitation,
+                    circles=circles,
+                )
+
+        with self.assertRaises(models.ConnectionLimitException):
+            accepting_user.accept_invitation(
+                original_invitation,
+                circles=circles,
+            )
 
     def test_accepting_invitation_adds_user_to_circles(self):
         inviting_user = models.User.objects.create_user(
