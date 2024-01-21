@@ -1,8 +1,24 @@
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DeleteView
 from django.views.generic.base import TemplateView
+
+from . import models
+
+class DeleteUserView(DeleteView):
+    model = models.User
+    success_url = reverse_lazy('delete_done')
+
+    def get_object(self):
+        return self.request.user
+
+delete = DeleteUserView.as_view()
+
+class DeleteDoneView(TemplateView):
+    template_name = 'core/delete_done.html'
+
+delete_done = DeleteDoneView.as_view()
 
 class IndexView(TemplateView):
     template_name = 'core/index.html'

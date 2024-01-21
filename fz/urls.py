@@ -21,6 +21,8 @@ from django.urls import include, path
 from core import views as core_views
 
 auth_urlpatterns = [
+    path('delete', core_views.delete, name='delete'),
+    path('delete-done', core_views.delete_done, name='delete_done'),
     path('login', auth_views.LoginView.as_view(), name='login'),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('password-change', auth_views.PasswordChangeView.as_view(), name='password_change'),

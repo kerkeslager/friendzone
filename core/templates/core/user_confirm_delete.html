@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% block title %}confirm delete user{% endblock %}
+
+{% block main %}
+  <form method="post">
+    {% csrf_token %}
+    <p>Are you sure you want to delete your account?</p>
+    <p>Note that we really delete your data, so this action cannot be undone.</p>
+    {{ form }}
+    <input type="submit" value="Confirm">
+  </form>
+{% endblock %}
+
