@@ -4,6 +4,6 @@
 
 {% block main %}
   {% for circle in object_list %}
-    <p>{{ circle.name }}</p>
+    <p><a href='{{ circle.get_absolute_url }}'>{{ circle.name }}</a></p>
   {% endfor %}
 {% endblock %}
