@@ -1,0 +1,9 @@
+{% extends 'core/base.html' %}
+
+{% block title %}circles{% endblock %}
+
+{% block main %}
+  {% for circle in object_list %}
+    <p>{{ circle.name }}</p>
+  {% endfor %}
+{% endblock %}

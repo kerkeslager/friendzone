@@ -2,8 +2,17 @@ from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView
 from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
 
 from . import forms, models
+
+class CircleListView(ListView):
+    model = models.Circle
+
+    def get_queryset(self):
+        return self.request.user.circles.all()
+
+circle_list = CircleListView.as_view()
 
 class DeleteUserView(DeleteView):
     model = models.User
