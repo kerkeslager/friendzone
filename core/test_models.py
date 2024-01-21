@@ -3,6 +3,26 @@ from django.test import TestCase, TransactionTestCase
 from . import models
 
 class UserTests(TransactionTestCase):
+    def test_user_save_new_creates_default_circles(self):
+        user = models.User(username='testuser')
+        user.save()
+
+        self.assertEqual(user.circles.all().count(), 2)
+        self.assertEqual(user.circles.filter(name='Family').count(), 1)
+        self.assertEqual(user.circles.filter(name='Friends').count(), 1)
+
+    def test_user_save_old_does_not_create_more_circles(self):
+        user = models.User(username='testuser')
+        user.save()
+
+        user.circles.filter(name='Family').delete()
+
+        user.set_password('hello')
+        user.save()
+
+        self.assertEqual(user.circles.all().count(), 1)
+        self.assertEqual(user.circles.filter(name='Friends').count(), 1)
+
     def test_create_user_creates_default_circles(self):
         user = models.User.objects.create_user(
             username='testuser',

@@ -7,21 +7,20 @@ MAX_CONNECTIONS_PER_USER = 50
 class ConnectionLimitException(Exception):
     pass
 
-class UserManager(auth_models.UserManager):
-    @transaction.atomic
-    def create_user(self, *args, **kwargs):
-        user = super().create_user(*args, **kwargs)
-
-        for name in ['Friends', 'Family']:
-            circle = Circle(owner=user, name=name)
-            circle.save()
-
-        return user
-
 class User(auth_models.AbstractUser):
-    objects = UserManager()
-
     name = models.CharField(max_length=256)
+
+    def save(self, **kwargs):
+        create_default_circles = self.pk is None
+
+        result = super().save(**kwargs)
+
+        if create_default_circles:
+            for name in ['Friends', 'Family']:
+                circle = Circle(owner=self, name=name)
+                circle.save()
+
+        return result
 
     @property
     def connections(self):
