@@ -5,7 +5,10 @@
 {% block main %}
 <p>{{ object.name }} circle</p>
 
-<p><a href='{% url "circle_delete" pk=object.pk %}'>delete</a></p>
+<p>
+  <a href='{% url "circle_edit" pk=object.pk %}'>edit</a>
+  <a href='{% url "circle_delete" pk=object.pk %}'>delete</a>
+</p>
 
 {% for member in object.members %}
   <p>{{ member.name }}</p>

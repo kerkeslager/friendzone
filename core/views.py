@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView
+from django.views.generic import CreateView, DeleteView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -23,7 +23,27 @@ class CircleDeleteView(DeleteView):
     model = models.Circle
     success_url = reverse_lazy('circle_list')
 
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
 circle_delete = CircleDeleteView.as_view()
+
+class CircleEditView(UpdateView):
+    model = models.Circle
+    fields = ('name',)
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+circle_edit = CircleEditView.as_view()
 
 class CircleDetailView(DetailView):
     model = models.Circle
