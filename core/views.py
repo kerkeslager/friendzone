@@ -1,10 +1,9 @@
-from django.contrib.auth import authenticate, get_user_model, login
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView
 from django.views.generic.base import TemplateView
 
-from . import models
+from . import forms, models
 
 class DeleteUserView(DeleteView):
     model = models.User
@@ -30,13 +29,8 @@ class SettingsView(TemplateView):
 
 settings = SettingsView.as_view()
 
-class SignupForm(UserCreationForm):
-    class Meta:
-        model = get_user_model()
-        fields = UserCreationForm.Meta.fields
-
 class SignupView(CreateView):
-    form_class = SignupForm
+    form_class = forms.SignupForm
     success_url = reverse_lazy('welcome') # TODO Redirect to a welcome page
     template_name = 'registration/signup.html'
 
