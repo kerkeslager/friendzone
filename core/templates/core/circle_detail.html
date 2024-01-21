@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ object.name }} circle{% endblock %}
+
+{% block main %}
+<p>{{ object.name }} circle</p>
+
+<p>
+  <a href='{% url "circle_edit" pk=object.pk %}'>edit</a>
+  <a href='{% url "circle_delete" pk=object.pk %}'>delete</a>
+</p>
+
+{% for member in object.members %}
+  <p>{{ member.name }}</p>
+{% empty %}
+  <p>
+    There are no people in this circle. Add people to this circle by
+    <a href=''>creating an invite</a> or <a href=''>adding an existing connection</a>.
+  </p>
+{% endfor %}
+
+{% endblock %}

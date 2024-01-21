@@ -1,9 +1,69 @@
 from django.contrib.auth import authenticate, login
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView
+from django.views.generic import CreateView, DeleteView, UpdateView
 from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 
 from . import forms, models
+
+class CircleCreateView(CreateView):
+    model = models.Circle
+    fields = ('name',)
+    success_url = reverse_lazy('circle_list')
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+circle_create = CircleCreateView.as_view()
+
+class CircleDeleteView(DeleteView):
+    model = models.Circle
+    success_url = reverse_lazy('circle_list')
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+circle_delete = CircleDeleteView.as_view()
+
+class CircleEditView(UpdateView):
+    model = models.Circle
+    fields = ('name',)
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+circle_edit = CircleEditView.as_view()
+
+class CircleDetailView(DetailView):
+    model = models.Circle
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+circle_detail = CircleDetailView.as_view()
+
+class CircleListView(ListView):
+    model = models.Circle
+
+    def get_queryset(self):
+        return self.request.user.circles.order_by('name')
+
+circle_list = CircleListView.as_view()
 
 class DeleteUserView(DeleteView):
     model = models.User
