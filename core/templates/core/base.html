@@ -18,6 +18,8 @@
       {% if request.user.is_authenticated %}
         Logged in as {{ request.user.username }}.
 
+        <a href='{% url "settings" %}'>settings</a>
+
         <form method='post' action='{% url "logout" %}'>
           {% csrf_token %}
           <button type='submit'>logout</button>
