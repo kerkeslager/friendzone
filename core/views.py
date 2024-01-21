@@ -8,6 +8,23 @@ from django.views.generic.list import ListView
 
 from . import forms, models
 
+class CircleCreateView(CreateView):
+    model = models.Circle
+    fields = ('name',)
+    success_url = reverse_lazy('circle_list')
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+circle_create = CircleCreateView.as_view()
+
+class CircleDeleteView(DeleteView):
+    model = models.Circle
+    success_url = reverse_lazy('circle_list')
+
+circle_delete = CircleDeleteView.as_view()
+
 class CircleDetailView(DetailView):
     model = models.Circle
 
@@ -24,7 +41,7 @@ class CircleListView(ListView):
     model = models.Circle
 
     def get_queryset(self):
-        return self.request.user.circles.all()
+        return self.request.user.circles.order_by('name')
 
 circle_list = CircleListView.as_view()
 

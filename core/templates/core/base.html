@@ -16,7 +16,10 @@
       <img src='{% static 'core/logo.svg' %}'/>
 
       {% if request.user.is_authenticated %}
-        Logged in as <a href='{% url "settings" %}'>{{request.user.username}}</a>.
+        <a href='{% url "circle_list" %}'>circles</a>
+        <span>
+          Logged in as <a href='{% url "settings" %}'>{{request.user.username}}</a>.
+        </span>
 
         <form method='post' action='{% url "logout" %}'>
           {% csrf_token %}

@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+
+{% block title %}new circle{% endblock %}
+
+{% block main %}
+<form method='post'>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type='submit'>create</button>
+</form>
+{% endblock %}
