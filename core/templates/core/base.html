@@ -14,6 +14,18 @@
   <body>
     <header>
       <img src='{% static 'core/logo.svg' %}'/>
+
+      {% if request.user.is_authenticated %}
+        Logged in as <a href='{% url "settings" %}'>{{request.user.username}}</a>.
+
+        <form method='post' action='{% url "logout" %}'>
+          {% csrf_token %}
+          <button type='submit'>logout</button>
+        </form>
+      {% else %}
+        <a href='{% url "login" %}'>login</a>
+        <a href='{% url "signup" %}'>sign up</a>
+      {% endif %}
     </header>
 
     <main>

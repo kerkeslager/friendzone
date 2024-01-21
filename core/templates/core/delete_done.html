@@ -1,0 +1,10 @@
+{% extends 'core/base.html' %}
+
+{% block title %}user deleted{% endblock %}
+
+{% block main %}
+  <p>Your account has been deleted.</p>
+  <p>
+    <a href='{% url "index" %}'>Home</a>
+  </p>
+{% endblock %}

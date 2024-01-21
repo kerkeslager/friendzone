@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}
+
+{% block title %}settings{% endblock %}
+
+{% block main %}
+  <a href='{% url "password_change" %}'>Change password</a>
+  <a href='{% url "delete" %}'>Delete account</a>
+{% endblock %}
