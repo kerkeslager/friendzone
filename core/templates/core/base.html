@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab&family=Space+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap" rel="stylesheet">
 
     <link rel='stylesheet' href='{% static "core/style.css" %}'/>
 
@@ -29,7 +29,7 @@
 
         <form method='post' action='{% url "logout" %}'>
           {% csrf_token %}
-          <button type='submit'>logout</button>
+          <button class='as-link' type='submit'>logout</button>
         </form>
       {% else %}
         <a href='{% url "login" %}'>login</a>
