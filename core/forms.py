@@ -15,6 +15,14 @@ class InvitationAcceptForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
 
+class InvitationForm(forms.ModelForm):
+    class Meta:
+        model = models.Invitation
+        fields = ('name', 'circles', 'message')
+        widgets = {
+            'circles': forms.CheckboxSelectMultiple,
+        }
+
 class SignupForm(UserCreationForm):
     class Meta:
         model = get_user_model()

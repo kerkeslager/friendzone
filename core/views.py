@@ -66,10 +66,18 @@ class CircleListView(ListView):
 
 circle_list = CircleListView.as_view()
 
+class ConnectionListView(ListView):
+    model = models.Connection
+
+    def get_queryset(self):
+        return self.request.user.connected_users.order_by('name')
+
+connection_list = ConnectionListView.as_view()
+
 class InvitationCreateView(CreateView):
     model = models.Invitation
-    fields = ('name', 'circles', 'message')
     success_url = reverse_lazy('invite_list')
+    form_class = forms.InvitationForm
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -118,7 +126,7 @@ invite_delete = InvitationDeleteView.as_view()
 
 class InvitationEditView(UpdateView):
     model = models.Invitation
-    fields = ('name', 'circles', 'message')
+    form_class = forms.InvitationForm
 
     def get_object(self):
         return get_object_or_404(

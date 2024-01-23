@@ -9,6 +9,8 @@ urlpatterns = [
     path('circles/<uuid:pk>/edit', views.circle_edit, name='circle_edit'),
     path('circles/<uuid:pk>', views.circle_detail, name='circle_detail'),
 
+    path('connections', views.connection_list, name='connection_list'),
+
     path('invites', views.invite_list, name='invite_list'),
     path('invites/new', views.invite_create, name='invite_create'),
     path('invites/<uuid:pk>/accept', views.invite_accept, name='invite_accept'),
@@ -21,5 +23,6 @@ urlpatterns = [
     path('users/<uuid:pk>', views.user_detail, name='user_detail'),
 
     path('welcome', views.welcome, name='welcome'),
+    path('why', views.why, name='why'),
     path('', views.index, name='index'),
 ]
