@@ -177,6 +177,9 @@ class Circle(models.Model):
         related_name='circles'
     )
 
+    class Meta:
+        unique_together = (('name', 'owner'),)
+
     def __str__(self):
         return self.name
 

@@ -23,6 +23,14 @@ class InvitationForm(forms.ModelForm):
             'circles': forms.CheckboxSelectMultiple,
         }
 
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = models.Post
+        fields = ('circle', 'text')
+        widgets = {
+            'text': forms.Textarea(attrs={ 'rows': 5 }),
+        }
+
 class SignupForm(UserCreationForm):
     class Meta:
         model = get_user_model()

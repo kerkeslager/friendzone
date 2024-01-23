@@ -3,26 +3,9 @@
 {% block title %}home{% endblock %}
 
 {% block main %}
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
-  <p>Goodnight, moon</p>
+  <form method='post' action='{% url "post_create" %}'>
+    {% csrf_token %}
+    {{ post_form.as_p }}
+    <button type='submit'>create</button>
+  </form>
 {% endblock %}

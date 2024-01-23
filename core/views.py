@@ -184,7 +184,20 @@ delete_done = DeleteDoneView.as_view()
 class IndexView(TemplateView):
     template_name = 'core/index.html'
 
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['post_form'] = forms.PostForm()
+        return data
+
+
 index = IndexView.as_view()
+
+class PostCreateView(CreateView):
+    form_class = forms.PostForm
+    model = models.Post
+    success_url = reverse_lazy('index')
+
+post_create = PostCreateView.as_view()
 
 class SettingsView(TemplateView):
     template_name = 'core/settings.html'

@@ -11,6 +11,8 @@ urlpatterns = [
 
     path('connections', views.connection_list, name='connection_list'),
 
+    path('posts', views.post_create, name='post_create'),
+
     path('invites', views.invite_list, name='invite_list'),
     path('invites/new', views.invite_create, name='invite_create'),
     path('invites/<uuid:pk>/accept', views.invite_accept, name='invite_accept'),
