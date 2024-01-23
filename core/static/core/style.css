@@ -14,9 +14,10 @@ body, footer, header, main, section {
 }
 
 html {
-  font-size: 16px;
+  font-size: 18px;
   flex-direction: column;
   height: 100%;
+  font-family: 'Roboto Slab';
 }
 
 body {
