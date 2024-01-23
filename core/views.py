@@ -187,6 +187,7 @@ class IndexView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
         data['post_form'] = forms.PostForm()
+        data['feed'] = self.request.user.feed
         return data
 
 

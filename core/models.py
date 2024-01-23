@@ -32,6 +32,12 @@ class User(auth_models.AbstractUser):
         return self.name or self.username
 
     @property
+    def feed(self):
+        return Post.objects.filter(circle__connections__accepting_user=self).union(
+            Post.objects.filter(circle__connections__inviting_user=self)
+        ).order_by('-created_utc')
+
+    @property
     def connections(self):
         return Connection.objects.filter(
             inviting_user=self,
