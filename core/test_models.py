@@ -3,6 +3,13 @@ from django.test import TestCase, TransactionTestCase
 from . import models
 
 class UserTests(TransactionTestCase):
+    def test_user_display_name(self):
+        user = models.User(username='testuser')
+        self.assertEqual(user.display_name, 'testuser')
+
+        user.name = 'Test User'
+        self.assertEqual(user.display_name, 'Test User')
+
     def test_user_save_new_creates_default_circles(self):
         user = models.User(username='testuser')
         user.save()
@@ -131,6 +138,31 @@ class UserTests(TransactionTestCase):
             ).count(),
             1,
         )
+
+    def test_is_connected_with(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        self.assertFalse(inviting_user.is_connected_with(accepting_user))
+        self.assertFalse(accepting_user.is_connected_with(inviting_user))
+
+        invitation = inviting_user.create_invitation(
+            circles=inviting_user.circles.filter(name='Friends'),
+        )
+
+        accepting_user.accept_invitation(
+            invitation,
+            circles=accepting_user.circles.filter(name='Family'),
+        )
+
+        self.assertTrue(inviting_user.is_connected_with(accepting_user))
+        self.assertTrue(accepting_user.is_connected_with(inviting_user))
 
     def test_accepting_into_no_circles_throws_exception(self):
         inviting_user = models.User.objects.create_user(
