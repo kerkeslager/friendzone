@@ -8,6 +8,9 @@ import django.contrib.auth.models as auth_models
 class ConnectionLimitException(Exception):
     pass
 
+class AlreadyConnectedException(Exception):
+    pass
+
 class User(auth_models.AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
@@ -49,19 +52,22 @@ class User(auth_models.AbstractUser):
             )
         ).exists()
 
+    @property
     def connected_users(self):
         # This is to get around the stupidity of not being able to call methods
         # with arguments in Django templates; we can do
         # {% if user in other_user.connected_users %}
         # It would be preferable to do this in a query the way it's done in
         # is_connected_with() so use that when possible.
-        return Connection.objects.filter(accepting_user=self).values_list(
-            'inviting_user',
-            flat=True,
-        ).union(
-            Connection.objects.filter(inviting_user=self).values_list(
-                'accepting_user',
+        return User.objects.filter(
+            id__in=Connection.objects.filter(accepting_user=self).values_list(
+                'inviting_user',
                 flat=True,
+            ).union(
+                Connection.objects.filter(inviting_user=self).values_list(
+                    'accepting_user',
+                    flat=True,
+                ),
             ),
         )
 
@@ -92,6 +98,9 @@ class User(auth_models.AbstractUser):
 
         if circles_count != circles.filter(owner=self).count():
             raise Exception('Cannot cannot accept into circle you do not own')
+
+        if self.is_connected_with(invitation.owner):
+            raise AlreadyConnectedException('You are already connected')
 
         connection = Connection.objects.create(
             inviting_user=invitation.owner,

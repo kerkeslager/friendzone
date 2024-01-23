@@ -67,10 +67,11 @@ class CircleListView(ListView):
 circle_list = CircleListView.as_view()
 
 class ConnectionListView(ListView):
-    model = models.Connection
+    model = models.User
+    template_name = 'core/connection_list.html'
 
     def get_queryset(self):
-        return self.request.user.connected_users.order_by('name')
+        return self.request.user.connected_users.order_by('name', 'username')
 
 connection_list = ConnectionListView.as_view()
 

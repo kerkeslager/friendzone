@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+
+{% block title %}connections{% endblock %}
+
+{% block main %}
+  {% for user in object_list %}
+    <p>
+      <a href='{% url "user_detail" pk=user.pk %}'>{{ user.display_name }}</a>
+    </p>
+  {% endfor %}
+{% endblock %}
