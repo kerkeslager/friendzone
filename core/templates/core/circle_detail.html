@@ -15,7 +15,8 @@
 {% empty %}
   <p>
     There are no people in this circle. Add people to this circle by
-    <a href=''>creating an invite</a> or <a href=''>adding an existing connection</a>.
+    <a href='{% url "invite_create" %}'>creating an invite</a>
+    or <a href=''>adding an existing connection</a>.
   </p>
 {% endfor %}
 

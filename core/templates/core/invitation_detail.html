@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ object.name }} circle{% endblock %}
+
+{% block main %}
+
+<p>
+  {{ object.owner.display_name }} would like to invite you to connect.
+  {{ object.owner.display_name}} wrote:
+</p>
+
+<p>"{{ object.message }}"</p>
+
+{% if not request.user.is_authenticated %}
+  <p>
+    You must have a FriendZone account to accept this invite.
+  </p>
+
+  <p>
+    <a href='{% url "login" %}?next={{ object.get_absolute_url }}'>login</a>
+    <a href='{% url "signup" %}?next={{ object.get_absolute_url }}'>signup</a>
+  </p>
+{% elif object.owner == request.user %}
+  <p>
+    <a href='{% url "invite_edit" pk=object.pk %}'>edit</a>
+    <a href='{% url "invite_delete" pk=object.pk %}'>delete</a>
+  </p>
+
+  <p>QR Code Here</p>
+{% else %}
+  <form method='post' action='{% url "invite_accept" pk=object.pk %}'>
+    {% csrf_token %}
+
+    <p>
+      If you would like to connect with {{ object.owner.display_name }}, select which
+      circles you wish to add {{ object.owner.display_name }} to:
+    </p>
+
+    {{ form.as_p }}
+
+    <button type='submit'>accept</button>
+  </form>
+{% endif %}
+
+{% endblock %}

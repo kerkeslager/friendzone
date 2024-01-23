@@ -27,6 +27,10 @@ class User(auth_models.AbstractUser):
         return result
 
     @property
+    def display_name(self):
+        return self.name or self.username
+
+    @property
     def connections(self):
         return Connection.objects.filter(
             inviting_user=self,
@@ -35,6 +39,17 @@ class User(auth_models.AbstractUser):
                 accepting_user=self,
             ),
         )
+
+    def is_connected_with(self, other_user):
+        return Connection.objects.filter(
+            inviting_user=self,
+            accepting_user=other_user,
+        ).union(
+            Connection.objects.filter(
+                inviting_user=other_user,
+                accepting_user=self,
+            )
+        ).exists()
 
     @transaction.atomic
     def create_invitation(self, *, circles):
@@ -83,10 +98,15 @@ class Invitation(models.Model):
         on_delete=models.CASCADE,
         related_name='invitations'
     )
+    name = models.CharField(max_length=256)
+    message = models.CharField(max_length=1024)
     circles = models.ManyToManyField(
         'Circle',
         related_name='+',
     )
+
+    def get_absolute_url(self):
+        return reverse('invite_detail', args=[str(self.pk)])
 
 class ConnectionManager(models.Manager):
     @transaction.atomic
@@ -133,6 +153,9 @@ class Circle(models.Model):
         on_delete=models.CASCADE,
         related_name='circles'
     )
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         return reverse('circle_detail', args=[str(self.pk)])
