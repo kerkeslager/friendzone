@@ -88,6 +88,9 @@ body > header > img {
 
 body > main {
   flex-direction: column;
+  margin: 0 auto;
+  width: calc(100% - 2rem);
+  max-width: 50rem;
 }
 
 body > footer {
