@@ -17,6 +17,8 @@
 
       {% if request.user.is_authenticated %}
         <a href='{% url "circle_list" %}'>circles</a>
+        <a href='{% url "invite_list" %}'>invites</a>
+        <a href='{% url "connection_list" %}'>connections</a>
         <span>
           Logged in as <a href='{% url "settings" %}'>{{request.user.username}}</a>.
         </span>

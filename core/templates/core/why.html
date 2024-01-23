@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+
+{% block title %}why only {{ settings.MAX_CONNECTIONS_PER_USER }} connections?{% endblock %}
+
+{% block main %}
+  <h1>Why only {{ settings.MAX_CONNECTIONS_PER_USER }} connections?</h1>
+
+  <p>
+    FriendZone is a tool for maintaining the real relationships in your life.
+    Humans cannot maintain an unlimited number of relationships, so having
+    a very large number of connections indicates that someone is using
+    FriendZone outside its intended purpose.
+  </p>
+
+  <p>
+    FriendZone is explicitly <em>not</em> for the following purposes:
+  </p>
+
+  <ul>
+    <li>Advertising.</li>
+    <li>Meeting new people.</li>
+    <li>Maximizing likes, numbers of "friends", or engagement.</li>
+  </ul>
+
+  <p>
+    Limiting the number of connections our users can have prevents people
+    from abusing FriendZone for profit or competition.
+  </p>
+
+  <p>
+    For more information on FriendZone's choice to limit connections, see
+    <a href='https://en.wikipedia.org/wiki/Dunbar%27s_number'>Dunbar's number</a>.
+  </p>
+{% endblock %}

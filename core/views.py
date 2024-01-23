@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
 from . import forms, models
@@ -65,6 +66,107 @@ class CircleListView(ListView):
 
 circle_list = CircleListView.as_view()
 
+class ConnectionListView(ListView):
+    model = models.User
+    template_name = 'core/connection_list.html'
+
+    def get_queryset(self):
+        return self.request.user.connected_users.order_by('name', 'username')
+
+connection_list = ConnectionListView.as_view()
+
+class InvitationCreateView(CreateView):
+    model = models.Invitation
+    success_url = reverse_lazy('invite_list')
+    form_class = forms.InvitationForm
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+invite_create = InvitationCreateView.as_view()
+
+class InvitationAcceptView(FormView):
+    form_class = forms.InvitationAcceptForm
+    template_name = 'core/invitation_accept.html'
+
+    def get_form_kwargs(self):
+        result = super().get_form_kwargs()
+        result['circles'] = self.request.user.circles
+        return result
+
+    def get_success_url(self):
+        return reverse('user_detail', args={ 'pk': self.redirect_user.pk })
+
+    def form_valid(self, form):
+        invitation = get_object_or_404(
+            models.Invitation,
+            pk=self.kwargs['pk'],
+        )
+        circles = form.fields['circles'].queryset
+        self.request.user.accept_invitation(invitation, circles=circles)
+
+        self.redirect_user = invitation.owner
+
+        return super().form_valid(form)
+
+invite_accept = InvitationAcceptView.as_view()
+
+class InvitationDeleteView(DeleteView):
+    model = models.Invitation
+    success_url = reverse_lazy('invite_list')
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+invite_delete = InvitationDeleteView.as_view()
+
+class InvitationEditView(UpdateView):
+    model = models.Invitation
+    form_class = forms.InvitationForm
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+invite_edit = InvitationEditView.as_view()
+
+class InvitationDetailView(DetailView):
+    model = models.Invitation
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            pk=self.kwargs['pk'],
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+
+        if self.request.user.is_authenticated and self.request.user != self.object.owner:
+            data['form'] = forms.InvitationAcceptForm(
+                circles=self.request.user.circles.all(),
+            )
+
+        return data
+
+invite_detail = InvitationDetailView.as_view()
+
+class InvitationListView(ListView):
+    model = models.Invitation
+
+    def get_queryset(self):
+        return self.request.user.invitations.order_by('name')
+
+invite_list = InvitationListView.as_view()
+
 class DeleteUserView(DeleteView):
     model = models.User
     success_url = reverse_lazy('delete_done')
@@ -107,7 +209,31 @@ class SignupView(CreateView):
 
 signup = SignupView.as_view()
 
+class UserDetailView(DetailView):
+    model = models.User
+
+    def get_object(self):
+        user = get_object_or_404(
+            models.User,
+            pk=self.kwargs['pk'],
+        )
+
+        if self.request.user == user:
+            return user
+
+        if not self.request.user.is_connected_with(user):
+            raise Http404()
+
+        return user
+
+user_detail = UserDetailView.as_view()
+
 class WelcomeView(TemplateView):
     template_name = 'core/welcome.html'
 
 welcome = WelcomeView.as_view()
+
+class WhyView(TemplateView):
+    template_name = 'core/why.html'
+
+why = WhyView.as_view()

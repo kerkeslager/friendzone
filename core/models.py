@@ -5,9 +5,10 @@ from django.db import models, transaction
 from django.urls import reverse
 import django.contrib.auth.models as auth_models
 
-MAX_CONNECTIONS_PER_USER = 50
-
 class ConnectionLimitException(Exception):
+    pass
+
+class AlreadyConnectedException(Exception):
     pass
 
 class User(auth_models.AbstractUser):
@@ -27,12 +28,46 @@ class User(auth_models.AbstractUser):
         return result
 
     @property
+    def display_name(self):
+        return self.name or self.username
+
+    @property
     def connections(self):
         return Connection.objects.filter(
             inviting_user=self,
         ).union(
             Connection.objects.filter(
                 accepting_user=self,
+            ),
+        )
+
+    def is_connected_with(self, other_user):
+        return Connection.objects.filter(
+            inviting_user=self,
+            accepting_user=other_user,
+        ).union(
+            Connection.objects.filter(
+                inviting_user=other_user,
+                accepting_user=self,
+            )
+        ).exists()
+
+    @property
+    def connected_users(self):
+        # This is to get around the stupidity of not being able to call methods
+        # with arguments in Django templates; we can do
+        # {% if user in other_user.connected_users %}
+        # It would be preferable to do this in a query the way it's done in
+        # is_connected_with() so use that when possible.
+        return User.objects.filter(
+            id__in=Connection.objects.filter(accepting_user=self).values_list(
+                'inviting_user',
+                flat=True,
+            ).union(
+                Connection.objects.filter(inviting_user=self).values_list(
+                    'accepting_user',
+                    flat=True,
+                ),
             ),
         )
 
@@ -46,7 +81,7 @@ class User(auth_models.AbstractUser):
         if circles_count != circles.filter(owner=self).count():
             raise Exception('Cannot invite to circle you do not own')
 
-        if self.connections.count() >= MAX_CONNECTIONS_PER_USER:
+        if self.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
             raise ConnectionLimitException('Connection limit reached')
 
         invitation = Invitation.objects.create(owner=self)
@@ -63,6 +98,9 @@ class User(auth_models.AbstractUser):
 
         if circles_count != circles.filter(owner=self).count():
             raise Exception('Cannot cannot accept into circle you do not own')
+
+        if self.is_connected_with(invitation.owner):
+            raise AlreadyConnectedException('You are already connected')
 
         connection = Connection.objects.create(
             inviting_user=invitation.owner,
@@ -83,22 +121,27 @@ class Invitation(models.Model):
         on_delete=models.CASCADE,
         related_name='invitations'
     )
+    name = models.CharField(max_length=256)
+    message = models.CharField(max_length=1024)
     circles = models.ManyToManyField(
         'Circle',
         related_name='+',
     )
 
+    def get_absolute_url(self):
+        return reverse('invite_detail', args=[str(self.pk)])
+
 class ConnectionManager(models.Manager):
     @transaction.atomic
     def create(self, **kwargs):
         inviting_user = kwargs.get('inviting_user')
-        if inviting_user.connections.count() >= MAX_CONNECTIONS_PER_USER:
+        if inviting_user.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
             raise ConnectionLimitException(
                 'Inviting user has reached connection limit',
             )
 
         accepting_user = kwargs.get('accepting_user')
-        if accepting_user.connections.count() >= MAX_CONNECTIONS_PER_USER:
+        if accepting_user.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
             raise ConnectionLimitException(
                 'Accepting user has reached connection limit',
             )
@@ -133,6 +176,9 @@ class Circle(models.Model):
         on_delete=models.CASCADE,
         related_name='circles'
     )
+
+    def __str__(self):
+        return self.name
 
     def get_absolute_url(self):
         return reverse('circle_detail', args=[str(self.pk)])

@@ -3,6 +3,13 @@ from django.test import TestCase, TransactionTestCase
 from . import models
 
 class UserTests(TransactionTestCase):
+    def test_user_display_name(self):
+        user = models.User(username='testuser')
+        self.assertEqual(user.display_name, 'testuser')
+
+        user.name = 'Test User'
+        self.assertEqual(user.display_name, 'Test User')
+
     def test_user_save_new_creates_default_circles(self):
         user = models.User(username='testuser')
         user.save()
@@ -82,7 +89,7 @@ class UserTests(TransactionTestCase):
 
         circles = inviting_user.circles.filter(name='Friends')
 
-        for i in range(models.MAX_CONNECTIONS_PER_USER):
+        for i in range(settings.MAX_CONNECTIONS_PER_USER):
             other_user = models.User.objects.create_user(
                 username=f'user_{i}',
                 password='12345',
@@ -90,7 +97,7 @@ class UserTests(TransactionTestCase):
 
             # Half the models accepted by inviting user, half by others, to catch
             # issues with which user invited/accepted
-            if i > models.MAX_CONNECTIONS_PER_USER // 2:
+            if i > settings.MAX_CONNECTIONS_PER_USER // 2:
                 invitation = inviting_user.create_invitation(circles=circles)
                 other_user.accept_invitation(
                     invitation,
@@ -131,6 +138,31 @@ class UserTests(TransactionTestCase):
             ).count(),
             1,
         )
+
+    def test_is_connected_with(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        self.assertFalse(inviting_user.is_connected_with(accepting_user))
+        self.assertFalse(accepting_user.is_connected_with(inviting_user))
+
+        invitation = inviting_user.create_invitation(
+            circles=inviting_user.circles.filter(name='Friends'),
+        )
+
+        accepting_user.accept_invitation(
+            invitation,
+            circles=accepting_user.circles.filter(name='Family'),
+        )
+
+        self.assertTrue(inviting_user.is_connected_with(accepting_user))
+        self.assertTrue(accepting_user.is_connected_with(inviting_user))
 
     def test_accepting_into_no_circles_throws_exception(self):
         inviting_user = models.User.objects.create_user(
@@ -185,7 +217,7 @@ class UserTests(TransactionTestCase):
         circles = inviting_user.circles.filter(name='Friends')
         original_invitation = inviting_user.create_invitation(circles=circles)
 
-        for i in range(models.MAX_CONNECTIONS_PER_USER):
+        for i in range(settings.MAX_CONNECTIONS_PER_USER):
             other_user = models.User.objects.create_user(
                 username=f'user_{i}',
                 password='12345',
@@ -193,7 +225,7 @@ class UserTests(TransactionTestCase):
 
             # Half the models accepted by inviting user, half by others, to catch
             # issues with which user invited/accepted
-            if i > models.MAX_CONNECTIONS_PER_USER // 2:
+            if i > settings.MAX_CONNECTIONS_PER_USER // 2:
                 invitation = inviting_user.create_invitation(circles=circles)
 
                 other_user.accept_invitation(
@@ -233,7 +265,7 @@ class UserTests(TransactionTestCase):
         )
         circles = accepting_user.circles.filter(name='Friends')
 
-        for i in range(models.MAX_CONNECTIONS_PER_USER):
+        for i in range(settings.MAX_CONNECTIONS_PER_USER):
             other_user = models.User.objects.create_user(
                 username=f'user_{i}',
                 password='12345',
@@ -241,7 +273,7 @@ class UserTests(TransactionTestCase):
 
             # Half the models accepted by inviting user, half by others, to catch
             # issues with which user invited/accepted
-            if i > models.MAX_CONNECTIONS_PER_USER // 2:
+            if i > settings.MAX_CONNECTIONS_PER_USER // 2:
                 invitation = accepting_user.create_invitation(circles=circles)
 
                 other_user.accept_invitation(
