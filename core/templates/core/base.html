@@ -24,7 +24,7 @@
         <a href='{% url "circle_list" %}'>circles</a>
         <a href='{% url "invite_list" %}'>invites</a>
         <a href='{% url "connection_list" %}'>connections</a>
-        <span>
+        <span style='margin-left: auto;'>
           Logged in as <a href='{% url "settings" %}'>{{request.user.username}}</a>.
         </span>
 
@@ -33,7 +33,7 @@
           <button class='as-link' type='submit'>logout</button>
         </form>
       {% else %}
-        <a href='{% url "login" %}'>login</a>
+        <a style='margin-left: auto;' href='{% url "login" %}'>login</a>
         <a href='{% url "signup" %}'>sign up</a>
       {% endif %}
     </header>

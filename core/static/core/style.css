@@ -13,7 +13,18 @@ body, footer, header, main, section {
   width: 100%;
 }
 
-button {
+nav {
+  display: flex;
+  gap: 1rem;
+  flex-direction: row;
+  align-items: center;
+}
+
+a.as-button,
+a:link.as-button,
+a:visited.as-button,
+button,
+input[type=submit] {
   background: white;
   border: 2px solid black;
   border-radius: 0.6rem;
@@ -21,6 +32,8 @@ button {
 
   font-family: 'Roboto Slab';
   font-size: 20px;
+
+  text-decoration: none;
 }
 
 a,
@@ -36,6 +49,7 @@ button.as-link {
 }
 
 a:hover,
+a:hover.as-button,
 button:hover {
   font-size: 22px;
 }
@@ -74,6 +88,9 @@ body > header > img {
 
 body > main {
   flex-direction: column;
+  margin: 0 auto;
+  width: calc(100% - 2rem);
+  max-width: 50rem;
 }
 
 body > footer {
