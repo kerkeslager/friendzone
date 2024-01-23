@@ -13,8 +13,36 @@ body, footer, header, main, section {
   width: 100%;
 }
 
+button {
+  background: white;
+  border: 2px solid black;
+  border-radius: 0.6rem;
+  padding: 0.15rem 0.6rem 0.3rem 0.6rem;
+
+  font-family: 'Roboto Slab';
+  font-size: 20px;
+}
+
+a,
+a:link,
+a:visited,
+button.as-link {
+  color: black;
+  padding: 0;
+  border: none;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  cursor: pointer;
+}
+
+a:hover,
+button:hover {
+  font-size: 22px;
+}
+
 html {
-  font-size: 16px;
+  font-family: 'Roboto Slab';
+  font-size: 20px;
   flex-direction: column;
   height: 100%;
 }

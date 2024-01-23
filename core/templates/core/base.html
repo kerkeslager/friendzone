@@ -6,6 +6,10 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap" rel="stylesheet">
+
     <link rel='stylesheet' href='{% static "core/style.css" %}'/>
 
     <title>fz | {% block title %}{% endblock %}</title>
@@ -16,6 +20,7 @@
       <img src='{% static 'core/logo.svg' %}'/>
 
       {% if request.user.is_authenticated %}
+        <a href='{% url "index" %}'>home</a>
         <a href='{% url "circle_list" %}'>circles</a>
         <a href='{% url "invite_list" %}'>invites</a>
         <a href='{% url "connection_list" %}'>connections</a>
@@ -25,7 +30,7 @@
 
         <form method='post' action='{% url "logout" %}'>
           {% csrf_token %}
-          <button type='submit'>logout</button>
+          <button class='as-link' type='submit'>logout</button>
         </form>
       {% else %}
         <a href='{% url "login" %}'>login</a>
