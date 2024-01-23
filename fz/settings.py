@@ -63,10 +63,16 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.settings_for_templates',
             ],
         },
     },
 ]
+
+MAX_CONNECTIONS_PER_USER = 150
+SETTINGS_FOR_TEMPLATES = (
+    'MAX_CONNECTIONS_PER_USER',
+)
 
 WSGI_APPLICATION = 'fz.wsgi.application'
 

@@ -223,3 +223,8 @@ class WelcomeView(TemplateView):
     template_name = 'core/welcome.html'
 
 welcome = WelcomeView.as_view()
+
+class WhyView(TemplateView):
+    template_name = 'core/why.html'
+
+why = WhyView.as_view()

@@ -27,6 +27,37 @@
   </p>
 
   <p>QR Code Here</p>
+{% elif request.user in object.owner.connected_users %}
+  <p>
+    You are already connected with {{ object.owner.display_name }}!
+  </p>
+{% elif request.user.connections.count >= settings.MAX_CONNECTIONS_PER_USER %}
+  <p>
+    You have too many connections to accept this connection. FriendZone allows
+    a maximum of
+    {{ settings.MAX_CONNECTIONS_PER_USER }} connections. For information on
+    why, see
+    <a href='{% url "why" %}'>Why only {{ settings.MAX_CONNECTIONS_PER_USER }} connections?</a>.
+  </p>
+
+  <p>
+    If you still wish to connect with {{ object.owner.display_name }}, please
+    <a href='{% url "connection_list" %}'>delete an existing connection</a>
+    first.
+  </p>
+{% elif object.owner.connections.count >= settings.MAX_CONNECTIONS_PER_USER %}
+  <p>
+    {{ object.owner.display_name }} has too many connections to allow you to
+    accept their invitation. FriendZone allows a maximum of
+    {{ settings.MAX_CONNECTIONS_PER_USER }} connections.
+    For information on why, see
+    <a href='{% url "why" %}'>Why only {{ settings.MAX_CONNECTIONS_PER_USER }} connections?</a>.
+  </p>
+
+  <p>
+    If you still want to connect with {{ object.owner.display_name }}, ask them
+    to delete some of their connections.
+  </p>
 {% else %}
   <form method='post' action='{% url "invite_accept" pk=object.pk %}'>
     {% csrf_token %}

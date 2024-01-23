@@ -5,8 +5,6 @@ from django.db import models, transaction
 from django.urls import reverse
 import django.contrib.auth.models as auth_models
 
-MAX_CONNECTIONS_PER_USER = 50
-
 class ConnectionLimitException(Exception):
     pass
 
@@ -51,6 +49,22 @@ class User(auth_models.AbstractUser):
             )
         ).exists()
 
+    def connected_users(self):
+        # This is to get around the stupidity of not being able to call methods
+        # with arguments in Django templates; we can do
+        # {% if user in other_user.connected_users %}
+        # It would be preferable to do this in a query the way it's done in
+        # is_connected_with() so use that when possible.
+        return Connection.objects.filter(accepting_user=self).values_list(
+            'inviting_user',
+            flat=True,
+        ).union(
+            Connection.objects.filter(inviting_user=self).values_list(
+                'accepting_user',
+                flat=True,
+            ),
+        )
+
     @transaction.atomic
     def create_invitation(self, *, circles):
         circles_count = circles.count()
@@ -61,7 +75,7 @@ class User(auth_models.AbstractUser):
         if circles_count != circles.filter(owner=self).count():
             raise Exception('Cannot invite to circle you do not own')
 
-        if self.connections.count() >= MAX_CONNECTIONS_PER_USER:
+        if self.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
             raise ConnectionLimitException('Connection limit reached')
 
         invitation = Invitation.objects.create(owner=self)
@@ -112,13 +126,13 @@ class ConnectionManager(models.Manager):
     @transaction.atomic
     def create(self, **kwargs):
         inviting_user = kwargs.get('inviting_user')
-        if inviting_user.connections.count() >= MAX_CONNECTIONS_PER_USER:
+        if inviting_user.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
             raise ConnectionLimitException(
                 'Inviting user has reached connection limit',
             )
 
         accepting_user = kwargs.get('accepting_user')
-        if accepting_user.connections.count() >= MAX_CONNECTIONS_PER_USER:
+        if accepting_user.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
             raise ConnectionLimitException(
                 'Accepting user has reached connection limit',
             )
