@@ -37,44 +37,17 @@ class User(auth_models.AbstractUser):
             Post.objects.filter(circle__connections__inviting_user=self)
         ).order_by('-created_utc')
 
-    @property
-    def connections(self):
-        return Connection.objects.filter(
-            inviting_user=self,
-        ).union(
-            Connection.objects.filter(
-                accepting_user=self,
-            ),
-        )
-
     def is_connected_with(self, other_user):
-        return Connection.objects.filter(
-            inviting_user=self,
-            accepting_user=other_user,
-        ).union(
-            Connection.objects.filter(
-                inviting_user=other_user,
-                accepting_user=self,
-            )
+        return self.connections.filter(
+            other_user=other_user,
         ).exists()
 
     @property
     def connected_users(self):
-        # This is to get around the stupidity of not being able to call methods
-        # with arguments in Django templates; we can do
-        # {% if user in other_user.connected_users %}
-        # It would be preferable to do this in a query the way it's done in
-        # is_connected_with() so use that when possible.
         return User.objects.filter(
-            id__in=Connection.objects.filter(accepting_user=self).values_list(
-                'inviting_user',
-                flat=True,
-            ).union(
-                Connection.objects.filter(inviting_user=self).values_list(
-                    'accepting_user',
-                    flat=True,
-                ),
-            ),
+            pk__in=Connection.objects.filter(
+                owner=self,
+            ).values_list('other_user', flat=True),
         )
 
     @transaction.atomic
@@ -109,16 +82,22 @@ class User(auth_models.AbstractUser):
             raise AlreadyConnectedException('You are already connected')
 
         connection = Connection.objects.create(
-            inviting_user=invitation.owner,
-            accepting_user=self,
+            owner=invitation.owner,
+            other_user=self,
         )
 
         for circle in invitation.circles.all():
-            connection.circles.add(circle)
-        for circle in circles.all():
-            connection.circles.add(circle)
+            CircleMembership.objects.create(
+                circle=circle,
+                connection=connection,
+            )
 
-        connection.save()
+        for circle in circles:
+            CircleMembership.objects.create(
+                circle=circle,
+                connection=connection.opposite,
+            )
+
 
 class Invitation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -137,41 +116,68 @@ class Invitation(models.Model):
     def get_absolute_url(self):
         return reverse('invite_detail', args=[str(self.pk)])
 
-class ConnectionManager(models.Manager):
-    @transaction.atomic
-    def create(self, **kwargs):
-        inviting_user = kwargs.get('inviting_user')
-        if inviting_user.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
-            raise ConnectionLimitException(
-                'Inviting user has reached connection limit',
-            )
-
-        accepting_user = kwargs.get('accepting_user')
-        if accepting_user.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
-            raise ConnectionLimitException(
-                'Accepting user has reached connection limit',
-            )
-
-        return super().create(**kwargs)
-
 class Connection(models.Model):
-    objects = ConnectionManager()
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_utc = models.DateTimeField(auto_now_add=True)
-    inviting_user = models.ForeignKey(
+    opposite = models.ForeignKey(
+        'Connection',
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='+'
-    )
-    accepting_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='+'
-    )
-    circles = models.ManyToManyField(
-        'Circle',
         related_name='connections',
+    )
+    other_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        if self.opposite is None:
+            assert self._state.adding
+            create_opposite = True
+        else:
+            create_opposite = False
+
+        if self._state.adding:
+            if self.owner.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
+                raise ConnectionLimitException()
+
+        result = super().save(*args, **kwargs)
+
+        if create_opposite:
+            opposite = Connection(
+                opposite=self,
+                owner=self.other_user,
+                other_user=self.owner,
+            )
+            opposite.save()
+            self.opposite = opposite
+            self.save()
+
+        return result
+
+
+class UserConnection(models.Model):
+    # This exists so that if Connection is deleted, UserConnection is deleted
+    connection = models.ForeignKey(
+        'Connection',
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+    owner = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+    connected_user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='+',
     )
 
 class Circle(models.Model):
@@ -195,20 +201,28 @@ class Circle(models.Model):
     @property
     def members(self):
         return User.objects.filter(
-            pk__in=self.connections.filter(
-                accepting_user=self.owner,
-            ).values_list(
-                'inviting_user',
-                flat=True,
-            ).union(
-                self.connections.filter(
-                    inviting_user=self.owner,
-                ).values_list(
-                    'accepting_user',
-                    flat=True,
-                )
-            )
+            pk__in=CircleMembership.objects.filter(
+                circle=self,
+                # connection__owner=circle.owner, isn't necessary because these are always equal
+            ).values_list('connection__other_user', flat=True),
         )
+
+class CircleMembership(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    circle = models.ForeignKey(
+        'Circle',
+        on_delete=models.CASCADE,
+        related_name='circle_memberships',
+    )
+    connection = models.ForeignKey(
+        'Connection',
+        on_delete=models.CASCADE,
+        related_name='circle_memberships',
+    )
+
+    def save(self, *args, **kwargs):
+        assert self.circle.owner == self.connection.owner
+        return super().save(*args, **kwargs)
 
 class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

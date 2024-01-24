@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import TestCase, TransactionTestCase
 
 from . import models
@@ -112,6 +113,101 @@ class UserTests(TransactionTestCase):
         with self.assertRaises(models.ConnectionLimitException):
             inviting_user.create_invitation(circles=circles)
 
+    def test_create_connection_creates_opposite_connection(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        self.assertEqual(connection, connection.opposite.opposite)
+        self.assertEqual(connection.owner, inviting_user)
+        self.assertEqual(connection.other_user, accepting_user)
+        self.assertEqual(connection.opposite.owner, accepting_user)
+        self.assertEqual(connection.opposite.other_user, inviting_user)
+
+    def test_connected_users_in_each_others_connected_users(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        self.assertIn(inviting_user, accepting_user.connected_users.all())
+        self.assertIn(accepting_user, inviting_user.connected_users.all())
+
+    def test_deleting_connection_deletes_opposite_connection(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        connection.delete()
+
+        self.assertFalse(models.Connection.objects.filter(
+            owner=inviting_user,
+            other_user=accepting_user,
+        ).exists())
+        self.assertFalse(models.Connection.objects.filter(
+            owner=accepting_user,
+            other_user=inviting_user,
+        ).exists())
+
+    def test_deleting_opposite_connection_deletes_connection(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        connection.opposite.delete()
+
+        self.assertFalse(models.Connection.objects.filter(
+            owner=inviting_user,
+            other_user=accepting_user,
+        ).exists())
+        self.assertFalse(models.Connection.objects.filter(
+            owner=accepting_user,
+            other_user=inviting_user,
+        ).exists())
+
     def test_accepting_invitation_creates_connection(self):
         inviting_user = models.User.objects.create_user(
             username='inviting_user',
@@ -131,38 +227,8 @@ class UserTests(TransactionTestCase):
             circles=accepting_user.circles.filter(name='Family'),
         )
 
-        self.assertEqual(
-            models.Connection.objects.filter(
-                inviting_user=inviting_user,
-                accepting_user=accepting_user,
-            ).count(),
-            1,
-        )
-
-    def test_is_connected_with(self):
-        inviting_user = models.User.objects.create_user(
-            username='inviting_user',
-            password='12345',
-        )
-        accepting_user = models.User.objects.create_user(
-            username='accepting_user',
-            password='12345',
-        )
-
-        self.assertFalse(inviting_user.is_connected_with(accepting_user))
-        self.assertFalse(accepting_user.is_connected_with(inviting_user))
-
-        invitation = inviting_user.create_invitation(
-            circles=inviting_user.circles.filter(name='Friends'),
-        )
-
-        accepting_user.accept_invitation(
-            invitation,
-            circles=accepting_user.circles.filter(name='Family'),
-        )
-
-        self.assertTrue(inviting_user.is_connected_with(accepting_user))
         self.assertTrue(accepting_user.is_connected_with(inviting_user))
+        self.assertTrue(inviting_user.is_connected_with(accepting_user))
 
     def test_accepting_into_no_circles_throws_exception(self):
         inviting_user = models.User.objects.create_user(
