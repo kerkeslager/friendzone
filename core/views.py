@@ -96,7 +96,7 @@ class InvitationAcceptView(FormView):
         return result
 
     def get_success_url(self):
-        return reverse('user_detail', args={ 'pk': self.redirect_user.pk })
+        return reverse('user_detail', kwargs={ 'pk': self.redirect_user.pk })
 
     def form_valid(self, form):
         invitation = get_object_or_404(
