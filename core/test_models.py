@@ -389,3 +389,37 @@ class UserTests(TransactionTestCase):
             inviting_user,
             accepting_user.circles.get(name='Family').members.all(),
         )
+
+    def test_deleting_connection_deletes_circle_membership(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        invitation = inviting_user.create_invitation(
+            circles=inviting_user.circles.filter(name='Friends'),
+        )
+
+        accepting_user.accept_invitation(
+            invitation,
+            circles=accepting_user.circles.filter(name='Family'),
+        )
+
+        models.Connection.objects.filter(
+            owner=inviting_user,
+            other_user=accepting_user,
+        ).delete()
+
+
+        self.assertNotIn(
+            accepting_user,
+            inviting_user.circles.get(name='Friends').members.all(),
+        )
+        self.assertNotIn(
+            inviting_user,
+            accepting_user.circles.get(name='Family').members.all(),
+        )
