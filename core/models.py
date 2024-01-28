@@ -15,6 +15,9 @@ class User(auth_models.AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
 
+    def __str__(self):
+        return self.name
+
     def save(self, **kwargs):
         create_default_circles = self._state.adding
 
@@ -33,8 +36,18 @@ class User(auth_models.AbstractUser):
 
     @property
     def feed(self):
-        return Post.objects.filter(circle__connections__accepting_user=self).union(
-            Post.objects.filter(circle__connections__inviting_user=self)
+        connection_pks = Connection.objects.filter(other_user=self)
+
+        circle_membership_pks = CircleMembership.objects.filter(
+            connection__pk__in=connection_pks,
+        ).values_list('pk', flat=True)
+
+        post_pks = PostUser.objects.filter(
+            circle_membership__pk__in=circle_membership_pks,
+        ).values_list('post_circle__post__pk', flat=True)
+
+        return self.posts.union(
+            Post.objects.filter(pk__in=post_pks),
         ).order_by('-created_utc')
 
     def is_connected_with(self, other_user):
@@ -242,10 +255,54 @@ class Message(models.Model):
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    circle = models.ForeignKey(
-        'Circle',
+    created_utc = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='posts',
     )
-    created_utc = models.DateTimeField(auto_now_add=True)
     text = models.CharField(max_length=1024)
+
+    def publish(self, *, circles):
+        for circle in circles:
+            PostCircle.objects.create(circle=circle, post=self)
+
+class PostCircle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    circle = models.ForeignKey(
+        'Circle',
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+    post = models.ForeignKey(
+        'Post',
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+
+    def save(self, *args, **kwargs):
+        link_to_users = self._state.adding
+
+        result = super().save(*args, **kwargs)
+
+        if link_to_users:
+            for circle_membership in CircleMembership.objects.filter(circle=self.circle):
+                PostUser.objects.create(
+                    post_circle=self,
+                    circle_membership=circle_membership,
+                )
+
+        return result
+
+
+class PostUser(models.Model):
+    post_circle = models.ForeignKey(
+        'PostCircle',
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
+    circle_membership = models.ForeignKey(
+        'CircleMembership',
+        on_delete=models.CASCADE,
+        related_name='+',
+    )

@@ -26,7 +26,7 @@ class InvitationForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = models.Post
-        fields = ('circle', 'text')
+        fields = ('text',)
         widgets = {
             'text': forms.Textarea(attrs={ 'rows': 5 }),
         }
