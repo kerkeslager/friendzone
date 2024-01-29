@@ -1,11 +1,13 @@
 {% extends 'core/base.html' %}
 
-{% block title %}new invite{% endblock %}
+{% block title %}edit post{% endblock %}
 
 {% block main %}
+<a href='{% "post_delete" pk=form.instance.pk %}'>delete</a>
 <form method='post'>
   {% csrf_token %}
-  {{ form.as_p }}
+  {{ form }}
   <button type='submit'>save</button>
 </form>
 {% endblock %}
+
