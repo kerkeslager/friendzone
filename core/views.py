@@ -197,7 +197,48 @@ class PostCreateView(CreateView):
     model = models.Post
     success_url = reverse_lazy('index')
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 post_create = PostCreateView.as_view()
+
+class PostDeleteView(DeleteView):
+    model = models.Post
+    success_url = reverse_lazy('index')
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+post_delete = PostDeleteView.as_view()
+
+class PostEditView(UpdateView):
+    model = models.Post
+    form_class = forms.PostForm
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+post_edit = PostEditView.as_view()
+
+class PostDetailView(DetailView):
+    model = models.Post
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            pk=self.kwargs['pk'],
+        )
+
+post_detail = PostDetailView.as_view()
 
 class SettingsView(TemplateView):
     template_name = 'core/settings.html'

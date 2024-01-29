@@ -15,7 +15,7 @@
         <section class='post'>
           <date>{{ post.created_utc|date:"l, F j, Y g:ia T" }}</date>
           <header>
-            <a href='{% url "user_detail" pk=post.circle.owner.pk %}'>{{ post.circle.owner.display_name }}</a>:
+            <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a>:
           </header>
           <main>
             {{ post.text }}
