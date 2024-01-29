@@ -46,6 +46,8 @@ input[type=submit] {
   font-family: 'Roboto Slab';
   font-size: 20px;
 
+  cursor: pointer;
+
   text-decoration: none;
 }
 
@@ -63,8 +65,10 @@ button.as-link {
 
 a:hover,
 a:hover.as-button,
-button:hover {
+button:hover,
+input[type=submit]:hover {
   font-size: 22px;
+  border-width: 2.5px;
 }
 
 html {
