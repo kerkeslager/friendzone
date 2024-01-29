@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+
+{% block title %}post{% endblock %}
+
+{% block main %}
+  <section class='post'>
+    <date>{{ object.created_utc|date:"l, F j, Y g:ia T" }}</date>
+    <header>
+      <a href='{% url "user_detail" pk=object.owner.pk %}'>{{ object.owner.display_name }}</a> said:
+    </header>
+    <main>
+      {{ post.text }}
+    </main>
+    {% if request.user == object.owner %}
+      <nav>
+        <a href='{% url "post_edit" pk=object.pk %}'>Edit</a>
+        <a href='{% url "post_delete" pk=object.pk %}'>Delete</a>
+      </nav>
+    {% endif %}
+  </section>
+{% endblock %}
