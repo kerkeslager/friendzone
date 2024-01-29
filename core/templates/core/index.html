@@ -3,23 +3,27 @@
 {% block title %}home{% endblock %}
 
 {% block main %}
-  <form method='post' action='{% url "post_create" %}'>
-    {% csrf_token %}
-    {{ post_form }}
-    <button type='submit'>create</button>
-  </form>
+  {% if request.user.is_authenticated %}
+    <form method='post' action='{% url "post_create" %}'>
+      {% csrf_token %}
+      {{ post_form }}
+      <button type='submit'>create</button>
+    </form>
 
-  <section id='feed'>
-    {% for post in feed %}
-      <section class='post'>
-        <date>{{ post.created_utc|date:"l, F j, Y g:ia T" }}</date>
-        <header>
-          <a href='{% url "user_detail" pk=post.circle.owner.pk %}'>{{ post.circle.owner.display_name }}</a>:
-        </header>
-        <main>
-          {{ post.text }}
-        </main>
-      </section>
-    {% endfor %}
-  </section>
+    <section id='feed'>
+      {% for post in request.user.feed %}
+        <section class='post'>
+          <date>{{ post.created_utc|date:"l, F j, Y g:ia T" }}</date>
+          <header>
+            <a href='{% url "user_detail" pk=post.circle.owner.pk %}'>{{ post.circle.owner.display_name }}</a>:
+          </header>
+          <main>
+            {{ post.text }}
+          </main>
+        </section>
+      {% endfor %}
+    </section>
+  {% else %}
+    <p>Homepage text</p>
+  {% endif %}
 {% endblock %}
