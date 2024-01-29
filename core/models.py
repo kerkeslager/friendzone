@@ -21,7 +21,8 @@ class User(auth_models.AbstractUser):
         result = super().save(**kwargs)
 
         if create_default_circles:
-            for name in ['Friends', 'Family']:
+            # Seems like the 'circles/new' (circle_create)... Ok I will access differently in circle_detail
+            for name in ['Friends', 'Family']: 
                 circle = Circle(owner=self, name=name)
                 circle.save()
 

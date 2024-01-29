@@ -6,8 +6,11 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
+import logging 
 
 from . import forms, models
+
+logger = logging.getLogger(__name__)
 
 class CircleCreateView(CreateView):
     model = models.Circle
@@ -35,6 +38,7 @@ circle_delete = CircleDeleteView.as_view()
 
 class CircleEditView(UpdateView):
     model = models.Circle
+    print(model)
     fields = ('name',)
 
     def get_object(self):
@@ -96,7 +100,7 @@ class InvitationAcceptView(FormView):
         return result
 
     def get_success_url(self):
-        return reverse('user_detail', args={ 'pk': self.redirect_user.pk })
+        return reverse('user_detail', kwargs={ 'pk': self.redirect_user.pk })
 
     def form_valid(self, form):
         invitation = get_object_or_404(
@@ -227,6 +231,9 @@ class UserDetailView(DetailView):
         return user
 
 user_detail = UserDetailView.as_view()
+
+
+
 
 class WelcomeView(TemplateView):
     template_name = 'core/welcome.html'

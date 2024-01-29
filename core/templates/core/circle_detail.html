@@ -8,10 +8,12 @@
 <p>
   <a href='{% url "circle_edit" pk=object.pk %}'>edit</a>
   <a href='{% url "circle_delete" pk=object.pk %}'>delete</a>
+  
 </p>
+<a href='{{ circle.get_absolute_url }}'>{{ circle.owner.connected_users }}</a>
 
-{% for member in object.members %}
-  <p>{{ member.name }}</p>
+{% for member in circle.owner.connected_users %}
+  <p>{{ member }}</p>
 {% empty %}
   <p>
     There are no people in this circle. Add people to this circle by

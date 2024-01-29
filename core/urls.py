@@ -8,6 +8,7 @@ urlpatterns = [
     path('circles/<uuid:pk>/delete', views.circle_delete, name='circle_delete'),
     path('circles/<uuid:pk>/edit', views.circle_edit, name='circle_edit'),
     path('circles/<uuid:pk>', views.circle_detail, name='circle_detail'),
+    
 
     path('connections', views.connection_list, name='connection_list'),
 
@@ -21,6 +22,7 @@ urlpatterns = [
     path('settings', views.settings, name='settings'),
 
     path('users/<uuid:pk>', views.user_detail, name='user_detail'),
+    #path('users', views.user_list, name='user_list'),
 
     path('welcome', views.welcome, name='welcome'),
     path('why', views.why, name='why'),
