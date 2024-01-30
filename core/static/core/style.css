@@ -20,6 +20,19 @@ nav {
   align-items: center;
 }
 
+form {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
 a.as-button,
 a:link.as-button,
 a:visited.as-button,
@@ -32,6 +45,8 @@ input[type=submit] {
 
   font-family: 'Roboto Slab';
   font-size: 20px;
+
+  cursor: pointer;
 
   text-decoration: none;
 }
@@ -50,8 +65,10 @@ button.as-link {
 
 a:hover,
 a:hover.as-button,
-button:hover {
+button:hover,
+input[type=submit]:hover {
   font-size: 22px;
+  border-width: 2.5px;
 }
 
 html {
@@ -66,44 +83,63 @@ body {
   flex-direction: column;
   height: 100%;
   overflow: scroll;
+
+  & > header {
+    background: white;
+    position: sticky;
+    z-index: 1;
+    top: 0;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    border-bottom: 2px solid black;
+    padding: 1rem;
+
+    & > img {
+      height: 3rem;
+    }
+  }
+
+  & > main {
+    flex-direction: column;
+    margin: 0 auto;
+    width: calc(100% - 2rem);
+    max-width: 50rem;
+  }
+
+  & > footer {
+    background: white;
+
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    border-top: 2px solid black;
+    margin-top: auto;
+    position: sticky;
+    bottom: 0;
+    padding: 1rem;
+  }
 }
 
-body > header {
-  background: white;
-  position: sticky;
-  z-index: 1;
-  top: 0;
+#feed {
+  .post:not(:first-child) {
+    padding-top: 1rem;
+    border-top: 2px solid black;
+  }
 
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  .post {
+    gap: 0;
 
-  border-bottom: 2px solid black;
-  padding: 1rem;
-}
+    & > date {
+      font-size: 16px;
+    }
 
-body > header > img {
-  height: 3rem;
-}
-
-body > main {
-  flex-direction: column;
-  margin: 0 auto;
-  width: calc(100% - 2rem);
-  max-width: 50rem;
-}
-
-body > footer {
-  background: white;
-
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  border-top: 2px solid black;
-  margin-top: auto;
-  position: sticky;
-  bottom: 0;
-  padding: 1rem;
+    & > header {
+      display: block;
+    }
+  }
 }

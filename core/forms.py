@@ -23,6 +23,29 @@ class InvitationForm(forms.ModelForm):
             'circles': forms.CheckboxSelectMultiple,
         }
 
+class PostForm(forms.ModelForm):
+    circles = forms.ModelMultipleChoiceField(
+        queryset=models.Circle.objects.none(),
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    class Meta:
+        model = models.Post
+        fields = ('circles', 'text')
+        widgets = {
+            'text': forms.Textarea(attrs={ 'rows': 5 }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        circles = kwargs.pop('circles')
+        super().__init__(*args, **kwargs)
+        self.fields['circles'].queryset = circles
+
+    def save(self, *args, **kwargs):
+        result = super().save(*args, **kwargs)
+        import ipdb; ipdb.set_trace()
+        return result
+
 class SignupForm(UserCreationForm):
     class Meta:
         model = get_user_model()

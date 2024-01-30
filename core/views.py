@@ -96,7 +96,7 @@ class InvitationAcceptView(FormView):
         return result
 
     def get_success_url(self):
-        return reverse('user_detail', args={ 'pk': self.redirect_user.pk })
+        return reverse('user_detail', kwargs={ 'pk': self.redirect_user.pk })
 
     def form_valid(self, form):
         invitation = get_object_or_404(
@@ -184,7 +184,69 @@ delete_done = DeleteDoneView.as_view()
 class IndexView(TemplateView):
     template_name = 'core/index.html'
 
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+
+        if self.request.user.is_authenticated:
+            data['post_form'] = forms.PostForm(circles=self.request.user.circles)
+
+        return data
+
+
 index = IndexView.as_view()
+
+class PostCreateView(CreateView):
+    form_class = forms.PostForm
+    model = models.Post
+    success_url = reverse_lazy('index')
+
+    def get_form_kwargs(self):
+        result = super().get_form_kwargs()
+        result['circles'] = self.request.user.circles
+        return result
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+post_create = PostCreateView.as_view()
+
+class PostDeleteView(DeleteView):
+    model = models.Post
+    success_url = reverse_lazy('index')
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+post_delete = PostDeleteView.as_view()
+
+class PostEditView(UpdateView):
+    model = models.Post
+    form_class = forms.PostForm
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            pk=self.kwargs['pk'],
+        )
+
+post_edit = PostEditView.as_view()
+
+class PostDetailView(DetailView):
+    model = models.Post
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            pk=self.kwargs['pk'],
+        )
+
+post_detail = PostDetailView.as_view()
 
 class SettingsView(TemplateView):
     template_name = 'core/settings.html'

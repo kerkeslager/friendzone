@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import TestCase, TransactionTestCase
 
 from . import models
@@ -40,6 +41,8 @@ class UserTests(TransactionTestCase):
         self.assertEqual(user.circles.filter(name='Family').count(), 1)
         self.assertEqual(user.circles.filter(name='Friends').count(), 1)
 
+
+class User_create_invitation_Tests(TransactionTestCase):
     def test_user_create_invitation_sets_owner_and_circles(self):
         inviting_user = models.User.objects.create_user(
             username='testuser',
@@ -112,6 +115,103 @@ class UserTests(TransactionTestCase):
         with self.assertRaises(models.ConnectionLimitException):
             inviting_user.create_invitation(circles=circles)
 
+class ConnectionTests(TransactionTestCase):
+    def test_create_connection_creates_opposite_connection(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        self.assertEqual(connection, connection.opposite.opposite)
+        self.assertEqual(connection.owner, inviting_user)
+        self.assertEqual(connection.other_user, accepting_user)
+        self.assertEqual(connection.opposite.owner, accepting_user)
+        self.assertEqual(connection.opposite.other_user, inviting_user)
+
+    def test_connected_users_in_each_others_connected_users(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        self.assertIn(inviting_user, accepting_user.connected_users.all())
+        self.assertIn(accepting_user, inviting_user.connected_users.all())
+
+    def test_deleting_connection_deletes_opposite_connection(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        connection.delete()
+
+        self.assertFalse(models.Connection.objects.filter(
+            owner=inviting_user,
+            other_user=accepting_user,
+        ).exists())
+        self.assertFalse(models.Connection.objects.filter(
+            owner=accepting_user,
+            other_user=inviting_user,
+        ).exists())
+
+    def test_deleting_opposite_connection_deletes_connection(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        connection = models.Connection(
+            owner=inviting_user,
+            other_user=accepting_user,
+        )
+        connection.save()
+
+        connection.opposite.delete()
+
+        self.assertFalse(models.Connection.objects.filter(
+            owner=inviting_user,
+            other_user=accepting_user,
+        ).exists())
+        self.assertFalse(models.Connection.objects.filter(
+            owner=accepting_user,
+            other_user=inviting_user,
+        ).exists())
+
+class User_accept_invitation_Tests(TransactionTestCase):
     def test_accepting_invitation_creates_connection(self):
         inviting_user = models.User.objects.create_user(
             username='inviting_user',
@@ -131,38 +231,8 @@ class UserTests(TransactionTestCase):
             circles=accepting_user.circles.filter(name='Family'),
         )
 
-        self.assertEqual(
-            models.Connection.objects.filter(
-                inviting_user=inviting_user,
-                accepting_user=accepting_user,
-            ).count(),
-            1,
-        )
-
-    def test_is_connected_with(self):
-        inviting_user = models.User.objects.create_user(
-            username='inviting_user',
-            password='12345',
-        )
-        accepting_user = models.User.objects.create_user(
-            username='accepting_user',
-            password='12345',
-        )
-
-        self.assertFalse(inviting_user.is_connected_with(accepting_user))
-        self.assertFalse(accepting_user.is_connected_with(inviting_user))
-
-        invitation = inviting_user.create_invitation(
-            circles=inviting_user.circles.filter(name='Friends'),
-        )
-
-        accepting_user.accept_invitation(
-            invitation,
-            circles=accepting_user.circles.filter(name='Family'),
-        )
-
-        self.assertTrue(inviting_user.is_connected_with(accepting_user))
         self.assertTrue(accepting_user.is_connected_with(inviting_user))
+        self.assertTrue(inviting_user.is_connected_with(accepting_user))
 
     def test_accepting_into_no_circles_throws_exception(self):
         inviting_user = models.User.objects.create_user(
@@ -323,3 +393,258 @@ class UserTests(TransactionTestCase):
             inviting_user,
             accepting_user.circles.get(name='Family').members.all(),
         )
+
+    def test_deleting_connection_deletes_circle_membership(self):
+        inviting_user = models.User.objects.create_user(
+            username='inviting_user',
+            password='12345',
+        )
+        accepting_user = models.User.objects.create_user(
+            username='accepting_user',
+            password='12345',
+        )
+
+        invitation = inviting_user.create_invitation(
+            circles=inviting_user.circles.filter(name='Friends'),
+        )
+
+        accepting_user.accept_invitation(
+            invitation,
+            circles=accepting_user.circles.filter(name='Family'),
+        )
+
+        models.Connection.objects.filter(
+            owner=inviting_user,
+            other_user=accepting_user,
+        ).delete()
+
+
+        self.assertNotIn(
+            accepting_user,
+            inviting_user.circles.get(name='Friends').members.all(),
+        )
+        self.assertNotIn(
+            inviting_user,
+            accepting_user.circles.get(name='Family').members.all(),
+        )
+
+class FeedTests(TransactionTestCase):
+    def test_feed_starts_empty(self):
+        user = models.User.objects.create_user(
+            username='user',
+            password='12345',
+        )
+
+        self.assertEqual(user.feed.count(), 0)
+
+    def test_feed_contains_own_posts(self):
+        user = models.User.objects.create_user(
+            username='user',
+            password='12345',
+        )
+
+        post = models.Post.objects.create(
+            owner=user,
+            text='Hello, world',
+        )
+
+        self.assertIn(post, user.feed.all())
+
+    def test_feed_contains_posts_for_circles_in(self):
+        posting_user = models.User.objects.create_user(
+            username='posting_user',
+            password='12345',
+        )
+        reading_user = models.User.objects.create_user(
+            username='reading_user',
+            password='12345',
+        )
+
+        invitation = posting_user.create_invitation(
+            circles=posting_user.circles.filter(name='Friends'),
+        )
+        reading_user.accept_invitation(
+            invitation,
+            circles=reading_user.circles.filter(name='Friends'),
+        )
+
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
+        post.publish(circles=posting_user.circles.filter(name='Friends'))
+
+        self.assertIn(post, reading_user.feed.all())
+
+    def test_feed_does_not_contain_posts_for_circles_not_in(self):
+        posting_user = models.User.objects.create_user(
+            username='posting_user',
+            password='12345',
+        )
+        reading_user = models.User.objects.create_user(
+            username='reading_user',
+            password='12345',
+        )
+
+        invitation = posting_user.create_invitation(
+            circles=posting_user.circles.filter(name='Friends'),
+        )
+        reading_user.accept_invitation(
+            invitation,
+            circles=reading_user.circles.filter(name='Friends'),
+        )
+
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
+        post.publish(circles=posting_user.circles.filter(name='Family'))
+
+        self.assertNotIn(post, reading_user.feed.all())
+
+    def test_feed_does_not_contain_duplicates_if_multiple_circles(self):
+        posting_user = models.User.objects.create_user(
+            username='posting_user',
+            password='12345',
+        )
+        reading_user = models.User.objects.create_user(
+            username='reading_user',
+            password='12345',
+        )
+
+        invitation = posting_user.create_invitation(
+            circles=posting_user.circles.all(),
+        )
+        reading_user.accept_invitation(
+            invitation,
+            circles=reading_user.circles.filter(name='Friends'),
+        )
+
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
+        post.publish(circles=posting_user.circles.all())
+
+        self.assertIn(post, reading_user.feed.all())
+        self.assertEqual(reading_user.feed.count(), 1)
+
+    def test_removing_connection_removes_post_from_feed(self):
+        posting_user = models.User.objects.create_user(
+            username='posting_user',
+            password='12345',
+        )
+        reading_user = models.User.objects.create_user(
+            username='reading_user',
+            password='12345',
+        )
+
+        invitation = posting_user.create_invitation(
+            circles=posting_user.circles.all(),
+        )
+        reading_user.accept_invitation(
+            invitation,
+            circles=reading_user.circles.filter(name='Friends'),
+        )
+
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
+        post.publish(circles=posting_user.circles.all())
+
+        posting_user.connections.all().delete()
+
+        self.assertEqual(reading_user.feed.count(), 0)
+
+    def test_removing_circle_removes_post_from_feed(self):
+        posting_user = models.User.objects.create_user(
+            username='posting_user',
+            password='12345',
+        )
+        reading_user = models.User.objects.create_user(
+            username='reading_user',
+            password='12345',
+        )
+
+        invitation = posting_user.create_invitation(
+            circles=posting_user.circles.filter(name='Friends'),
+        )
+        reading_user.accept_invitation(
+            invitation,
+            circles=reading_user.circles.filter(name='Friends'),
+        )
+
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
+        post.publish(circles=posting_user.circles.all())
+
+        posting_user.circles.filter(name='Friends').delete()
+
+        self.assertEqual(reading_user.feed.count(), 0)
+
+    def test_removing_user_from_circle_removes_post_from_feed(self):
+        posting_user = models.User.objects.create_user(
+            username='posting_user',
+            password='12345',
+        )
+        reading_user = models.User.objects.create_user(
+            username='reading_user',
+            password='12345',
+        )
+
+        invitation = posting_user.create_invitation(
+            circles=posting_user.circles.filter(name='Friends'),
+        )
+        reading_user.accept_invitation(
+            invitation,
+            circles=reading_user.circles.filter(name='Friends'),
+        )
+
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
+        post.publish(circles=posting_user.circles.all())
+
+        circle = posting_user.circles.get(name='Friends')
+        connection = models.Connection.objects.get(other_user=reading_user)
+        models.CircleMembership.objects.filter(
+            circle__pk=circle.pk,
+            connection__pk=connection.pk,
+        ).delete()
+
+        self.assertEqual(reading_user.feed.count(), 0)
+
+    def test_removing_post_from_circle_removes_post_from_feed(self):
+        posting_user = models.User.objects.create_user(
+            username='posting_user',
+            password='12345',
+        )
+        reading_user = models.User.objects.create_user(
+            username='reading_user',
+            password='12345',
+        )
+
+        invitation = posting_user.create_invitation(
+            circles=posting_user.circles.filter(name='Friends'),
+        )
+        reading_user.accept_invitation(
+            invitation,
+            circles=reading_user.circles.filter(name='Friends'),
+        )
+
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
+        post.publish(circles=posting_user.circles.all())
+
+        models.PostCircle.objects.filter(
+            post=post,
+            circle=posting_user.circles.get(name='Friends'),
+        ).delete()
+
+        self.assertEqual(reading_user.feed.count(), 0)
