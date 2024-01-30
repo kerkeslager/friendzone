@@ -16,6 +16,8 @@ class InvitationAcceptForm(forms.Form):
         self.fields['circles'].queryset = circles
 
 class InvitationForm(forms.ModelForm):
+    message = forms.CharField(widget=forms.Textarea)
+
     class Meta:
         model = models.Invitation
         fields = ('name', 'circles', 'message')
@@ -40,11 +42,6 @@ class PostForm(forms.ModelForm):
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
-
-    def save(self, *args, **kwargs):
-        result = super().save(*args, **kwargs)
-        import ipdb; ipdb.set_trace()
-        return result
 
 class SignupForm(UserCreationForm):
     class Meta:

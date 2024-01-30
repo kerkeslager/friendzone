@@ -4,7 +4,7 @@
 
 {% block main %}
   {% for circle in object_list %}
-    <p><a href='{{ circle.get_absolute_url }}'>{{ circle.name }}</a></p>
+    {% include 'widgets/circle.html' with circle=circle %}
   {% endfor %}
 
   <a href='{% url "circle_create" %}'>new</a>

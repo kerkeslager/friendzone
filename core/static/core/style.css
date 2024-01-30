@@ -13,11 +13,19 @@ body, footer, header, main, section {
   width: 100%;
 }
 
+svg {
+  display: block;
+}
+
 nav {
   display: flex;
   gap: 1rem;
   flex-direction: row;
   align-items: center;
+
+  &.circle {
+    gap: 0.5rem;
+  }
 }
 
 form {

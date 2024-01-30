@@ -16,7 +16,7 @@ class User(auth_models.AbstractUser):
     name = models.CharField(max_length=256)
 
     def __str__(self):
-        return self.name
+        return self.display_name
 
     def save(self, **kwargs):
         create_default_circles = self._state.adding
@@ -196,10 +196,16 @@ class UserConnection(models.Model):
 class Circle(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
+    color = models.CharField(max_length=6)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='circles'
+    )
+    connections = models.ManyToManyField(
+        'Connection',
+        through='CircleMembership',
+        through_fields=('circle', 'connection'),
     )
 
     class Meta:
@@ -214,10 +220,7 @@ class Circle(models.Model):
     @property
     def members(self):
         return User.objects.filter(
-            pk__in=CircleMembership.objects.filter(
-                circle=self,
-                # connection__owner=circle.owner, isn't necessary because these are always equal
-            ).values_list('connection__other_user', flat=True),
+            pk__in=self.connections.all().values_list('other_user', flat=True),
         )
 
 class CircleMembership(models.Model):
@@ -232,6 +235,9 @@ class CircleMembership(models.Model):
         on_delete=models.CASCADE,
         related_name='circle_memberships',
     )
+
+    class Meta:
+        unique_together = (('circle', 'connection'),)
 
     def save(self, *args, **kwargs):
         assert self.circle.owner == self.connection.owner
