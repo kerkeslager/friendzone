@@ -262,6 +262,11 @@ class Post(models.Model):
         related_name='posts',
     )
     text = models.CharField(max_length=1024)
+    circles = models.ManyToManyField(
+        'Circle',
+        through='PostCircle',
+        through_fields=('post', 'circle'),
+    )
 
     def publish(self, *, circles):
         for circle in circles:
@@ -279,6 +284,9 @@ class PostCircle(models.Model):
         on_delete=models.CASCADE,
         related_name='+',
     )
+
+    class Meta:
+        unique_together = (('circle', 'post'),)
 
     def save(self, *args, **kwargs):
         link_to_users = self._state.adding

@@ -186,7 +186,10 @@ class IndexView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
-        data['post_form'] = forms.PostForm()
+
+        if self.request.user.is_authenticated:
+            data['post_form'] = forms.PostForm(circles=self.request.user.circles)
+
         return data
 
 
@@ -196,6 +199,11 @@ class PostCreateView(CreateView):
     form_class = forms.PostForm
     model = models.Post
     success_url = reverse_lazy('index')
+
+    def get_form_kwargs(self):
+        result = super().get_form_kwargs()
+        result['circles'] = self.request.user.circles
+        return result
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
