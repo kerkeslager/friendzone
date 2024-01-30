@@ -4,9 +4,12 @@
 
 {% block main %}
   {% for connection in object_list %}
-    <p>
+    <nav>
       <a href='{% url "user_detail" pk=connection.other_user.pk %}'>{{ connection.other_user.display_name }}</a>
-    </p>
+      {% for circle in connection.circles.all %}
+        {% include 'widgets/circle.html' with circle=circle %}
+      {% endfor %}
+    </nav>
   {% empty %}
     <p>You don't have any connections.</p>
     <p>

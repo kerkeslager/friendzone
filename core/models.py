@@ -146,6 +146,11 @@ class Connection(models.Model):
         on_delete=models.CASCADE,
         related_name='+',
     )
+    circles = models.ManyToManyField(
+        'Circle',
+        through='CircleMembership',
+        through_fields=('connection', 'circle'),
+    )
 
     @transaction.atomic
     def save(self, *args, **kwargs):
