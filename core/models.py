@@ -24,9 +24,8 @@ class User(auth_models.AbstractUser):
         result = super().save(**kwargs)
 
         if create_default_circles:
-            for name in ['Friends', 'Family']:
-                circle = Circle(owner=self, name=name)
-                circle.save()
+            Circle.objects.create(owner=self, color='008800', name='Family')
+            Circle.objects.create(owner=self, color='000088', name='Friends')
 
         return result
 
