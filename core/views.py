@@ -288,6 +288,16 @@ class UserDetailView(DetailView):
 
         return user
 
+    def get_context_data(self, *args, **kwargs):
+        result = super().get_context_data(*args, **kwargs)
+
+        if self.request.user != result['object']:
+            result['in_circles'] = self.request.user.circles.filter(
+                connections__other_user=result['object']
+            )
+
+        return result
+
 user_detail = UserDetailView.as_view()
 
 class WelcomeView(TemplateView):

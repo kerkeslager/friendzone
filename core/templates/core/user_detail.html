@@ -4,4 +4,15 @@
 
 {% block main %}
 <p>{{ object.display_name }}'s profile</p>
+
+{% if request.user != object %}
+  <p>
+    In circles:
+    {% for circle in in_circles %}
+      {% include 'widgets/circle.html' with circle=circle %}
+    {% empty %}
+      Not in any circles.
+    {% endfor %}
+  </p>
+{% endif %}
 {% endblock %}
