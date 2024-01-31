@@ -4,10 +4,20 @@ from django.contrib.auth.forms import UserCreationForm
 
 from . import models
 
+class CircleWidget(forms.CheckboxSelectMultiple):
+    option_template_name = 'widgets/circle_checkbox.html'
+
+    def get_context(self, name, value, attrs):
+        result = super().get_context(name, value, attrs)
+
+        #for og_dict in [og[1][0]['value'].instance for og in result['widget']['optgroups']
+        #    og_dict['circle'] = og_dict
+        return result
+
 class InvitationAcceptForm(forms.Form):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=CircleWidget,
     )
 
     def __init__(self, *args, **kwargs):
@@ -22,13 +32,13 @@ class InvitationForm(forms.ModelForm):
         model = models.Invitation
         fields = ('name', 'circles', 'message')
         widgets = {
-            'circles': forms.CheckboxSelectMultiple,
+            'circles': CircleWidget,
         }
 
 class PostForm(forms.ModelForm):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=CircleWidget,
     )
 
     class Meta:

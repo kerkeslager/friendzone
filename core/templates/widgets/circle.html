@@ -1,4 +1,4 @@
 <nav class='circle'>
-  <a href='{{ circle.get_absolute_url }}'>{% include 'snippets/circle.svg' with color=circle.color %}</a>
+  <a href='{{ circle.get_absolute_url }}'>{% include 'snippets/circle.svg' with circle=circle %}</a>
   <a href='{{ circle.get_absolute_url }}'>{{ circle.name }}</a>
 </nav>
