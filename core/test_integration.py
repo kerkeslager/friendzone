@@ -8,35 +8,25 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.service import Service as FirefoxService 
 from webdriver_manager.firefox import GeckoDriverManager
 import time 
-    
-class TestUserLogin(StaticLiveServerTestCase):
-    '''
-    #Using ChromeDriver
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.browser = webdriver.Chrome()
-        cls.browser.implicitly_wait(10)
-        #cls.wait = WebDriverWait(cls.browser, 10)
-        cls.wait = WebDriverWait(cls.browser, 50)  # Increase wait time to 20 seconds
-    '''
-    
+import unittest
 
+class IntegrationTests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
-        # Setup code to run once before all tests, e.g., starting a browser
-        cls.browser = webdriver.Firefox(service=Service(GeckoDriverManager().install()))
-        cls.browser.implicitly_wait(10)
-        cls.wait = WebDriverWait(cls.browser, 10)
         super().setUpClass()
+        if not hasattr(cls, 'browser') or cls.browser is None:
+            raise unittest.SkipTest("Browser not initialized. Skipping tests in BaseTestUserLogin.")
+        #cls.browser.implicitly_wait(10)
+        cls.wait = WebDriverWait(cls.browser, 5)
 
     @classmethod
     def tearDownClass(cls):
-        time.sleep(5)  # Keep the browser open for 5 seconds
-        cls.browser.quit()
+        if hasattr(cls, 'browser') and cls.browser is not None:
+            time.sleep(2)  # Keep the browser open for 2 seconds
+            cls.browser.quit()
         super().tearDownClass()
 
     def setUp(self):
@@ -58,15 +48,23 @@ class TestUserLogin(StaticLiveServerTestCase):
         password_input.send_keys('testpassword')
 
         # Submit the form
-        #submit_button = self.browser.find_element(By.ID, 'submit')
         submit_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
         submit_button.click()
 
         # Wait until the home page is loaded
-        
-        
         self.wait.until(EC.url_to_be(self.home_url))
+
         # Assert that the browser redirects to the home page
         self.assertEqual(self.browser.current_url, self.home_url)
 
-# Add more tests 
+class TestUserLoginChrome(IntegrationTests):
+    @classmethod
+    def setUpClass(cls):
+        cls.browser = webdriver.Chrome()
+        super().setUpClass()
+
+class TestUserLoginFirefox(IntegrationTests):
+    @classmethod
+    def setUpClass(cls):
+        cls.browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        super().setUpClass()
