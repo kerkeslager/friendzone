@@ -19,7 +19,7 @@ class IntegrationTests(StaticLiveServerTestCase):
         super().setUpClass()
         if not hasattr(cls, 'browser') or cls.browser is None:
             raise unittest.SkipTest("Browser not initialized. Skipping tests in BaseTestUserLogin.")
-        # WebDriverWait, check  there is a page load timeout so it doesn't hang forever 
+        # WebDriverWait, che
         cls.wait = WebDriverWait(cls.browser, 5)
 
     @classmethod
@@ -28,6 +28,31 @@ class IntegrationTests(StaticLiveServerTestCase):
             time.sleep(2)  # Keep the browser open for 2 seconds
             cls.browser.quit()
         super().tearDownClass()
+
+    def test_signup_success(self):
+        # Navigate to the signup page
+        self.home_url = self.live_server_url + reverse('welcome')  # 'home' is the name of your post-login redirect URL
+        self.signup_url = self.live_server_url + reverse('signup')  # 'signup' is the name of your signup URL
+        self.browser.get(self.signup_url)
+        # Fill in the username and password fields
+        username_input = self.browser.find_element(By.NAME, 'username')
+        password1_input = self.browser.find_element(By.NAME, 'password1')
+        password2_input = self.browser.find_element(By.NAME, 'password2')
+
+        username_input.send_keys('newuser')
+        password1_input.send_keys('newpassword12')
+        password2_input.send_keys('newpassword12')
+
+        # Submit the form
+        submit_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
+        submit_button.click()
+
+        # Wait until the home page is loaded
+        self.wait.until(EC.url_to_be(self.home_url))
+
+        # Assert that the browser redirects to the home page
+        self.assertEqual(self.browser.current_url, self.home_url)
+
 
 
     def test_login_success(self):
@@ -54,6 +79,19 @@ class IntegrationTests(StaticLiveServerTestCase):
 
         # Assert that the browser redirects to the home page
         self.assertEqual(self.browser.current_url, self.home_url)
+
+class TestUserSignupChrome(IntegrationTests):
+    @classmethod
+    def setUpClass(cls):
+        cls.browser = webdriver.Chrome()
+        super().setUpClass()
+
+
+class TestUserSignupFirefox(IntegrationTests):
+    @classmethod
+    def setUpClass(cls):
+        cls.browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        super().setUpClass()
 
 class TestUserLoginChrome(IntegrationTests):
     @classmethod
