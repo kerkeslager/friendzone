@@ -19,7 +19,7 @@ class IntegrationTests(StaticLiveServerTestCase):
         super().setUpClass()
         if not hasattr(cls, 'browser') or cls.browser is None:
             raise unittest.SkipTest("Browser not initialized. Skipping tests in BaseTestUserLogin.")
-        #cls.browser.implicitly_wait(10)
+        # WebDriverWait, check  there is a page load timeout so it doesn't hang forever 
         cls.wait = WebDriverWait(cls.browser, 5)
 
     @classmethod
@@ -29,15 +29,13 @@ class IntegrationTests(StaticLiveServerTestCase):
             cls.browser.quit()
         super().tearDownClass()
 
-    def setUp(self):
-        # Setup code to run before each test, e.g., creating test data
-        User = get_user_model()
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
-        self.login_url = self.live_server_url + reverse('login')  # 'login' is the name of your login URL
-        self.home_url = self.live_server_url + reverse('index')  # 'home' is the name of your post-login redirect URL
 
     def test_login_success(self):
         # Navigate to the login page
+        User = get_user_model()
+        self.login_url = self.live_server_url + reverse('login')  # 'login' is the name of your login URL
+        self.home_url = self.live_server_url + reverse('index')  # 'home' is the name of your post-login redirect URL
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.browser.get(self.login_url)
 
         # Fill in the username and password fields
