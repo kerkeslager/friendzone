@@ -4,6 +4,27 @@
 
 {% block main %}
 
+{% if object.owner == request.user %}
+  <section class='qr-code'>
+    {{ qr }}
+  </section>
+
+  <p>
+    <a href='{% url "invite_edit" pk=object.pk %}'>edit</a>
+    <a href='{% url "invite_delete" pk=object.pk %}'>delete</a>
+  </p>
+
+  <p>
+    This invite will add the user who accepts it to the following circles:
+  </p>
+
+  {% for circle in object.circles.all %}
+    {% include 'widgets/circle.html' with circle=circle %}
+  {% endfor %}
+
+  The following message will be displayed to other users who visit this page:
+{% endif %}
+
 <p>
   {{ object.owner.display_name }} would like to invite you to connect.
   {{ object.owner.display_name}} wrote:
@@ -20,21 +41,6 @@
     <a href='{% url "login" %}?next={{ object.get_absolute_url }}'>login</a>
     <a href='{% url "signup" %}?next={{ object.get_absolute_url }}'>signup</a>
   </p>
-{% elif object.owner == request.user %}
-  <p>QR Code Here</p>
-
-  <p>
-    <a href='{% url "invite_edit" pk=object.pk %}'>edit</a>
-    <a href='{% url "invite_delete" pk=object.pk %}'>delete</a>
-  </p>
-
-  <p>
-    This invite will add the user who accepts it to the following circles:
-  </p>
-
-  {% for circle in object.circles.all %}
-    {% include 'widgets/circle.html' with circle=circle %}
-  {% endfor %}
 {% elif request.user in object.owner.connected_users %}
   <p>
     You are already connected with {{ object.owner.display_name }}!
@@ -66,7 +72,7 @@
     If you still want to connect with {{ object.owner.display_name }}, ask them
     to delete some of their connections.
   </p>
-{% else %}
+{% elif request.user != object.owner %}
   <form method='post' action='{% url "invite_accept" pk=object.pk %}'>
     {% csrf_token %}
 
