@@ -21,12 +21,20 @@
     <a href='{% url "signup" %}?next={{ object.get_absolute_url }}'>signup</a>
   </p>
 {% elif object.owner == request.user %}
+  <p>QR Code Here</p>
+
   <p>
     <a href='{% url "invite_edit" pk=object.pk %}'>edit</a>
     <a href='{% url "invite_delete" pk=object.pk %}'>delete</a>
   </p>
 
-  <p>QR Code Here</p>
+  <p>
+    This invite will add the user who accepts it to the following circles:
+  </p>
+
+  {% for circle in object.circles.all %}
+    {% include 'widgets/circle.html' with circle=circle %}
+  {% endfor %}
 {% elif request.user in object.owner.connected_users %}
   <p>
     You are already connected with {{ object.owner.display_name }}!

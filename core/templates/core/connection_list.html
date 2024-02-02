@@ -3,9 +3,18 @@
 {% block title %}connections{% endblock %}
 
 {% block main %}
-  {% for user in object_list %}
+  {% for connection in object_list %}
+    <nav>
+      <a href='{% url "user_detail" pk=connection.other_user.pk %}'>{{ connection.other_user.display_name }}</a>
+      {% for circle in connection.circles.all %}
+        {% include 'widgets/circle.html' with circle=circle %}
+      {% endfor %}
+    </nav>
+  {% empty %}
+    <p>You don't have any connections.</p>
     <p>
-      <a href='{% url "user_detail" pk=user.pk %}'>{{ user.display_name }}</a>
+      <a href='{% url "invite_create" %}'>Create an invite</a> to connect with
+      people you know.
     </p>
   {% endfor %}
 {% endblock %}

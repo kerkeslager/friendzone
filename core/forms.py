@@ -4,10 +4,13 @@ from django.contrib.auth.forms import UserCreationForm
 
 from . import models
 
+class CircleWidget(forms.CheckboxSelectMultiple):
+    option_template_name = 'widgets/circle_checkbox.html'
+
 class InvitationAcceptForm(forms.Form):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=CircleWidget,
     )
 
     def __init__(self, *args, **kwargs):
@@ -16,17 +19,19 @@ class InvitationAcceptForm(forms.Form):
         self.fields['circles'].queryset = circles
 
 class InvitationForm(forms.ModelForm):
+    message = forms.CharField(widget=forms.Textarea)
+
     class Meta:
         model = models.Invitation
         fields = ('name', 'circles', 'message')
         widgets = {
-            'circles': forms.CheckboxSelectMultiple,
+            'circles': CircleWidget,
         }
 
 class PostForm(forms.ModelForm):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=CircleWidget,
     )
 
     class Meta:
@@ -40,11 +45,6 @@ class PostForm(forms.ModelForm):
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
-
-    def save(self, *args, **kwargs):
-        result = super().save(*args, **kwargs)
-        import ipdb; ipdb.set_trace()
-        return result
 
 class SignupForm(UserCreationForm):
     class Meta:

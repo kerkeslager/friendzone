@@ -11,7 +11,7 @@ from . import forms, models
 
 class CircleCreateView(CreateView):
     model = models.Circle
-    fields = ('name',)
+    fields = ('name', 'color')
     success_url = reverse_lazy('circle_list')
 
     def form_valid(self, form):
@@ -35,7 +35,7 @@ circle_delete = CircleDeleteView.as_view()
 
 class CircleEditView(UpdateView):
     model = models.Circle
-    fields = ('name',)
+    fields = ('name','color')
 
     def get_object(self):
         return get_object_or_404(
@@ -67,11 +67,11 @@ class CircleListView(ListView):
 circle_list = CircleListView.as_view()
 
 class ConnectionListView(ListView):
-    model = models.User
+    model = models.Connection
     template_name = 'core/connection_list.html'
 
     def get_queryset(self):
-        return self.request.user.connected_users.order_by('name', 'username')
+        return self.request.user.connections.order_by('other_user__name', 'other_user__username')
 
 connection_list = ConnectionListView.as_view()
 
@@ -287,6 +287,16 @@ class UserDetailView(DetailView):
             raise Http404()
 
         return user
+
+    def get_context_data(self, *args, **kwargs):
+        result = super().get_context_data(*args, **kwargs)
+
+        if self.request.user != result['object']:
+            result['in_circles'] = self.request.user.circles.filter(
+                connections__other_user=result['object']
+            )
+
+        return result
 
 user_detail = UserDetailView.as_view()
 

@@ -1,0 +1,7 @@
+<label for='{{ widget.attrs.id }}'>
+  <nav class='circle'>
+    <input type='{{ widget.type }}' name='{{ widget.name }}' value='{{ widget.value|stringformat:"s" }}' />
+    {% include 'snippets/circle.svg' with circle=widget.value.instance %}
+    {{ widget.label }}
+  </nav>
+</label>
