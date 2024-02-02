@@ -1,11 +1,16 @@
+import io
+
 from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
+from django.utils.safestring import mark_safe
 from django.views.generic import CreateView, DeleteView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
+
+import pyqrcode
 
 from . import forms, models
 
@@ -150,10 +155,19 @@ class InvitationDetailView(DetailView):
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
 
-        if self.request.user.is_authenticated and self.request.user != self.object.owner:
-            data['form'] = forms.InvitationAcceptForm(
-                circles=self.request.user.circles.all(),
-            )
+        if self.request.user.is_authenticated:
+            if self.request.user == self.object.owner:
+                qr = pyqrcode.create(self.request.build_absolute_uri())
+                qr_buffer = io.BytesIO()
+                qr.svg(qr_buffer, omithw=True)
+
+                data['qr'] = mark_safe(
+                    qr_buffer.getvalue().decode('utf-8'),
+                )
+            else:
+                data['form'] = forms.InvitationAcceptForm(
+                    circles=self.request.user.circles.all(),
+                )
 
         return data
 

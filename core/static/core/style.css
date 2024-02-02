@@ -151,3 +151,7 @@ body {
     }
   }
 }
+
+section.qr-code svg {
+  width: 20rem;
+}
