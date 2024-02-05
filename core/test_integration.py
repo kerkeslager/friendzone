@@ -13,16 +13,12 @@ from webdriver_manager.firefox import GeckoDriverManager
 import time 
 import unittest
 
-
-
-
-
-class IntegrationTests(StaticLiveServerTestCase):
+class IntegrationTests(object):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         if not hasattr(cls, 'browser') or cls.browser is None:
-            raise unittest.SkipTest("Browser not initialized. Skipping tests in BaseTestUserLogin.")
+            raise Exception("This is a base class and its tests should not run.")
         # WebDriverWait, che
         cls.wait = WebDriverWait(cls.browser, 5)
 
@@ -33,10 +29,8 @@ class IntegrationTests(StaticLiveServerTestCase):
             cls.browser.quit()
         super().tearDownClass()
 
-    
     def find_url(self, url_name):
         return self.live_server_url + reverse(url_name)
-
 
     def test_login_success(self):
         # Navigate to the login page
@@ -63,8 +57,8 @@ class IntegrationTests(StaticLiveServerTestCase):
 
 
 
-    ## With signing up, if I set up the signup_url to be reverse('signup'), I'm currently going from the 
-    # Login test success logged in as testuser. auth/login takes me to to home_url which is index.    
+    ## With signing up, if I set up the signup_url to be reverse('signup'), I'm currently going from the
+    # Login test success logged in as testuser. auth/login takes me to to home_url which is index.
     # I'm not sure if I should be testing the signup page in the same test as the login page.
     # Well, I'm accessing the signup page from the login page going from auth/login to auth/signup... Seems like bad practice 
     # Check below for how we might check for a failed signup.
@@ -94,7 +88,6 @@ class IntegrationTests(StaticLiveServerTestCase):
     # The exceptions are currently text inputs that I might have to search for in the browser such as:
     # user with this username already exists
     # how might we deal with this?
-    
     def test_signup_failure(self):
         # Navigate to the signup page
         self.browser.get(self.find_url('signup'))
@@ -119,13 +112,13 @@ class IntegrationTests(StaticLiveServerTestCase):
 
 
 
-class TestUserLoginChrome(IntegrationTests):
+class TestUserLoginChrome(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         cls.browser = webdriver.Chrome()
         super().setUpClass()
 
-class TestUserLoginFirefox(IntegrationTests):
+class TestUserLoginFirefox(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         cls.browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
