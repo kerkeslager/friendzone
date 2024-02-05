@@ -3,7 +3,7 @@
 {% block title %}edit post{% endblock %}
 
 {% block main %}
-<a href='{% "post_delete" pk=form.instance.pk %}'>delete</a>
+<a href='{% url "post_delete" pk=form.instance.pk %}'>delete</a>
 <form method='post'>
   {% csrf_token %}
   {{ form }}

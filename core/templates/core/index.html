@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load markdown %}
 
 {% block title %}home{% endblock %}
 
@@ -18,7 +19,7 @@
             <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a> said:
           </header>
           <main>
-            {{ post.text }}
+            {{ post.text|markdown }}
           </main>
           <nav>
             <a href='{% url "post_detail" pk=post.pk %}'>View</a>
