@@ -1,18 +1,21 @@
+import time
+import unittest
+
+from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-import time
-import unittest
+from webdriver_manager.firefox import GeckoDriverManager
 
 class IntegrationTests(object):
     @classmethod
@@ -30,13 +33,13 @@ class IntegrationTests(object):
             cls.browser.quit()
         super().tearDownClass()
 
-    def find_url(self, url_name):
-        return self.live_server_url + reverse(url_name)
+    def find_url(self, *args, **kwargs):
+        return self.live_server_url + reverse(*args, **kwargs)
 
     def test_login_success(self):
         # Navigate to the login page
         User = get_user_model()
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        user = User.objects.create_user(username='testuser', password='testpassword')
         self.browser.get(self.live_server_url + reverse('login'))
 
         # Fill in the username and password fields
@@ -80,11 +83,26 @@ class IntegrationTests(object):
 class TestUserLoginChrome(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.browser = webdriver.Chrome()
+        options = ChromeOptions()
+
+        if settings.TEST_INTEGRATION_HEADLESS:
+            options.add_argument('--headless=new')
+
+        cls.browser = webdriver.Chrome(options)
+
         super().setUpClass()
 
 class TestUserLoginFirefox(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.browser = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        options = FirefoxOptions()
+
+        if settings.TEST_INTEGRATION_HEADLESS:
+            options.headless = True
+
+        cls.browser = webdriver.Firefox(
+            options=options,
+            service=FirefoxService(GeckoDriverManager().install()),
+        )
+
         super().setUpClass()

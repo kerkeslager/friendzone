@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -131,3 +132,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+def environment_var_truthiness(v):
+    return {
+        '0': False,
+        '1': True,
+        'f': False,
+        't': True,
+        'false': False,
+        'true': True,
+    }[str(v).lower()]
+
+TEST_INTEGRATION_HEADLESS = environment_var_truthiness(os.environ.get('HEADLESS', 1))
