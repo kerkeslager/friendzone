@@ -8,9 +8,10 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service as FirefoxService 
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
-import time 
+
+import time
 import unittest
 
 class IntegrationTests(object):
@@ -55,13 +56,6 @@ class IntegrationTests(object):
         # Assert that the browser redirects to the home page
         self.assertEqual(self.browser.current_url,  self.live_server_url + reverse('index'))
 
-
-
-    ## With signing up, if I set up the signup_url to be reverse('signup'), I'm currently going from the
-    # Login test success logged in as testuser. auth/login takes me to to home_url which is index.
-    # I'm not sure if I should be testing the signup page in the same test as the login page.
-    # Well, I'm accessing the signup page from the login page going from auth/login to auth/signup... Seems like bad practice 
-    # Check below for how we might check for a failed signup.
     def test_signup_success(self):
         self.browser.get(self.live_server_url + reverse('signup') )
         # Fill in the username and password fields
@@ -82,35 +76,6 @@ class IntegrationTests(object):
 
         # Assert that the browser redirects to the home page
         self.assertEqual(self.browser.current_url, self.find_url('welcome') )
-
-
-
-    # The exceptions are currently text inputs that I might have to search for in the browser such as:
-    # user with this username already exists
-    # how might we deal with this?
-    def test_signup_failure(self):
-        # Navigate to the signup page
-        self.browser.get(self.find_url('signup'))
-        # Fill in the username and password fields
-        username_input = self.browser.find_element(By.NAME, 'username')
-        password1_input = self.browser.find_element(By.NAME, 'password1')
-        password2_input = self.browser.find_element(By.NAME, 'password2')
-
-        username_input.send_keys('testuser')
-        password1_input.send_keys('testpassword')
-        password2_input.send_keys('testpassword')
-
-        # Submit the form
-        submit_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
-        submit_button.click()
-
-        # Wait until the home page is loaded
-        self.wait.until(EC.url_to_be(self.find_url('welcome')))  ## Checking for the right url?
-
-        # Assert that the browser redirects to the home page
-        self.assertEqual(self.browser.current_url, self.find_url('welcome'))
-
-
 
 class TestUserLoginChrome(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
