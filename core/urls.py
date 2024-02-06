@@ -42,4 +42,9 @@ urlpatterns = [
     path('welcome', views.welcome, name='welcome'),
     path('why', views.why, name='why'),
     path('', views.index, name='index'),
+    path('messages/<uuid:connection_id>/', views.MessageListView.as_view(), name='message_list'),
+    path('messages/<uuid:connection_id>/create/', views.MessageCreateView.as_view(), name='message_create'),
+    path('messages/<uuid:message_id>/edit/', views.MessageUpdateView.as_view(), name='message_edit'),
+    path('messages/', views.MessageOverviewView.as_view(), name='message_overview'),
 ]
+

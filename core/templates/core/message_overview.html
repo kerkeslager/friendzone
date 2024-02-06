@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+  <h2>Message Overview</h2>
+  <p>Select a connection to view messages:</p>
+  <ul>
+    {% for connection in object_list %}
+      <li>
+        Connection with {{ connection.other_user.username }} - 
+        <a href="{% url 'message_list' connection_id=connection.id %}">View Messages</a>
+        <!-- Adjust the above line to match the actual field names in your Connection model -->
+      </li>
+    {% empty %}
+      <li>No connections available.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

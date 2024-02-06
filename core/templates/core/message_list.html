@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+  <h2>Messages</h2>
+  <ul>
+    {% for message in object_list %}
+      <li>
+        <strong>{{ message.from_user.username }}:</strong> {{ message.text }} <br>
+        <small>Sent on {{ message.created_utc }}</small>
+      </li>
+    {% empty %}
+      <li>No messages.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'message_create' connection_id=connection_id %}">Send a new message</a>
+{% endblock %}

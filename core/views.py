@@ -4,11 +4,15 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
-from django.views.generic import CreateView, DeleteView, UpdateView
+from django.views.generic import CreateView, DeleteView, UpdateView, ListView
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
+from django.db.models import Q
+
+
+
 
 import pyqrcode
 
@@ -323,3 +327,49 @@ class WhyView(TemplateView):
     template_name = 'core/why.html'
 
 why = WhyView.as_view()
+
+
+
+class MessageListView(ListView):
+    model = models.Message
+    template_name = 'core/message_list.html'
+
+    def get_queryset(self):
+        return models.Message.objects.filter(connection__id=self.kwargs['connection_id']).order_by('-created_utc')
+    
+class MessageCreateView(CreateView):
+    model = models.Message
+    fields = ['text']
+    template_name = 'core/message_form.html'
+
+    def form_valid(self, form):
+        form.instance.from_user = self.request.user
+        form.instance.connection_id = self.kwargs['connection_id']  # Assume connection_id is passed in URL
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('message_list', kwargs={'connection_id': self.kwargs['connection_id']})
+    
+class MessageUpdateView(UpdateView):
+    model = models.Message
+    fields = ['text']
+    template_name = 'core/message_form.html'
+
+    def get_object(self):
+        message = super().get_object()
+        if message.from_user != self.request.user:
+            raise Http404("You are not allowed to edit this message")
+        return message
+
+    def get_success_url(self):
+        return reverse('message_detail', kwargs={'pk': self.object.pk})
+
+class MessageOverviewView(ListView):
+    model = models.Connection
+    template_name = 'core/message_overview.html'
+
+    def get_queryset(self):
+        print(self.request.user.connections.all())
+        return models.Connection.objects.filter(
+            Q(owner=self.request.user) | Q(other_user=self.request.user)
+        ).distinct()

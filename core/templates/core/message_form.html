@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+  <h2>{% if object %}Edit{% else %}New{% endif %} Message</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+
+  <a href="{% url 'message_list' connection_id=connection_id %}">Back to messages</a>
+{% endblock %}
