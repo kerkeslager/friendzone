@@ -1,0 +1,100 @@
+@startuml
+
+' Define entity class template
+class User {
+    id: UUIDField
+    name: CharField
+    display_name()
+    feed()
+    is_connected_with(other_user)
+    connected_users()
+    create_invitation(circles)
+    accept_invitation(invitation, circles)
+}
+
+class Circle {
+    id: UUIDField
+    name: CharField
+    color: CharField
+    owner: ForeignKey(User)
+    members()
+}
+
+class Connection {
+    id: UUIDField
+    created_utc: DateTimeField
+    opposite: ForeignKey(Connection)
+    owner: ForeignKey(User)
+    other_user: ForeignKey(User)
+}
+
+class Invitation {
+    id: UUIDField
+    owner: ForeignKey(User)
+    name: CharField
+    message: CharField
+    circles: ManyToManyField(Circle)
+}
+
+class Message {
+    id: UUIDField
+    connection: ForeignKey(Connection)
+    from_user: ForeignKey(User)
+    created_utc: DateTimeField
+    read: BooleanField
+    text: CharField
+}
+
+class Post {
+    id: UUIDField
+    created_utc: DateTimeField
+    owner: ForeignKey(User)
+    text: CharField
+    circles: ManyToManyField(Circle)
+    publish(circles)
+}
+
+class PostCircle {
+    id: UUIDField
+    circle: ForeignKey(Circle)
+    post: ForeignKey(Post)
+}
+
+class CircleMembership {
+    id: UUIDField
+    circle: ForeignKey(Circle)
+    connection: ForeignKey(Connection)
+}
+
+class PostUser {
+    post_circle: ForeignKey(PostCircle)
+    circle_membership: ForeignKey(CircleMembership)
+}
+
+' Define relationships between entities
+User "1" -- "0..*" Circle : owns
+User "1" -- "0..*" Connection : owns
+User "1" -- "0..*" Invitation : owns
+User "1" -- "0..*" Message : sent
+User "1" -- "0..*" Post : owns
+
+Circle "1" -- "0..*" Connection : consists of
+Circle "1" -- "0..*" CircleMembership : has
+Circle "1" -- "0..*" Post : includes
+
+Connection "1" -- "0..1" Connection : opposite
+
+Invitation "1" -- "0..*" Circle : for
+Invitation "1" -- "0..*" User : sent by
+
+Post "1" -- "0..*" PostCircle : belongs to
+Post "1" -- "0..*" Circle : shared with
+
+CircleMembership "1" -- "0..*" Connection : consists of
+
+PostCircle "1" -- "0..*" Post : belongs to
+PostCircle "1" -- "0..*" Circle : belongs to
+
+PostUser "1" -- "1" CircleMembership : linked to
+
+@enduml
