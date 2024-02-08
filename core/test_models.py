@@ -672,18 +672,26 @@ class MessageTests(TransactionTestCase):
 
         sending_user.send_message_to(receiving_user, text=text)
 
+        # TODO There are a ton of assertions here, which could probably go in
+        # their own tests.
+
+        message = models.Message.objects.first()
+        self.assertEqual(message.text, text)
+        self.assertEqual(message.from_user, sending_user)
+        self.assertEqual(message.to_user, receiving_user)
+
         self.assertEqual(sending_user.connections.count(), 1)
         sending_connection = sending_user.connections.first()
         self.assertEqual(sending_connection.outgoing_messages.count(), 1)
-        self.assertEqual(sending_connection.outgoing_messages.first().text, text)
+        self.assertEqual(sending_connection.outgoing_messages.first(), message)
         self.assertEqual(sending_connection.incoming_messages.count(), 0)
         self.assertEqual(sending_connection.messages.count(), 1)
-        self.assertEqual(sending_connection.messages.first().text, text)
+        self.assertEqual(sending_connection.messages.first(), message)
 
         self.assertEqual(receiving_user.connections.count(), 1)
         receiving_connection = receiving_user.connections.first()
         self.assertEqual(receiving_connection.outgoing_messages.count(), 0)
         self.assertEqual(receiving_connection.incoming_messages.count(), 1)
-        self.assertEqual(receiving_connection.incoming_messages.first().text, text)
+        self.assertEqual(receiving_connection.incoming_messages.first(), message)
         self.assertEqual(receiving_connection.messages.count(), 1)
-        self.assertEqual(receiving_connection.messages.first().text, text)
+        self.assertEqual(receiving_connection.messages.first(), message)
