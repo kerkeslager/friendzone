@@ -54,6 +54,12 @@ class User(auth_models.AbstractUser):
             other_user=other_user,
         ).exists()
 
+    def send_message_to(self, other_user, *, text:str):
+        return Message.objects.create(
+            connection=self.connections.get(other_user=other_user),
+            text=text,
+        )
+
     @property
     def connected_users(self):
         return User.objects.filter(
