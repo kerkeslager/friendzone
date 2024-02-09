@@ -310,7 +310,7 @@ class UserDetailView(DetailView):
                 connections__other_user=result['object']
             )
 
-        result['feed_for_user'] = self.request.feed_for_user(result['object'])
+        result['feed_for_user'] = self.request.user.feed_for_user(result['object'])
 
         return result
 
