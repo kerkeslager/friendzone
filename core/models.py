@@ -54,6 +54,12 @@ class User(auth_models.AbstractUser):
             other_user=other_user,
         ).exists()
 
+    def send_message_to(self, other_user, *, text:str):
+        return Message.objects.create(
+            connection=self.connections.get(other_user=other_user),
+            text=text,
+        )
+
     @property
     def connected_users(self):
         return User.objects.filter(
@@ -151,6 +157,20 @@ class Connection(models.Model):
         through='CircleMembership',
         through_fields=('connection', 'circle'),
     )
+
+    @property
+    def incoming_messages(self):
+        return self.opposite.outgoing_messages.all()
+
+    @property
+    def messages(self):
+        return self.outgoing_messages.all().union(
+            self.incoming_messages.all()
+        ).order_by('-created_utc')
+
+    @property
+    def unread_message_count(self):
+        return self.incoming_messages.filter(is_read=False).count()
 
     @transaction.atomic
     def save(self, *args, **kwargs):
@@ -252,16 +272,19 @@ class Message(models.Model):
     connection = models.ForeignKey(
         'Connection',
         on_delete=models.CASCADE,
-        related_name='messages',
-    )
-    from_user = models.ForeignKey(
-        'User',
-        on_delete=models.CASCADE,
-        related_name='messages',
+        related_name='outgoing_messages',
     )
     created_utc = models.DateTimeField(auto_now_add=True)
-    read = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
     text = models.CharField(max_length=1024)
+
+    @property
+    def from_user(self):
+        return self.connection.owner
+
+    @property
+    def to_user(self):
+        return self.connection.other_user
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
