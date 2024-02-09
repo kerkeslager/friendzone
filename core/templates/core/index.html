@@ -11,7 +11,7 @@
       <button type='submit'>create</button>
     </form>
 
-    {% include 'widgets/post_list.html' %}
+    {% include 'widgets/post_list.html' post_list=requests.user.feed %}
   {% else %}
     <p>Homepage text</p>
   {% endif %}
