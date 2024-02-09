@@ -49,6 +49,25 @@ class User(auth_models.AbstractUser):
             Post.objects.filter(pk__in=post_pks),
         ).order_by('-created_utc')
 
+    def feed_for_user(self, user):
+        if self == user:
+            return self.posts.all()
+
+        connection_pks = Connection.objects.filter(
+            owner=user,
+            other_user=self,
+        )
+
+        circle_membership_pks = CircleMembership.objects.filter(
+            connection__pk__in=connection_pks,
+        ).values_list('pk', flat=True)
+
+        post_pks = PostUser.objects.filter(
+            circle_membership__pk__in=circle_membership_pks,
+        ).values_list('post_circle__post__pk', flat=True)
+
+        return Post.objects.filter(pk__in=post_pks)
+
     def is_connected_with(self, other_user):
         return self.connections.filter(
             other_user=other_user,

@@ -15,5 +15,7 @@
     {% endfor %}
   </p>
 {% endif %}
-{% include 'widgets/post_list.html' %}
+
+{% include 'widgets/post_list.html' with post_list=feed_for_user %}
+
 {% endblock %}

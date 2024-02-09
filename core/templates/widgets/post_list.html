@@ -1,16 +1,16 @@
 <section id='feed'>
-    {% for post in request.user.feed %}
-    <section class='post'>
-        <date>{{ post.created_utc|date:"l, F j, Y g:ia T" }}</date>
-        <header>
-            <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a> said:
-        </header>
-        <main>
-            {{ post.text }}
-        </main>
-        <nav>
-            <a href='{% url "post_detail" pk=post.pk %}'>View</a>
-        </nav>
-    </section>
-    {% endfor %}
+  {% for post in post_list %}
+  <section class='post'>
+    <date>{{ post.created_utc|date:"l, F j, Y g:ia T" }}</date>
+    <header>
+      <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a> said:
+    </header>
+    <main>
+      {{ post.text }}
+    </main>
+    <nav>
+      <a href='{% url "post_detail" pk=post.pk %}'>View</a>
+    </nav>
+  </section>
+  {% endfor %}
 </section>
