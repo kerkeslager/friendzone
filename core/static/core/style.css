@@ -1,11 +1,97 @@
-* {
-  position: relative;
+:root {
+  --fg: #111;
+  --bg: #eee;
+  --line-thickness: 0.1rem;
+}
+
+html {
+  font-size: 125%;
   box-sizing: border-box;
+}
+
+*, ::after, ::before {
+  box-sizing: inherit;
+  text-decoration-thickness: var(--line-thickness);
+
+  color: var(--fg);
+  background: var(--bg);
+
+  position: relative;
   margin: 0;
   padding: 0;
 }
 
-body, footer, header, main, section {
+img {
+  max-width: 100%;
+  height: auto; /* relative to width */
+}
+
+a.as-button,
+a:link.as-button,
+a:visited.as-button,
+button,
+input[type='button'],
+input[type='reset'],
+input[type='submit'] {
+  display: inline-flex;
+  padding: 0.15rem 0.6rem 0.3rem 0.6rem;
+  font-family: 'Roboto Slab';
+  font-size: 1rem;
+  font-weight: normal;
+
+  background: var(--bg);
+  color: var(--fg);
+
+  border: var(--line-thickness) solid var(--fg);
+  border-radius: 0.6rem;
+
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button:disabled,
+input[type='button']:disabled,
+input[type='reset']:disabled,
+input[type='submit']:disabled{
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+input[type='email'],
+input[type='number'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='text'],
+input[type='url'],
+textarea,
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-shadow: none;
+  box-sizing: inherit;
+  padding: .4rem 1rem;
+  width: 100%;
+  color: var(--fg);
+  background-color: var(--bg);
+  border: var(--line-thickness) solid var(--fg);
+  border-radius: 0;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--fg);
+  font-style: italic;
+}
+
+fieldset {
+  border: var(--line-thickness) solid var(--fg);
+}
+
+/* end normalization */
+
+body, footer, header, main, section, div {
   display: flex;
   gap: 1rem;
   flex-direction: column;
@@ -41,33 +127,15 @@ form > div {
   gap: 0;
 }
 
-a.as-button,
-a:link.as-button,
-a:visited.as-button,
-button,
-input[type=submit] {
-  background: white;
-  border: 2px solid black;
-  border-radius: 0.6rem;
-  padding: 0.15rem 0.6rem 0.3rem 0.6rem;
-
-  font-family: 'Roboto Slab';
-  font-size: 20px;
-
-  cursor: pointer;
-
-  text-decoration: none;
-}
-
 a,
 a:link,
 a:visited,
 button.as-link {
-  color: black;
+  color: var(--fg);
   padding: 0;
   border: none;
   text-decoration: underline;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: var(--line-thickness);
   cursor: pointer;
 }
 
@@ -93,7 +161,7 @@ body {
   overflow: scroll;
 
   & > header {
-    background: white;
+    background: var(--bg);
     position: sticky;
     z-index: 1;
     top: 0;
@@ -102,10 +170,10 @@ body {
     flex-direction: row;
     align-items: center;
 
-    border-bottom: 2px solid black;
+    border-bottom: var(--line-thickness) solid var(--fg);
     padding: 1rem;
 
-    & > img {
+    & > svg {
       height: 3rem;
     }
   }
@@ -118,14 +186,14 @@ body {
   }
 
   & > footer {
-    background: white;
+    background: var(--bg);
 
     flex-direction: row;
     align-items: center;
     justify-content: center;
 
     width: 100%;
-    border-top: 2px solid black;
+    border-top: var(--line-thickness) solid var(--fg);
     margin-top: auto;
     position: sticky;
     bottom: 0;
@@ -136,7 +204,7 @@ body {
 #feed {
   .post:not(:first-child) {
     padding-top: 1rem;
-    border-top: 2px solid black;
+    border-top: var(--line-thickness) solid var(--fg);
   }
 
   .post {
