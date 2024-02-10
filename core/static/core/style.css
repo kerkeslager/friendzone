@@ -26,6 +26,14 @@ html {
   position: relative;
   margin: 0;
   padding: 0;
+  letter-spacing: 0.04rem;
+  word-spacing: 0.06rem;
+}
+
+h1, h2, h3 {
+  font-family: 'Roboto Serif', serif;
+  letter-spacing: normal;
+  letter-spacing: normal;
 }
 
 img {
@@ -104,6 +112,7 @@ select {
   background-color: var(--bg);
   border: var(--line-thickness) solid var(--fg);
   border-radius: 0;
+  font-family: 'Roboto Mono';
   font-size: 0.9rem;
 }
 
