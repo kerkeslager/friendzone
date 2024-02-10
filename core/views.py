@@ -285,6 +285,11 @@ class SignupView(CreateView):
 
 signup = SignupView.as_view()
 
+class StyleView(TemplateView):
+    template_name = 'core/style.html'
+
+style = StyleView.as_view()
+
 class UserDetailView(DetailView):
     model = models.User
 

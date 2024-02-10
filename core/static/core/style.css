@@ -54,14 +54,34 @@ input[type='submit'] {
 
   cursor: pointer;
   text-decoration: none;
+  transition: transform 0.2s ease-in-out;
+  transform-origin: center;
+}
+
+a.as-button:hover,
+a:link.as-button:hover,
+a:visited.as-button:hover,
+button:hover,
+input[type='button']:hover,
+input[type='reset']:hover,
+input[type='submit']:hover {
+  transform: scale(1.1);
+  z-index: 1;
 }
 
 button:disabled,
 input[type='button']:disabled,
 input[type='reset']:disabled,
-input[type='submit']:disabled{
+input[type='submit']:disabled {
   border-style: dashed;
   cursor: not-allowed;
+}
+
+button:disabled:hover,
+input[type='button']:disabled:hover,
+input[type='reset']:disabled:hover,
+input[type='submit']:disabled:hover {
+  transform: none;
 }
 
 input[type='email'],
@@ -78,18 +98,73 @@ select {
   appearance: none;
   box-shadow: none;
   box-sizing: inherit;
-  padding: .4rem 1rem;
+  padding: .2rem .3rem;
   width: 100%;
   color: var(--fg);
   background-color: var(--bg);
   border: var(--line-thickness) solid var(--fg);
   border-radius: 0;
+  font-size: 0.9rem;
+}
+
+input[type='email'],
+input[type='number'],
+input[type='password'],
+input[type='search'],
+input[type='tel'],
+input[type='text'],
+input[type='url'],
+select {
+  width: 20rem;
+}
+
+textarea {
+  width: 25rem;
+  height: 5rem;
+}
+
+input[type='checkbox'],
+input[type='checkbox']:checked {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  border: var(--line-thickness) solid var(--fg);
+  background: var(--bg);
+  width: 1rem;
+  height: 1rem;
+}
+
+input[type='checkbox']:checked {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='%23111' stroke-width='2.5'/></svg>");
+}
+
+@media (prefers-color-scheme: dark) {
+  input[type='checkbox']:checked {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='%23eee' stroke-width='2.5'/></svg>");
+  }
 }
 
 input::placeholder,
 textarea::placeholder {
   color: var(--fg);
   font-style: italic;
+  font-weight: light;
+  opacity: 1;
+}
+
+input,
+textarea {
+  transform-origin: top left;
+  transition: transform 0.2s ease-in-out;
+  z-index: 1;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  transform: scale(1.15);
+  transition: transform 0.2s ease-in-out;
 }
 
 fieldset {
@@ -135,6 +210,7 @@ form > div {
 }
 
 a,
+a:active,
 a:link,
 a:visited,
 button.as-link {
@@ -143,20 +219,21 @@ button.as-link {
   border: none;
   text-decoration: underline;
   text-decoration-thickness: var(--line-thickness);
+  transition: transform 0.2s ease-in-out;
+  transform-origin: 50% 70%;
   cursor: pointer;
 }
 
 a:hover,
-a:hover.as-button,
-button:hover,
-input[type=submit]:hover {
-  font-size: 22px;
-  border-width: 2.5px;
+a:active:hover,
+a:visited:hover,
+button.as-link:hover {
+  transform: scale(1.2);
+  z-index: 1;
 }
 
 html {
   font-family: 'Roboto Slab';
-  font-size: 20px;
   flex-direction: column;
   height: 100%;
 }

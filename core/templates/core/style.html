@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+{% load markdown %}
+
+{% block title %}style{% endblock %}
+
+{% block main %}
+  <h1>Style</h1>
+
+  <p>
+    This page is not part of FriendZone's functionality. The purpose of this
+    page is to showcase the styles of elements for testing purposes. This page
+    should not be linked anywhere on the site.
+  </p>
+
+  <h2>Headers</h2>
+
+  <h1>h1: The quick brown fox jumps over the lazy dog.</h1>
+  <h2>h2: The quick brown fox jumps over the lazy dog.</h2>
+  <h3>h3: The quick brown fox jumps over the lazy dog.</h3>
+
+  <p>Note: we aren't including h4 or smaller headers.</p>
+
+  <h2>Buttons</h2>
+
+  <p>
+    <a class='as-button' href='https://www.gnu.org/licenses/gpl-3.0.en.html#license-text'>a.as-button</a>
+    <button>button</button>
+    <input type='button' value="input[type='button']"/>
+    <input type='reset' value="input[type='reset']"/>
+    <input type='submit' value="input[type='submit']"/>
+    <button disabled='true'>button:disabled</button>
+    <input type='button' disabled='true' value="input[type='button']:disabled"/>
+    <input type='reset' disabled='true' value="input[type='reset']:disabled"/>
+    <input type='submit' disabled='true' value="input[type='submit']:disabled"/>
+  </p>
+
+  <h2>Links</h2>
+
+  <p>
+    <a href='https://www.gnu.org/licenses/gpl-3.0.en.html#license-text'>a link</a>
+    <button class='as-link'>button.as_link</button>
+  </p>
+
+  <h2>Inputs</h2>
+
+  <p>
+    <label>input[type='email']<label>
+    <input type='email' placeholder='Lorem ipsum'></input>
+  </p>
+  <p>
+    <label>input[type='number']<label>
+    <input type='number' placeholder='Lorem ipsum'></input>
+  </p>
+  <p>
+    <label>input[type='password']<label>
+    <input type='password' placeholder='Lorem ipsum'></input>
+  </p>
+  <p>
+    <label>input[type='search']<label>
+    <input type='search' placeholder='Lorem ipsum'></input>
+  </p>
+  <p>
+    <label>input[type='tel']<label>
+    <input type='tel' placeholder='Lorem ipsum'></input>
+  </p>
+  <p>
+    <label>input[type='text']<label>
+    <input type='text' placeholder='Lorem ipsum'></input>
+  </p>
+  <p>
+    <label>input[type='url']<label>
+    <input type='url' placeholder='Lorem ipsum'></input>
+  </p>
+  <p>
+    <label>textarea</label>
+    <textarea placeholder='Lorem ipsum'></textarea>
+  </p>
+  <p>
+    <label>select</label>
+    <select>
+      <option>Brie</option>
+      <option>Chevre</option>
+      <option>Gouda</option>
+      <option>Mozarella</option>
+      <option>Pepper Jack</option>
+    </select>
+  </p>
+  <p><input type='checkbox'/><label>checkbox</label></p>
+{% endblock %}
