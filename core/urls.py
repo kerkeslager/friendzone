@@ -36,6 +36,7 @@ urlpatterns = [
     path('invites/', include(invite_urlpatterns)),
 
     path('settings', views.settings, name='settings'),
+    path('style', views.style, name='style'),
 
     path('users/<uuid:pk>', views.user_detail, name='user_detail'),
 
