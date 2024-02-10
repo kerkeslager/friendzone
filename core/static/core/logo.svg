@@ -2,14 +2,14 @@
   <path
     d='M 30 90 Q 30 0 60 0'
     fill='transparent'
-    stroke='black'
+    stroke='currentColor'
     stroke-linecap='round'
     stroke-linejoin='round'
     stroke-width='9' />
   <path
     d='M 22.5 22.5 L 60 45 L 7.5 52.5 L 45 75'
     fill='transparent'
-    stroke='black'
+    stroke='currentColor'
     stroke-linecap='round'
     stroke-linejoin='round'
     stroke-width='9' />

@@ -17,7 +17,7 @@
 
   <body>
     <header>
-      <img src='{% static 'core/logo.svg' %}'/>
+      {% include 'snippets/logo.svg' %}
 
       {% if request.user.is_authenticated %}
         <a href='{% url "index" %}'>home</a>
