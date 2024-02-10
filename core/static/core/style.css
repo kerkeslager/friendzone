@@ -4,6 +4,13 @@
   --line-thickness: 0.1rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #eee;
+    --bg: #333;
+  }
+}
+
 html {
   font-size: 125%;
   box-sizing: border-box;
