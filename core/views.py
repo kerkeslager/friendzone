@@ -159,7 +159,11 @@ class InvitationDetailView(DetailView):
             if self.request.user == self.object.owner:
                 qr = pyqrcode.create(self.request.build_absolute_uri())
                 qr_buffer = io.BytesIO()
-                qr.svg(qr_buffer, omithw=True)
+                qr.svg(
+                    qr_buffer,
+                    module_color='currentColor',
+                    omithw=True,
+                )
 
                 data['qr'] = mark_safe(
                     qr_buffer.getvalue().decode('utf-8'),
