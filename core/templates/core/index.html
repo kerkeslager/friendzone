@@ -1,5 +1,4 @@
 {% extends 'core/base.html' %}
-{% load markdown %}
 
 {% block title %}home{% endblock %}
 
@@ -11,7 +10,7 @@
       <button type='submit'>create</button>
     </form>
 
-    {% include 'widgets/post_list.html' with post_list=requests.user.feed %}
+    {% include 'widgets/post_list.html' with post_list=request.user.feed.all %}
   {% else %}
     <p>Homepage text</p>
   {% endif %}
