@@ -13,7 +13,10 @@ class AlreadyConnectedException(Exception):
 
 class User(auth_models.AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=256)
+    name = models.CharField(
+        help_text='If no name is given, your public display will default to your username.',
+        max_length=256,
+    )
 
     allow_js = models.BooleanField(default=True)
     foreground_color = models.CharField(blank=True, max_length=16)
@@ -32,6 +35,9 @@ class User(auth_models.AbstractUser):
             Circle.objects.create(owner=self, color='000088', name='Friends')
 
         return result
+
+    def get_absolute_url(self):
+        return reverse('user_detail', args=[str(self.pk)])
 
     @property
     def display_name(self):

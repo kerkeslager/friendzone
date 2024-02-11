@@ -5,7 +5,9 @@
 {% block main %}
 <p>{{ object.display_name }}'s profile</p>
 
-{% if request.user != object %}
+{% if request.user == object %}
+  <a href='{% url "profile_edit" %}'>edit profile</a>
+{% else %}
   <p>
     In circles:
     {% for circle in in_circles %}

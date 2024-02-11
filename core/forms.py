@@ -46,6 +46,13 @@ class PostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
 
+class ProfileForm(forms.ModelForm):
+    name = forms.CharField(required=False)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('name',)
+
 class SignupForm(UserCreationForm):
     class Meta:
         model = get_user_model()
