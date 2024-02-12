@@ -216,6 +216,12 @@ textarea:focus {
 
 fieldset {
   border: var(--line-thickness) solid var(--fg);
+  padding: 0.5rem 1.2rem 0.8rem 1.2rem;
+  border-radius: 1rem;
+
+  & > legend {
+    line-height: 1;
+  }
 }
 
 /* end normalization */
