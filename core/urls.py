@@ -30,6 +30,8 @@ urlpatterns = [
 
     path('connections', views.connection_list, name='connection_list'),
 
+    path('style.css', views.css_style, name='css_style'),
+
     path('posts/', include(post_urlpatterns)),
 
     path('invites', views.invite_list, name='invite_list'),
