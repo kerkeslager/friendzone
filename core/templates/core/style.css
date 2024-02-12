@@ -46,6 +46,20 @@ html {
   padding: 0;
   letter-spacing: 0.04rem;
   word-spacing: 0.06rem;
+
+  /*
+   * TODO
+   * The following styles set the line height, which creates padding on either
+   * side of each line of text. This creates a de-facto margin at the top and
+   * bottom of text, which is not what we want. What we want is spacing
+   * between lines. The following proposed CSS features will probably fix this,
+   * but are not supported by browsers yet:
+   *
+   * text-box-edge: cap alphabetic;
+   * text-box-trim: both;
+   */
+  line-height: 2;
+  vertical-align: baseline;
 }
 
 h1, h2, h3 {
@@ -299,7 +313,7 @@ body {
     flex-direction: column;
     margin: 0 auto;
     width: calc(100% - 2rem);
-    max-width: 50rem;
+    max-width: 40rem;
   }
 
   & > footer {
@@ -353,6 +367,17 @@ body {
   }
 }
 
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  & > li {
+    margin-left: 1rem;
+    list-style-type: square;
+  }
+}
+
 section.qr-code svg {
   width: 20rem;
   align-self: center;
@@ -362,7 +387,7 @@ section.qr-code svg {
   gap: 0;
 
   & > .tab-list {
-    padding: 0 1.25rem;
+    padding: 0 1.5rem;
 
     & > .tab {
       border: var(--line-thickness) solid var(--fg);
@@ -379,7 +404,7 @@ section.qr-code svg {
 
   & > .panel {
     border: var(--line-thickness) solid var(--fg);
-    border-radius: 0.5rem;
-    padding: 1rem;
+    border-radius: 1rem;
+    padding: 0.8rem 2rem 1.5rem 2rem;
   }
 }
