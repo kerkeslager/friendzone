@@ -280,7 +280,7 @@ body {
   & > header {
     background: var(--bg);
     position: sticky;
-    z-index: 1;
+    z-index: 2;
     top: 0;
 
     display: flex;
@@ -315,7 +315,7 @@ body {
     position: sticky;
     bottom: 0;
     padding: 1rem;
-    z-index: 1;
+    z-index: 2;
   }
 }
 
