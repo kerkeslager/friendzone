@@ -357,3 +357,29 @@ section.qr-code svg {
   width: 20rem;
   align-self: center;
 }
+
+.tab-area {
+  gap: 0;
+
+  & > .tab-list {
+    padding: 0 1.25rem;
+
+    & > .tab {
+      border: var(--line-thickness) solid var(--fg);
+      border-radius: 0.5rem 0.5rem 0 0;
+      padding: 0.2rem 0.75rem 0.2rem 0.75rem;
+      z-index: 1;
+      margin-bottom: calc(0px - var(--line-thickness));
+    }
+
+    & > .current.tab {
+      border-bottom-color: var(--bg);
+    }
+  }
+
+  & > .panel {
+    border: var(--line-thickness) solid var(--fg);
+    border-radius: 0.5rem;
+    padding: 1rem;
+  }
+}

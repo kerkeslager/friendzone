@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+
+{% block title %}about{% endblock %}
+
+{% block main %}
+  <h1>About</h1>
+
+  <section class='tab-area'>
+    {% include 'core/about_tabs.html' with current_tab='about_main' %}
+
+    <section class='panel'>
+      <h2>About</h2>
+
+      <p>Hello</p>
+    </section>
+  </section>
+{% endblock %}
+
