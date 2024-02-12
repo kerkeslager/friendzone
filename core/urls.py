@@ -2,6 +2,12 @@ from django.urls import include, path
 
 from . import views
 
+about_urlpatterns = [
+    path('moderation', views.about_moderation, name='about_moderation'),
+    path('philosophy', views.about_philosophy, name='about_philosophy'),
+    path('privacy', views.about_privacy, name='about_privacy'),
+]
+
 circle_urlpatterns = [
     path('new', views.circle_create, name='circle_create'),
     path('<uuid:pk>/delete', views.circle_delete, name='circle_delete'),
@@ -25,6 +31,9 @@ post_urlpatterns = [
 ]
 
 urlpatterns = [
+    path('about', views.about_main, name='about_main'),
+    path('about/', include(about_urlpatterns)),
+
     path('circles', views.circle_list, name='circle_list'),
     path('circles/', include(circle_urlpatterns)),
 

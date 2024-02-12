@@ -14,6 +14,26 @@ import pyqrcode
 
 from . import forms, models
 
+class AboutView(TemplateView):
+    template_name = 'core/about.html'
+
+about_main = AboutView.as_view()
+
+class AboutModerationView(TemplateView):
+    template_name = 'core/about_moderation.html'
+
+about_moderation = AboutModerationView.as_view()
+
+class AboutPhilosophyView(TemplateView):
+    template_name = 'core/about_philosophy.html'
+
+about_philosophy = AboutPhilosophyView.as_view()
+
+class AboutPrivacy(TemplateView):
+    template_name = 'core/about_privacy.html'
+
+about_privacy = AboutPrivacy.as_view()
+
 class CircleCreateView(CreateView):
     model = models.Circle
     fields = ('name', 'color')

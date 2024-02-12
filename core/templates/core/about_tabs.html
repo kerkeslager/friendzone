@@ -1,0 +1,25 @@
+<nav class='tab-list'>
+  {% if current_tab == 'about_main' %}
+    <span class='current tab'>about</span>
+  {% else %}
+    <span class='tab'><a href='{% url "about_main" %}'>about</a></span>
+  {% endif %}
+
+  {% if current_tab == 'about_moderation' %}
+    <span class='current tab'>moderation</span>
+  {% else %}
+    <span class='tab'><a href='{% url "about_moderation" %}'>moderation</a></span>
+  {% endif %}
+
+  {% if current_tab == 'about_philosophy' %}
+    <span class='current tab'>philosophy</span>
+  {% else %}
+    <span class='tab'><a href='{% url "about_philosophy" %}'>philosophy</a></span>
+  {% endif %}
+
+  {% if current_tab == 'about_privacy' %}
+    <span class='current tab'>privacy</span>
+  {% else %}
+    <span class='tab'><a href='{% url "about_privacy" %}'>privacy</a></span>
+  {% endif %}
+</nav>
