@@ -38,6 +38,8 @@ urlpatterns = [
     path('settings', views.settings, name='settings'),
     path('style', views.style, name='style'),
 
+    path('users/me/edit', views.profile_edit, name='profile_edit'),
+    path('users/me', views.user_detail, name='profile_detail'),
     path('users/<uuid:pk>', views.user_detail, name='user_detail'),
 
     path('welcome', views.welcome, name='welcome'),

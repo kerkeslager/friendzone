@@ -3,5 +3,11 @@
 {% block title %}welcome{% endblock %}
 
 {% block main %}
-  Welcome to FriendZone!
+  <p>Welcome to FriendZone!</p>
+
+  <p>
+    To get started using FriendZone,
+    <a href='{% url "profile_edit" %}'>create your profile</a> or
+    <a href='{% url "invite_create" %}'>invite someone to connect</a>.
+  </p>
 {% endblock %}

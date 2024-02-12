@@ -185,6 +185,16 @@ class InvitationListView(ListView):
 
 invite_list = InvitationListView.as_view()
 
+class ProfileEditView(UpdateView):
+    template_name = 'core/profile_form.html'
+    model = models.User
+    form_class = forms.ProfileForm
+
+    def get_object(self):
+        return self.request.user
+
+profile_edit = ProfileEditView.as_view()
+
 class DeleteUserView(DeleteView):
     model = models.User
     success_url = reverse_lazy('delete_done')
@@ -304,6 +314,9 @@ class UserDetailView(DetailView):
     model = models.User
 
     def get_object(self):
+        if 'pk' not in self.kwargs:
+            return self.request.user
+
         user = get_object_or_404(
             models.User,
             pk=self.kwargs['pk'],
