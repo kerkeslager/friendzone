@@ -12,6 +12,10 @@
 
     <link rel='stylesheet' href='{% url "css_style" %}'/>
 
+    {% if request.user.allow_js %}
+      <script type='text/javascript' src='{% static "core/script.js" %}'></script>
+    {% endif %}
+
     <title>fz | {% block title %}{% endblock %}</title>
   </head>
 
