@@ -108,5 +108,6 @@ class TestUserLoginFirefox(IntegrationTests, StaticLiveServerTestCase):
             options=options,
             service=FirefoxService(GeckoDriverManager().install()),
         )
+        cls.browser.set_window_size(1920, 1080)
 
         super().setUpClass()
