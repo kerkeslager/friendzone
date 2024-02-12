@@ -10,7 +10,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Roboto+Serif&family=Roboto+Slab&display=swap" rel="stylesheet">
 
-    <link rel='stylesheet' href='{% static "core/style.css" %}'/>
+    <link rel='stylesheet' href='{% url "css_style" %}'/>
+
+    {% if request.user.allow_js %}
+      <script type='text/javascript' src='{% static "core/script.js" %}'></script>
+    {% endif %}
 
     <title>fz | {% block title %}{% endblock %}</title>
   </head>

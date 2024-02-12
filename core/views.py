@@ -80,6 +80,12 @@ class ConnectionListView(ListView):
 
 connection_list = ConnectionListView.as_view()
 
+class CSSView(TemplateView):
+    template_name = 'core/style.css'
+    content_type = 'text/css'
+
+css_style = CSSView.as_view()
+
 class InvitationCreateView(CreateView):
     model = models.Invitation
     success_url = reverse_lazy('invite_list')

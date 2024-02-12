@@ -1,13 +1,31 @@
 :root {
-  --fg: #111;
-  --bg: #eee;
+  {% if request.user.foreground_color %}
+    --fg: {{ request.user.foreground_color }};
+  {% else %}
+    --fg: #111;
+  {% endif %}
+
+  {% if request.user.background_color %}
+    --bg: {{ request.user.background_color }};
+  {% else %}
+    --bg: #eee;
+  {% endif %}
   --line-thickness: 0.1rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fg: #eee;
-    --bg: #333;
+    {% if request.user.foreground_color %}
+      --fg: {{ request.user.foreground_color }};
+    {% else %}
+      --fg: #eee;
+    {% endif %}
+
+    {% if request.user.background_color %}
+      --bg: {{ request.user.background_color }};
+    {% else %}
+      --bg: #333;
+    {% endif %}
   }
 }
 
@@ -144,15 +162,21 @@ input[type='checkbox']:checked {
   height: 1rem;
 }
 
-input[type='checkbox']:checked {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='%23111' stroke-width='2.5'/></svg>");
-}
-
-@media (prefers-color-scheme: dark) {
+{% if request.user.foreground_color %}
   input[type='checkbox']:checked {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='%23eee' stroke-width='2.5'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='{{ request.user.foreground_color|urlencode }}' stroke-width='2.5'/></svg>");
   }
-}
+{% else %}
+  input[type='checkbox']:checked {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='%23111' stroke-width='2.5'/></svg>");
+  }
+
+  @media (prefers-color-scheme: dark) {
+    input[type='checkbox']:checked {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='%23eee' stroke-width='2.5'/></svg>");
+    }
+  }
+{% endif %}
 
 input::placeholder,
 textarea::placeholder {

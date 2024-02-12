@@ -5,11 +5,14 @@ from django.db import models, transaction
 from django.urls import reverse
 import django.contrib.auth.models as auth_models
 
+from . import validators
+
 class ConnectionLimitException(Exception):
     pass
 
 class AlreadyConnectedException(Exception):
     pass
+
 
 class User(auth_models.AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -19,8 +22,16 @@ class User(auth_models.AbstractUser):
     )
 
     allow_js = models.BooleanField(default=True)
-    foreground_color = models.CharField(blank=True, max_length=16)
-    background_color = models.CharField(blank=True, max_length=16)
+    foreground_color = models.CharField(
+        blank=True,
+        max_length=16,
+        validators=[validators.validate_color],
+    )
+    background_color = models.CharField(
+        blank=True,
+        max_length=16,
+        validators=[validators.validate_color],
+    )
 
     def __str__(self):
         return self.display_name
