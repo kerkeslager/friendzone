@@ -42,8 +42,8 @@ class User(auth_models.AbstractUser):
         result = super().save(**kwargs)
 
         if create_default_circles:
-            Circle.objects.create(owner=self, color='008800', name='Family')
-            Circle.objects.create(owner=self, color='000088', name='Friends')
+            Circle.objects.create(owner=self, color='#008800', name='Family')
+            Circle.objects.create(owner=self, color='#000088', name='Friends')
 
         return result
 
@@ -260,7 +260,10 @@ class UserConnection(models.Model):
 class Circle(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
-    color = models.CharField(max_length=6)
+    color = models.CharField(
+        max_length=16,
+        validators=[validators.validate_color],
+    )
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
