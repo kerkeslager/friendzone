@@ -266,8 +266,14 @@ class PostDetailView(DetailView):
 
 post_detail = PostDetailView.as_view()
 
-class SettingsView(TemplateView):
+class SettingsView(UpdateView):
+    model = models.User
+    fields = ('allow_js', 'foreground_color', 'background_color')
     template_name = 'core/settings.html'
+    success_url = reverse_lazy('settings')
+
+    def get_object(self):
+        return self.request.user
 
 settings = SettingsView.as_view()
 

@@ -15,6 +15,10 @@ class User(auth_models.AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=256)
 
+    allow_js = models.BooleanField(default=True)
+    foreground_color = models.CharField(blank=True, max_length=16)
+    background_color = models.CharField(blank=True, max_length=16)
+
     def __str__(self):
         return self.display_name
 
