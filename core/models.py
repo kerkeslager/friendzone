@@ -13,7 +13,7 @@ class AlreadyConnectedException(Exception):
     pass
 
 def validate_color(color:str):
-    color = color.replace(' ','').lower()
+    color = color.strip().lower()
 
     W3C_COLORS = {
         'aqua',
