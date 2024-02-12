@@ -1,10 +1,11 @@
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.urls import reverse
 import django.contrib.auth.models as auth_models
+
+from . import validators
 
 class ConnectionLimitException(Exception):
     pass
@@ -12,183 +13,6 @@ class ConnectionLimitException(Exception):
 class AlreadyConnectedException(Exception):
     pass
 
-def validate_color(color:str):
-    color = color.strip().lower()
-
-    W3C_COLORS = {
-        'aqua',
-        'black',
-        'blue',
-        'fuchsia',
-        'gray',
-        'green',
-        'lime',
-        'maroon',
-        'navy',
-        'olive',
-        'purple',
-        'red',
-        'silver',
-        'teal',
-        'white',
-        'yellow',
-    }
-
-    if color.lower() in W3C_COLORS:
-        return
-
-    CROSS_BROWSER_COLORS = {
-        'aliceblue',
-        'antiquewhite',
-        'aqua',
-        'aquamarine',
-        'azure',
-        'beige',
-        'bisque',
-        'black',
-        'blanchedalmond',
-        'blue',
-        'blueviolet',
-        'brown',
-        'burlywood',
-        'cadetblue',
-        'chartreuse',
-        'chocolate',
-        'coral',
-        'cornflowerblue',
-        'cornsilk',
-        'crimson',
-        'cyan',
-        'darkblue',
-        'darkcyan',
-        'darkgoldenrod',
-        'darkgray',
-        'darkgreen',
-        'darkkhaki',
-        'darkmagenta',
-        'darkolivegreen',
-        'darkorange',
-        'darkorchid',
-        'darkred',
-        'darksalmon',
-        'darkseagreen',
-        'darkslateblue',
-        'darkslategray',
-        'darkturquoise',
-        'darkviolet',
-        'deeppink',
-        'deepskyblue',
-        'dimgray',
-        'dodgerblue',
-        'firebrick',
-        'floralwhite',
-        'forestgreen',
-        'fuchsia',
-        'gainsboro',
-        'ghostwhite',
-        'gold',
-        'goldenrod',
-        'gray',
-        'green',
-        'greenyellow',
-        'honeydew',
-        'hotpink',
-        'indianred',
-        'indigo',
-        'ivory',
-        'khaki',
-        'lavender',
-        'lavenderblush',
-        'lawngreen',
-        'lemonchiffon',
-        'lightblue',
-        'lightcoral',
-        'lightcyan',
-        'lightgoldenrodyellow',
-        'lightgrey',
-        'lightgreen',
-        'lightpink',
-        'lightsalmon',
-        'lightseagreen',
-        'lightskyblue',
-        'lightslategray',
-        'lightsteelblue',
-        'lightyellow',
-        'lime',
-        'limegreen',
-        'linen',
-        'magenta',
-        'maroon',
-        'mediumaquamarine',
-        'mediumblue',
-        'mediumorchid',
-        'mediumpurple',
-        'mediumseagreen',
-        'mediumslateblue',
-        'mediumspringgreen',
-        'mediumturquoise',
-        'mediumvioletred',
-        'midnightblue',
-        'mintcream',
-        'mistyrose',
-        'moccasin',
-        'navajowhite',
-        'navy',
-        'oldlace',
-        'olive',
-        'olivedrab',
-        'orange',
-        'orangered',
-        'orchid',
-        'palegoldenrod',
-        'palegreen',
-        'paleturquoise',
-        'palevioletred',
-        'papayawhip',
-        'peachpuff',
-        'peru',
-        'pink',
-        'plum',
-        'powderblue',
-        'purple',
-        'red',
-        'rosybrown',
-        'royalblue',
-        'saddlebrown',
-        'salmon',
-        'sandybrown',
-        'seagreen',
-        'seashell',
-        'sienna',
-        'silver',
-        'skyblue',
-        'slateblue',
-        'slategray',
-        'snow',
-        'springgreen',
-        'steelblue',
-        'tan',
-        'teal',
-        'thistle',
-        'tomato',
-        'turquoise',
-        'violet',
-        'wheat',
-        'white',
-        'whitesmoke',
-        'yellow',
-        'yellowgreen',
-    }
-
-    if color in CROSS_BROWSER_COLORS:
-        return
-
-    if color.startswith('#'):
-        HEX_CHARS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' }
-        if len(color) in [4,7] and all(ch in HEX_CHARS for ch in color[1:]):
-            return
-
-    raise ValidationError('Only HTML color names or hex codes starting with # are supported')
 
 class User(auth_models.AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -201,12 +25,12 @@ class User(auth_models.AbstractUser):
     foreground_color = models.CharField(
         blank=True,
         max_length=16,
-        validators=[validate_color],
+        validators=[validators.validate_color],
     )
     background_color = models.CharField(
         blank=True,
         max_length=16,
-        validators=[validate_color],
+        validators=[validators.validate_color],
     )
 
     def __str__(self):
