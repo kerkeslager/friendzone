@@ -133,6 +133,27 @@ input[type='submit']:hover {
   z-index: 1;
 }
 
+@keyframes button-wiggle {
+  0%  { transform: scale(1.1) skewX(0); }
+  75% { transform: scale(1.1) skewX(0); }
+  80% { transform: scale(1.1) skewX(15deg); }
+  85% { transform: scale(1.1) skewX(-15deg); }
+  90% { transform: scale(1.1) skewX(15deg); }
+  95% { transform: scale(1.1) skewX(-15deg); }
+}
+
+a.as-button:focus,
+a:link.as-button:focus,
+a:visited.as-button:focus,
+button:focus,
+input[type='button']:focus,
+input[type='reset']:focus,
+input[type='submit']:focus {
+  outline: none;
+  animation: button-wiggle 3s linear infinite;
+  z-index: 1;
+}
+
 button:disabled,
 input[type='button']:disabled,
 input[type='reset']:disabled,
@@ -198,6 +219,20 @@ input[type='checkbox']:checked {
   background: var(--bg);
   width: 1rem;
   height: 1rem;
+}
+
+@keyframes checkbox-wiggle {
+  0%  { transform: scale(1.2) skewX(0); }
+  75% { transform: scale(1.2) skewX(0); }
+  80% { transform: scale(1.2) skewX(15deg); }
+  85% { transform: scale(1.2) skewX(-15deg); }
+  90% { transform: scale(1.2) skewX(15deg); }
+  95% { transform: scale(1.2) skewX(-15deg); }
+}
+
+input[type='checkbox']:focus {
+  animation: checkbox-wiggle 3s linear infinite;
+  transform-origin: center;
 }
 
 {% if request.user.foreground_color %}
@@ -295,10 +330,6 @@ button.as-link {
   transition: transform 0.2s ease-in-out;
   transform-origin: 50% 70%;
   cursor: pointer;
-}
-
-button.as-link:focus {
-  outline: none;
 }
 
 a:focus,

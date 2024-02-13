@@ -37,7 +37,7 @@
 
         <form method='post' action='{% url "logout" %}'>
           {% csrf_token %}
-          <button class='as-link' type='submit'>logout</button>
+          <button class='as-link' type='submit' tabindex='-1'>logout</button>
         </form>
       {% else %}
         <a style='margin-left: auto;' href='{% url "login" %}'>login</a>
