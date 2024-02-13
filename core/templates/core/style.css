@@ -476,3 +476,22 @@ ul {
     padding: 2rem;
   }
 }
+
+.crop-application {
+  overflow: hidden;
+
+  & > img {
+    position: absolute;
+    max-height: none;
+    max-width: none;
+  }
+}
+
+.crop-visualization {
+  & > section {
+    border: var(--line-thickness) dashed var(--fg);
+    position: absolute;
+    background: transparent;
+    padding: 0 1rem;
+  }
+}

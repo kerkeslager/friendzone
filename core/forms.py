@@ -64,10 +64,11 @@ class PostForm(forms.ModelForm):
 
 class ProfileForm(forms.ModelForm):
     name = forms.CharField(required=False)
+    avatar = forms.ImageField(required=False)
 
     class Meta:
         model = get_user_model()
-        fields = ('name',)
+        fields = ('name', 'avatar')
 
 class SettingsForm(forms.ModelForm):
     class Meta:

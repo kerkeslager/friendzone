@@ -5,7 +5,7 @@ from django.db import models, transaction
 from django.urls import reverse
 import django.contrib.auth.models as auth_models
 
-from . import validators
+from . import images, validators
 
 class ConnectionLimitException(Exception):
     pass
@@ -13,14 +13,24 @@ class ConnectionLimitException(Exception):
 class AlreadyConnectedException(Exception):
     pass
 
-
 class User(auth_models.AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # Profile Fields
     name = models.CharField(
         help_text='If no name is given, your public display will default to your username.',
         max_length=256,
     )
+    avatar = models.ImageField(
+        null=True,
+        blank=True,
+        height_field='avatar_height',
+        width_field='avatar_width',
+    )
+    avatar_height = models.PositiveIntegerField(default=0)
+    avatar_width = models.PositiveIntegerField(default=0)
 
+    # Settings Fields
     allow_js = models.BooleanField(default=True)
     foreground_color = models.CharField(
         blank=True,
@@ -53,6 +63,32 @@ class User(auth_models.AbstractUser):
     @property
     def display_name(self):
         return self.name or self.username
+
+    @property
+    def avatar_crop(self):
+        # TODO Allow users to set the crop values
+
+        x0 = 0
+        x1 = self.avatar_width
+        y0 = 0
+        y1 = self.avatar_height
+
+        if self.avatar_height > self.avatar_width:
+            y0 = (self.avatar_height - self.avatar_width) // 2
+            y1 = (self.avatar_height + self.avatar_width) // 2
+
+        elif self.avatar_width > self.avatar_height:
+            x0 = (self.avatar_width - self.avatar_height) // 2
+            x1 = (self.avatar_width + self.avatar_height) // 2
+
+        return images.ImageCrop(
+            image_width=self.avatar_width,
+            image_height=self.avatar_height,
+            x0=x0,
+            x1=x1,
+            y0=y0,
+            y1=y1,
+        )
 
     @property
     def feed(self):
