@@ -36,7 +36,7 @@ about_privacy = AboutPrivacy.as_view()
 
 class CircleCreateView(CreateView):
     model = models.Circle
-    fields = ('name', 'color')
+    form_class = forms.CircleForm
     success_url = reverse_lazy('circle_list')
 
     def form_valid(self, form):
@@ -60,7 +60,7 @@ circle_delete = CircleDeleteView.as_view()
 
 class CircleEditView(UpdateView):
     model = models.Circle
-    fields = ('name','color')
+    form_class = forms.CircleForm
 
     def get_object(self):
         return get_object_or_404(

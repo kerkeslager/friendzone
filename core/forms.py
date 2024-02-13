@@ -4,8 +4,18 @@ from django.contrib.auth.forms import UserCreationForm
 
 from . import models
 
+COLOR_HELP_TEXT = 'Accepts HTML color names and hex codes starting with "#".'
+
 class CircleWidget(forms.CheckboxSelectMultiple):
     option_template_name = 'widgets/circle_checkbox.html'
+
+class CircleForm(forms.ModelForm):
+    class Meta:
+        model = models.Circle
+        fields = ('name', 'color')
+        help_texts = {
+            'color': f"The color of the circle's icon. { COLOR_HELP_TEXT }",
+        }
 
 class InvitationAcceptForm(forms.Form):
     circles = forms.ModelMultipleChoiceField(
@@ -61,8 +71,8 @@ class SettingsForm(forms.ModelForm):
             'allow_js':
                 'All major functionality of the site works without JS, but some '
                 'features may have fewer page loads and more interactivity.',
-            'foreground_color': 'Accepts HTML color names and hex codes starting with "#".',
-            'background_color': 'Accepts HTML color names and hex codes starting with "#".',
+            'foreground_color': COLOR_HELP_TEXT,
+            'background_color': COLOR_HELP_TEXT,
         }
 
 class SignupForm(UserCreationForm):
