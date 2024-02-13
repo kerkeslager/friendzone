@@ -1,0 +1,14 @@
+<section
+    class='crop-application'
+    style='width: {{ width }}; height: {{ height }};'>
+  <img
+    src='{{ img_url }}'
+    style='
+      left: {{ crop.inverse_left_percent }}%;
+      top: {{ crop.top_percent }}%;
+      width: {{ crop.inverse_width_percent }}%;
+      height: {{ crop.inverse_height_percent }}%;
+      max-height: none;
+      max-width: none;
+    '/>
+</section>

@@ -476,3 +476,11 @@ ul {
     padding: 2rem;
   }
 }
+
+.crop-application {
+  overflow: hidden;
+
+  & > img {
+    position: absolute;
+  }
+}

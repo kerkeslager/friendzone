@@ -5,20 +5,7 @@
 {% block main %}
 <p>{{ object.display_name }}'s profile</p>
 
-<section style='width: 20rem; height: 20rem; overflow:hidden;'>
-  <img
-      src='{{ object.avatar.url }}'
-      style='
-        position: absolute;
-        left: {{ object.avatar_crop.inverse_left_percent }}%;
-        top: {{ object.avatar_crop.top_percent }}%;
-        width: {{ object.avatar_crop.inverse_width_percent }}%;
-        height: {{ object.avatar_crop.inverse_height_percent }}%;
-        max-height: none;
-        max-width: none;
-      '
-  />
-</section>
+{% include 'widgets/crop_apply.html' with img_url=object.avatar.url crop=object.avatar_crop width='20rem' height='20rem' %}
 
 {% if request.user == object %}
   <a href='{% url "profile_edit" %}'>edit profile</a>
