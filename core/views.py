@@ -1,4 +1,5 @@
 import io
+from django.core.mail import EmailMessage
 
 from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
@@ -10,6 +11,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
+from django.conf import settings as s
 import pyqrcode
 
 from . import forms, models
@@ -106,14 +108,47 @@ class CSSView(TemplateView):
 
 css_style = CSSView.as_view()
 
+def send_invitation_email_with_qr(invitee_email, invitation_link):
+    # Generate QR Code
+    qr = pyqrcode.create(invitation_link)
+    qr_buffer = io.BytesIO()
+    qr.png(qr_buffer, scale=5)
+    qr_buffer.seek(0)
+
+    # Prepare Email
+    email = EmailMessage(
+        subject="You're Invited!",
+        body="Please scan the attached QR code to accept the invitation.",
+        from_email= s.DEFAULT_FROM_EMAIL,
+        to=[invitee_email]
+    )
+    
+    # Attach QR code
+    email.attach('invitation_qr.png', qr_buffer.getvalue(), 'image/png')
+    
+    # Send Email
+    email.send()
+
 class InvitationCreateView(CreateView):
     model = models.Invitation
     success_url = reverse_lazy('invite_list')
     form_class = forms.InvitationForm
 
     def form_valid(self, form):
+        # Set the invitation owner before saving
         form.instance.owner = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        invitation = form.instance
+        
+        
+        # Generate the absolute URL for the invitation
+        invitation_link = self.request.build_absolute_uri(reverse('invite_detail', kwargs={'pk': form.instance.pk}))
+        
+        # Assuming the form has a field to input the invitee's email
+        if invitation.invitee_email:
+             send_invitation_email_with_qr(invitation.invitee_email, invitation_link)
+        
+        return response
 
 invite_create = InvitationCreateView.as_view()
 

@@ -144,3 +144,10 @@ def environment_var_truthiness(v):
     }[str(v).lower()]
 
 TEST_INTEGRATION_HEADLESS = environment_var_truthiness(os.environ.get('HEADLESS', 1))
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'emails'
+
+DEFAULT_FROM_EMAIL = 'yourname@example.com'

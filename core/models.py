@@ -170,6 +170,7 @@ class Invitation(models.Model):
         'Circle',
         related_name='+',
     )
+    invitee_email = models.EmailField(max_length=254, blank=True, null=True)
 
     def get_absolute_url(self):
         return reverse('invite_detail', args=[str(self.pk)])

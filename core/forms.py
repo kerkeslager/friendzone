@@ -28,14 +28,16 @@ class InvitationAcceptForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
 
+
 class InvitationForm(forms.ModelForm):
     message = forms.CharField(widget=forms.Textarea)
+    
 
     class Meta:
         model = models.Invitation
-        fields = ('name', 'circles', 'message')
+        fields = ('name', 'circles', 'message', 'invitee_email')  # Include the invitee_email in the fields
         widgets = {
-            'circles': CircleWidget,
+            'circles': CircleWidget, 
         }
 
 class PostForm(forms.ModelForm):
