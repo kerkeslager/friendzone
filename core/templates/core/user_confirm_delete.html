@@ -3,15 +3,25 @@
 {% block title %}confirm delete user{% endblock %}
 
 {% block main %}
-  <form method="post">
-    {% csrf_token %}
-    <p>Are you sure you want to delete your account?</p>
-    <p>Note that we really delete your data, so this action cannot be undone.</p>
-    {{ form }}
-    <nav>
-      <input type='submit' value='confirm'>
-      <a class='as-button' href='{% url "settings" %}'>cancel</a>
-    </nav>
-  </form>
+  <h1>Settings</h1>
+
+  <section class='tab-area'>
+    {% include 'core/settings_tabs.html' %}
+
+    <section class='panel'>
+      <h2>Delete account</h2>
+
+      <form method='post'>
+        {% csrf_token %}
+        <p>Are you sure you want to delete your account?</p>
+        <p>Note that we really delete your data, so this action cannot be undone.</p>
+        {{ form }}
+        <nav>
+          <input type='submit' value='confirm'>
+          <a class='as-button' href='{% url "settings" %}'>cancel</a>
+        </nav>
+      </form>
+    </section>
+  </section>
 {% endblock %}
 
