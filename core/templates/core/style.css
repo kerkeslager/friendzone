@@ -551,3 +551,14 @@ h1.message-title {
     & > input:focus { transform: none; }
   }
 }
+
+.avatar-placeholder {
+  width: 20rem;
+  height: 20rem;
+  border: var(--line-thickness) solid var(--fg);
+
+  & svg {
+    width: 100%;
+    height: 100%;
+  }
+}

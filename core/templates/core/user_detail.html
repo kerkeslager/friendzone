@@ -5,7 +5,13 @@
 {% block main %}
 <p>{{ object.display_name }}'s profile</p>
 
-{% include 'widgets/crop_apply.html' with img_url=object.avatar.url crop=object.avatar_crop width='20rem' height='20rem' %}
+{% if object.avatar %}
+  {% include 'widgets/crop_apply.html' with img_url=object.avatar.url crop=object.avatar_crop width='20rem' height='20rem' %}
+{% else %}
+  <section class='avatar-placeholder'>
+    {% include 'snippets/user.svg' %}
+  </section>
+{% endif %}
 
 {% if request.user == object %}
   <a href='{% url "profile_edit" %}'>edit profile</a>
