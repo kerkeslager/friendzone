@@ -384,7 +384,12 @@ ul {
   }
 }
 
-section.qr-code svg {
+.helptext {
+  font-size: 70%;
+  margin-bottom: 0.7rem;
+}
+
+.qr-code svg {
   width: 20rem;
   align-self: center;
 }
