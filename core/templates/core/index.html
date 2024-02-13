@@ -4,11 +4,14 @@
 
 {% block main %}
   {% if request.user.is_authenticated %}
-    <form method='post' action='{% url "post_create" %}'>
-      {% csrf_token %}
-      {{ post_form }}
-      <button type='submit'>create</button>
-    </form>
+    <section>
+      <h3>Post to your feed</h3>
+      <form method='post' action='{% url "post_create" %}'>
+        {% csrf_token %}
+        {{ post_form }}
+        <button type='submit'>create</button>
+      </form>
+    </section>
 
     {% include 'widgets/post_list.html' with post_list=request.user.feed.all %}
   {% else %}
