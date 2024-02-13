@@ -4,8 +4,6 @@
 
 {% block main %}
   {% include 'core/settings_tabs.html' %}
-  <a href='{% url "password_change" %}'>Change password</a>
-  <a href='{% url "delete" %}'>Delete account</a>
 
   <form method='post'>
     {% csrf_token %}
