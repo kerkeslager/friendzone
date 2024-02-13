@@ -4,8 +4,18 @@ from django.contrib.auth.forms import UserCreationForm
 
 from . import models
 
+COLOR_HELP_TEXT = 'Accepts HTML color names and hex codes starting with "#".'
+
 class CircleWidget(forms.CheckboxSelectMultiple):
     option_template_name = 'widgets/circle_checkbox.html'
+
+class CircleForm(forms.ModelForm):
+    class Meta:
+        model = models.Circle
+        fields = ('name', 'color')
+        help_texts = {
+            'color': f"The color of the circle's icon. { COLOR_HELP_TEXT }",
+        }
 
 class InvitationAcceptForm(forms.Form):
     circles = forms.ModelMultipleChoiceField(
@@ -31,6 +41,7 @@ class InvitationForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
+        help_text='This post will be visible to these circles.',
         widget=CircleWidget,
     )
 
@@ -38,7 +49,12 @@ class PostForm(forms.ModelForm):
         model = models.Post
         fields = ('circles', 'text')
         widgets = {
-            'text': forms.Textarea(attrs={ 'rows': 5 }),
+            'text': forms.Textarea(
+                attrs={
+                    'placeholder': "What's on your mind?",
+                    'rows': 5,
+                },
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -52,6 +68,18 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ('name',)
+
+class SettingsForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ('allow_js', 'foreground_color', 'background_color')
+        help_texts = {
+            'allow_js':
+                'All major functionality of the site works without JS, but some '
+                'features may have fewer page loads and more interactivity.',
+            'foreground_color': COLOR_HELP_TEXT,
+            'background_color': COLOR_HELP_TEXT,
+        }
 
 class SignupForm(UserCreationForm):
     class Meta:

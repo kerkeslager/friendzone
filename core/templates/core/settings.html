@@ -3,13 +3,19 @@
 {% block title %}settings{% endblock %}
 
 {% block main %}
-  <a href='{% url "password_change" %}'>Change password</a>
-  <a href='{% url "delete" %}'>Delete account</a>
+  <h1>Settings</h1>
 
-  <form method='post'>
-    {% csrf_token %}
-    {{ form }}
-    <button type='submit'>save</button>
-  </form>
+  <section class='tab-area'>
+    {% include 'core/settings_tabs.html' with current_tab='appearance_settings' %}
 
+    <section class='panel'>
+      <h2>Appearance</h2>
+
+      <form method='post'>
+        {% csrf_token %}
+        {{ form }}
+        <button type='submit'>save</button>
+      </form>
+    </section>
+  </section>
 {% endblock %}

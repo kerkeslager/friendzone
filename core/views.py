@@ -36,7 +36,7 @@ about_privacy = AboutPrivacy.as_view()
 
 class CircleCreateView(CreateView):
     model = models.Circle
-    fields = ('name', 'color')
+    form_class = forms.CircleForm
     success_url = reverse_lazy('circle_list')
 
     def form_valid(self, form):
@@ -60,7 +60,7 @@ circle_delete = CircleDeleteView.as_view()
 
 class CircleEditView(UpdateView):
     model = models.Circle
-    fields = ('name','color')
+    form_class = forms.CircleForm
 
     def get_object(self):
         return get_object_or_404(
@@ -212,9 +212,9 @@ class InvitationListView(ListView):
 invite_list = InvitationListView.as_view()
 
 class ProfileEditView(UpdateView):
-    template_name = 'core/profile_form.html'
-    model = models.User
     form_class = forms.ProfileForm
+    model = models.User
+    template_name = 'core/profile_form.html'
 
     def get_object(self):
         return self.request.user
@@ -303,10 +303,10 @@ class PostDetailView(DetailView):
 post_detail = PostDetailView.as_view()
 
 class SettingsView(UpdateView):
+    form_class = forms.SettingsForm
     model = models.User
-    fields = ('allow_js', 'foreground_color', 'background_color')
-    template_name = 'core/settings.html'
     success_url = reverse_lazy('settings')
+    template_name = 'core/settings.html'
 
     def get_object(self):
         return self.request.user

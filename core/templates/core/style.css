@@ -46,7 +46,15 @@ html {
   padding: 0;
   letter-spacing: 0.04rem;
   word-spacing: 0.06rem;
+}
 
+h1, h2, h3 {
+  font-family: 'Roboto Serif', serif;
+  letter-spacing: normal;
+  word-spacing: normal;
+}
+
+p {
   /*
    * TODO
    * The following styles set the line height, which creates padding on either
@@ -57,15 +65,31 @@ html {
    *
    * text-box-edge: cap alphabetic;
    * text-box-trim: both;
+   *
+   * Until this is supported, we are using a negative margin on the top/bottom
+   * of text elements to achieve this.
    */
+  background: transparent;
   line-height: 2;
-  vertical-align: baseline;
+  margin-top: -0.65rem;
+  margin-bottom: -0.4rem;
 }
 
-h1, h2, h3 {
-  font-family: 'Roboto Serif', serif;
-  letter-spacing: normal;
-  letter-spacing: normal;
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  & ol, & ul {
+    gap: 1.8rem;
+
+    & > li {
+      background: transparent;
+      line-height: 2;
+      margin-top: -0.65rem;
+      margin-bottom: -0.4rem;
+    }
+  }
 }
 
 img {
@@ -106,6 +130,27 @@ input[type='button']:hover,
 input[type='reset']:hover,
 input[type='submit']:hover {
   transform: scale(1.1);
+  z-index: 1;
+}
+
+@keyframes button-wiggle {
+  0%  { transform: scale(1.1) skewX(0); }
+  75% { transform: scale(1.1) skewX(0); }
+  80% { transform: scale(1.1) skewX(15deg); }
+  85% { transform: scale(1.1) skewX(-15deg); }
+  90% { transform: scale(1.1) skewX(15deg); }
+  95% { transform: scale(1.1) skewX(-15deg); }
+}
+
+a.as-button:focus,
+a:link.as-button:focus,
+a:visited.as-button:focus,
+button:focus,
+input[type='button']:focus,
+input[type='reset']:focus,
+input[type='submit']:focus {
+  outline: none;
+  animation: button-wiggle 3s linear infinite;
   z-index: 1;
 }
 
@@ -176,6 +221,20 @@ input[type='checkbox']:checked {
   height: 1rem;
 }
 
+@keyframes checkbox-wiggle {
+  0%  { transform: scale(1.2) skewX(0); }
+  75% { transform: scale(1.2) skewX(0); }
+  80% { transform: scale(1.2) skewX(15deg); }
+  85% { transform: scale(1.2) skewX(-15deg); }
+  90% { transform: scale(1.2) skewX(15deg); }
+  95% { transform: scale(1.2) skewX(-15deg); }
+}
+
+input[type='checkbox']:focus {
+  animation: checkbox-wiggle 3s linear infinite;
+  transform-origin: center;
+}
+
 {% if request.user.foreground_color %}
   input[type='checkbox']:checked {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M13.333 4 6 11.333 l -3.333 -3.333' stroke-linecap='round' stroke='{{ request.user.foreground_color|urlencode }}' stroke-width='2.5'/></svg>");
@@ -218,10 +277,6 @@ fieldset {
   border: var(--line-thickness) solid var(--fg);
   padding: 0.5rem 1.2rem 0.8rem 1.2rem;
   border-radius: 1rem;
-
-  & > legend {
-    line-height: 1;
-  }
 }
 
 /* end normalization */
@@ -277,10 +332,12 @@ button.as-link {
   cursor: pointer;
 }
 
+a:focus,
 a:hover,
 a:active:hover,
 a:visited:hover,
-button.as-link:hover {
+button.as-link:hover,
+button.as-link:focus {
   transform: scale(1.2);
   z-index: 1;
 }
@@ -384,7 +441,12 @@ ul {
   }
 }
 
-section.qr-code svg {
+.helptext {
+  font-size: 70%;
+  margin-bottom: 0.7rem;
+}
+
+.qr-code svg {
   width: 20rem;
   align-self: center;
 }
@@ -411,6 +473,6 @@ section.qr-code svg {
   & > .panel {
     border: var(--line-thickness) solid var(--fg);
     border-radius: 1rem;
-    padding: 0.8rem 2rem 1.5rem 2rem;
+    padding: 2rem;
   }
 }
