@@ -6,24 +6,8 @@ class ImageCrop(namedtuple('ImageCrop', ('original_width', 'original_height', 'x
         return self.x0
 
     @property
-    def right(self):
-        return self.x1 - self.original_width
-
-    @property
     def top(self):
         return self.y0
-
-    @property
-    def bottom(self):
-        return self.y1 - self.original_height
-
-    @property
-    def right_percent(self):
-        return 100 * self.right // self.original_width
-
-    @property
-    def bottom_percent(self):
-        return 100 * self.bottom // self.original_height
 
     @property
     def width(self):
