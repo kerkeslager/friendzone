@@ -495,3 +495,70 @@ ul {
     padding: 0 1rem;
   }
 }
+
+.message {
+  width: fit-content;
+  border: var(--line-thickness) solid var(--fg);
+  border-radius: 1rem;
+  padding: 0.5rem;
+  margin: 0 1rem;
+}
+
+main {
+  flex-direction: column-reverse;
+}
+
+.message.incoming {
+    align-self: flex-start;
+}
+
+.message.outgoing {
+    align-self: flex-end;
+}
+
+h1.message-title {
+  margin-top: -1rem;
+  padding: 1rem 0;
+  position: sticky;
+  top: 5.1rem;
+  background: var(--bg);
+  width: 100%;
+  border-bottom: var(--line-thickness) solid var(--fg);
+  z-index: 1;
+}
+
+.message-form {
+  width: 100%;
+  margin-bottom: -1rem;
+  padding: 1rem 0;
+  border-top: var(--line-thickness) solid var(--fg);
+
+  position: sticky;
+  bottom: 3.425rem; /* There's gotta be a better way */
+
+  display: flex;
+  flex-direction: row;
+
+  div {
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+
+    & > label { display: none; }
+
+    & > input { width: 100%; }
+
+    & > input:focus { transform: none; }
+  }
+}
+
+.avatar-placeholder {
+  width: 20rem;
+  height: 20rem;
+  border: var(--line-thickness) solid var(--fg);
+
+  & svg {
+    width: 100%;
+    height: 100%;
+  }
+}

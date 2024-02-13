@@ -17,6 +17,20 @@ class CircleForm(forms.ModelForm):
             'color': f"The color of the circle's icon. { COLOR_HELP_TEXT }",
         }
 
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = models.Message
+        fields = ('text',)
+        widgets = {
+            'text': forms.TextInput(
+                attrs={
+                    'autofocus': 'true',
+                    'placeholder': "Remember to be loving.",
+                    'rows': 1,
+                },
+            ),
+        }
+
 class InvitationAcceptForm(forms.Form):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
