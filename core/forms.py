@@ -41,6 +41,7 @@ class InvitationForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
+        help_text='This post will be visible to these circles.',
         widget=CircleWidget,
     )
 
@@ -48,7 +49,12 @@ class PostForm(forms.ModelForm):
         model = models.Post
         fields = ('circles', 'text')
         widgets = {
-            'text': forms.Textarea(attrs={ 'rows': 5 }),
+            'text': forms.Textarea(
+                attrs={
+                    'placeholder': "What's on your mind?",
+                    'rows': 5,
+                },
+            ),
         }
 
     def __init__(self, *args, **kwargs):
