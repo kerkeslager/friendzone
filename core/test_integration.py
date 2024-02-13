@@ -236,7 +236,6 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
         # Log out as user 1
         logout_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
         logout_button.click()
-        
 
         # Log in as user 2
         self.browser.get(self.live_server_url + reverse('login'))
@@ -247,7 +246,5 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
         submit_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
         submit_button.click()
 
-
         # Verify that user 2 CANNOT view the post
-        #self.wait.until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'post'), 'There are no posts in your feed'))
         self.wait.until(EC.invisibility_of_element((By.CLASS_NAME, 'post')))
