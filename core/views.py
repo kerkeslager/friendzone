@@ -212,9 +212,9 @@ class InvitationListView(ListView):
 invite_list = InvitationListView.as_view()
 
 class ProfileEditView(UpdateView):
-    template_name = 'core/profile_form.html'
-    model = models.User
     form_class = forms.ProfileForm
+    model = models.User
+    template_name = 'core/profile_form.html'
 
     def get_object(self):
         return self.request.user
@@ -303,10 +303,10 @@ class PostDetailView(DetailView):
 post_detail = PostDetailView.as_view()
 
 class SettingsView(UpdateView):
+    form_class = forms.SettingsForm
     model = models.User
-    fields = ('allow_js', 'foreground_color', 'background_color')
-    template_name = 'core/settings.html'
     success_url = reverse_lazy('settings')
+    template_name = 'core/settings.html'
 
     def get_object(self):
         return self.request.user
