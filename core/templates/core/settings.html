@@ -3,12 +3,19 @@
 {% block title %}settings{% endblock %}
 
 {% block main %}
-  {% include 'core/settings_tabs.html' %}
+  <h1>Settings</h1>
 
-  <form method='post'>
-    {% csrf_token %}
-    {{ form }}
-    <button type='submit'>save</button>
-  </form>
+  <section class='tab-area'>
+    {% include 'core/settings_tabs.html' %}
 
+    <section class='panel'>
+      <h2>Appearance</h2>
+
+      <form method='post'>
+        {% csrf_token %}
+        {{ form }}
+        <button type='submit'>save</button>
+      </form>
+    </section>
+  </section>
 {% endblock %}
