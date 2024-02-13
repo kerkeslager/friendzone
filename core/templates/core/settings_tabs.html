@@ -1,25 +1,19 @@
 <nav class='tab-list'>
-  {% if current_tab == 'about_main' %}
-    <span class='current tab'>about</span>
+  {% if current_tab == 'appearance_settings' %}
+    <span class='current tab'>appearance</span>
   {% else %}
-    <span class='tab'><a href='{% url "about_main" %}'>about</a></span>
+    <span class='tab'><a href='{% url "settings" %}'>appearance</a></span>
   {% endif %}
 
-  {% if current_tab == 'about_moderation' %}
-    <span class='current tab'>moderation</span>
+  {% if current_tab == 'password' %}
+    <span class='current tab'>password</span>
   {% else %}
-    <span class='tab'><a href='{% url "about_moderation" %}'>moderation</a></span>
+    <span class='tab'><a href='{% url "password_change" %}'>password</a></span>
   {% endif %}
 
-  {% if current_tab == 'about_philosophy' %}
-    <span class='current tab'>philosophy</span>
+  {% if current_tab == 'delete' %}
+    <span class='current tab'>delete account</span>
   {% else %}
-    <span class='tab'><a href='{% url "about_philosophy" %}'>philosophy</a></span>
-  {% endif %}
-
-  {% if current_tab == 'about_privacy' %}
-    <span class='current tab'>privacy</span>
-  {% else %}
-    <span class='tab'><a href='{% url "about_privacy" %}'>privacy</a></span>
+    <span class='tab'><a href='{% url "delete" %}'>delete account</a></span>
   {% endif %}
 </nav>
