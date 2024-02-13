@@ -10,6 +10,7 @@
 {% if request.user == object %}
   <a href='{% url "profile_edit" %}'>edit profile</a>
 {% else %}
+  <a href='{% url "convo_detail" pk=object.pk %}'>view messages with this user</a>
   <p>
     In circles:
     {% for circle in in_circles %}

@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% block title %}messages{% endblock %}
+
+{% block main %}
+  <h1>Conversation with {{ other_user }}</h1>
+
+  {% for message in object_list %}
+    <p>{{ message.text }}</p>
+  {% empty %}
+    <p>
+      <em>You have not sent or received any messages with {{ other_user }}.</em>
+    </p>
+  {% endfor %}
+{% endblock %}

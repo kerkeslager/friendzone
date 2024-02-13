@@ -1,6 +1,7 @@
 import io
 
 from django.contrib.auth import authenticate, login
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
@@ -99,6 +100,31 @@ class ConnectionListView(ListView):
         return self.request.user.connections.order_by('other_user__name', 'other_user__username')
 
 connection_list = ConnectionListView.as_view()
+
+class ConvoDetail(ListView):
+    model = models.Message
+
+    def get_queryset(self):
+        other_user = get_object_or_404(
+            models.User,
+            pk=self.kwargs['pk'],
+        )
+        connection = self.request.user.connections.get(other_user=other_user)
+        return models.Message.objects.filter(
+            Q(connection=connection) | Q(connection=connection.opposite)
+        ).order_by('created_utc')
+
+    def get_context_data(self, *args, **kwargs):
+        result = super().get_context_data(*args, **kwargs)
+        result['other_user'] = models.User.objects.get(pk=self.kwargs['pk'])
+        return result
+
+convo_detail = ConvoDetail.as_view()
+
+class ConvoList(ListView):
+    model = models.Message
+
+convo_list = ConvoList.as_view()
 
 class CSSView(TemplateView):
     template_name = 'core/style.css'
