@@ -482,5 +482,7 @@ ul {
 
   & > img {
     position: absolute;
+    max-height: none;
+    max-width: none;
   }
 }
