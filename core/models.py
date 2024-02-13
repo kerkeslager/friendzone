@@ -82,8 +82,8 @@ class User(auth_models.AbstractUser):
             x1 = (self.avatar_width + self.avatar_height) // 2
 
         return images.ImageCrop(
-            original_width=self.avatar_width,
-            original_height=self.avatar_height,
+            image_width=self.avatar_width,
+            image_height=self.avatar_height,
             x0=x0,
             x1=x1,
             y0=y0,
