@@ -116,6 +116,7 @@ class ConvoDetail(ListView):
 
     def get_context_data(self, *args, **kwargs):
         result = super().get_context_data(*args, **kwargs)
+        result['form'] = forms.MessageForm()
         result['other_user'] = models.User.objects.get(pk=self.kwargs['pk'])
         return result
 
@@ -125,6 +126,22 @@ class ConvoList(ListView):
     model = models.Message
 
 convo_list = ConvoList.as_view()
+
+# TODO Can we join this into the convo_detail view?
+class MessageCreateView(CreateView):
+    model = models.Message
+    form_class = forms.MessageForm
+
+    def form_valid(self, form):
+        form.instance.connection = self.request.user.connections.get(
+            other_user=models.User.objects.get(pk=self.kwargs['pk']),
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('convo_detail', args=[self.kwargs['pk']])
+
+message_create = MessageCreateView.as_view()
 
 class CSSView(TemplateView):
     template_name = 'core/style.css'

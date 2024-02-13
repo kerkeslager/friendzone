@@ -17,6 +17,7 @@ circle_urlpatterns = [
 
 convo_urlpatterns = [
     path('<uuid:pk>', views.convo_detail, name='convo_detail'),
+    path('<uuid:pk>/new', views.message_create, name='message_create'),
 ]
 
 invite_urlpatterns = [

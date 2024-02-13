@@ -3,13 +3,27 @@
 {% block title %}messages{% endblock %}
 
 {% block main %}
-  <h1>Conversation with {{ other_user }}</h1>
+  <h1 class='message-title'>Conversation with {{ other_user }}</h1>
 
   {% for message in object_list %}
-    <p>{{ message.text }}</p>
+    {% if message.from_user == request.user %}
+      <section class='message outgoing'>
+        {{ message.text }}
+      </section>
+    {% else %}
+      <section class='message incoming'>
+        {{ message.text }}
+      </section>
+    {% endif %}
   {% empty %}
     <p>
       <em>You have not sent or received any messages with {{ other_user }}.</em>
     </p>
   {% endfor %}
+
+  <form class='message-form' method='post' action='{% url "message_create" pk=other_user.pk %}'>
+    {% csrf_token %}
+    {{ form }}
+    <button type='submit'>send</button>
+  </form>
 {% endblock %}
