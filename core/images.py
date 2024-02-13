@@ -18,16 +18,8 @@ class ImageCrop(namedtuple('ImageCrop', ('original_width', 'original_height', 'x
         return self.y1 - self.original_height
 
     @property
-    def left_percent(self):
-        return 100 * self.left // self.original_width
-
-    @property
     def right_percent(self):
         return 100 * self.right // self.original_width
-
-    @property
-    def top_percent(self):
-        return 100 * self.top // self.original_height
 
     @property
     def bottom_percent(self):
@@ -38,16 +30,8 @@ class ImageCrop(namedtuple('ImageCrop', ('original_width', 'original_height', 'x
         return self.x1 - self.x0
 
     @property
-    def width_percent(self):
-        return 100 * self.width // self.original_width
-
-    @property
     def height(self):
         return self.y1 - self.y0
-
-    @property
-    def height_percent(self):
-        return 100 * self.height // self.original_height
 
     @property
     def apply_left(self):
@@ -64,3 +48,19 @@ class ImageCrop(namedtuple('ImageCrop', ('original_width', 'original_height', 'x
     @property
     def apply_height(self):
         return 100 * self.original_height // self.height
+
+    @property
+    def show_left(self):
+        return 100 * self.left // self.original_width
+
+    @property
+    def show_top(self):
+        return 100 * self.top // self.original_height
+
+    @property
+    def show_width(self):
+        return 100 * self.width // self.original_width
+
+    @property
+    def show_height(self):
+        return 100 * self.height // self.original_height
