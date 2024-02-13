@@ -1,24 +1,13 @@
-<style>
-  /* TODO Move this into style.css */
-  .crop {
-    border: var(--line-thickness) dashed var(--fg);
-    position: absolute;
-    background: transparent;
-    padding: 0 1rem;
-  }
-</style>
-
-<section>
-  <img src='{{ object.avatar.url }}' />
-  <div
-    class='crop'
+<section class='crop-visualization'>
+  <img src='{{ img_url }}' />
+  <section
     style='
-      left: {{ object.avatar_crop.show_left }}%;
-      top: {{ object.avatar_crop.show_top }}%;
-      width: {{ object.avatar_crop.show_width }}%;
-      height: {{ object.avatar_crop.show_height }}%;
+      left: {{ crop.show_left }}%;
+      top: {{ crop.show_top }}%;
+      width: {{ crop.show_width }}%;
+      height: {{ crop.show_height }}%;
     '
   >
     Crop area
-  </div>
+  </section>
 </section>
