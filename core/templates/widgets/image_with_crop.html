@@ -1,0 +1,24 @@
+<style>
+  /* TODO Move this into style.css */
+  .crop {
+    border: var(--line-thickness) dashed var(--fg);
+    position: absolute;
+    background: transparent;
+    padding: 0 1rem;
+  }
+</style>
+
+<section>
+  <img src='{{ object.avatar.url }}' />
+  <div
+    class='crop'
+    style='
+      left: {{ object.avatar_crop.left_percent }}%;
+      top: {{ object.avatar_crop.top_percent }}%;
+      width: {{ object.avatar_crop.width_percent }}%;
+      height: {{ object.avatar_crop.height_percent }}%;
+    '
+  >
+    Crop area
+  </div>
+</section>

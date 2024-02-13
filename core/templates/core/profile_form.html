@@ -3,9 +3,15 @@
 {% block title %}edit profile{% endblock %}
 
 {% block main %}
-  <form method='post'>
+  <form method='post' enctype='multipart/form-data'>
     {% csrf_token %}
     {{ form }}
+
+    {% if object.avatar %}
+      <p>Avatar preview:</p>
+      {% include 'widgets/image_with_crop.html' with image=object.avatar %}
+    {% endif %}
+
     <button type='submit'>save</button>
   </form>
 {% endblock %}
