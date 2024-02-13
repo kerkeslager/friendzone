@@ -15,6 +15,11 @@ circle_urlpatterns = [
     path('<uuid:pk>', views.circle_detail, name='circle_detail'),
 ]
 
+convo_urlpatterns = [
+    path('<uuid:pk>', views.convo_detail, name='convo_detail'),
+    path('<uuid:pk>/new', views.message_create, name='message_create'),
+]
+
 invite_urlpatterns = [
     path('new', views.invite_create, name='invite_create'),
     path('<uuid:pk>/accept', views.invite_accept, name='invite_accept'),
@@ -38,6 +43,9 @@ urlpatterns = [
     path('circles/', include(circle_urlpatterns)),
 
     path('connections', views.connection_list, name='connection_list'),
+
+    path('convos', views.convo_list, name='convo_list'),
+    path('convos/', include(convo_urlpatterns)),
 
     path('style.css', views.css_style, name='css_style'),
 
