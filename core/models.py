@@ -139,7 +139,6 @@ class User(auth_models.AbstractUser):
         ).values_list('post_circle__post__pk', flat=True)
 
         return Post.objects.filter(pk__in=post_pks)
-        #return Post.objects.all()
 
     def is_connected_with(self, other_user):
         return self.connections.filter(
