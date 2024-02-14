@@ -1,6 +1,6 @@
 from django.test import TransactionTestCase
 
-from . import models
+from .. import models
 
 class FeedTests(TransactionTestCase):
     def test_feed_starts_empty(self):
@@ -44,9 +44,9 @@ class FeedTests(TransactionTestCase):
             invitation,
             circles=reading_user.circles.filter(name='Friends'),
         )
-       
+
         self.assertNotIn(post, reading_user.feed.all())
-    
+
     def test_feed_contains_posts_for_circles_in(self):
         posting_user = models.User.objects.create_user(
             username='posting_user',
