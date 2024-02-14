@@ -390,11 +390,6 @@ class Post(models.Model):
         related_name='posts',
     )
     text = models.CharField(max_length=1024)
-    circles = models.ManyToManyField(
-        'Circle',
-        through='PostCircle',
-        through_fields=('post', 'circle'),
-    )
 
     def publish(self, *, circles):
         for circle in circles:
