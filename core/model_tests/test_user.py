@@ -97,8 +97,8 @@ class CreateInvitationTests(TransactionTestCase):
                 password='12345',
             )
 
-            # Half the models accepted by inviting user, half by others, to catch
-            # issues with which user invited/accepted
+            # Half the models accepted by inviting user, half by others, to
+            # catch issues with which user invited/accepted
             if i > settings.MAX_CONNECTIONS_PER_USER // 2:
                 invitation = inviting_user.create_invitation(circles=circles)
                 other_user.accept_invitation(
@@ -181,7 +181,11 @@ class AcceptInvitationTests(TransactionTestCase):
                 circles=other_user.circles.all(),
             )
 
-    def test_user_cannot_accept_invitation_if_inviting_user_max_connections_reached(self):
+    def test_user_cannot_accept_invitation_if_inviting_user_maxed(self):
+        '''
+        Test that users cannot accept invitations if the inviting user
+        has reached their max connections.
+        '''
         inviting_user = models.User.objects.create_user(
             username='testuser',
             password='12345',
@@ -196,8 +200,8 @@ class AcceptInvitationTests(TransactionTestCase):
                 password='12345',
             )
 
-            # Half the models accepted by inviting user, half by others, to catch
-            # issues with which user invited/accepted
+            # Half the models accepted by inviting user, half by others, to
+            # catch issues with which user invited/accepted
             if i > settings.MAX_CONNECTIONS_PER_USER // 2:
                 invitation = inviting_user.create_invitation(circles=circles)
 
@@ -222,7 +226,11 @@ class AcceptInvitationTests(TransactionTestCase):
                 circles=accepting_user.circles.all(),
             )
 
-    def test_user_cannot_accept_invitation_if_accepting_user_max_connections_reached(self):
+    def test_user_cannot_accept_invitation_if_accepting_user_maxed(self):
+        '''
+        Test that users cannot accept invitations if the accepting user
+        has maxed out their connections.
+        '''
         inviting_user = models.User.objects.create_user(
             username='testuser',
             password='12345',
@@ -244,8 +252,8 @@ class AcceptInvitationTests(TransactionTestCase):
                 password='12345',
             )
 
-            # Half the models accepted by inviting user, half by others, to catch
-            # issues with which user invited/accepted
+            # Half the models accepted by inviting user, half by others, to
+            # catch issues with which user invited/accepted
             if i > settings.MAX_CONNECTIONS_PER_USER // 2:
                 invitation = accepting_user.create_invitation(circles=circles)
 
@@ -320,7 +328,6 @@ class AcceptInvitationTests(TransactionTestCase):
             owner=inviting_user,
             other_user=accepting_user,
         ).delete()
-
 
         self.assertNotIn(
             accepting_user,
