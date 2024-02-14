@@ -10,6 +10,7 @@ class InvitationFormTests(TestCase):
         )
 
         form = forms.InvitationForm(
+            circles=user.circles.all(),
             data={
                 'name': 'My cool invitation',
                 'circles': [str(user.circles.get(name='Friends').pk)],
