@@ -2,15 +2,14 @@ import time
 import unittest
 
 from django.conf import settings
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth import get_user_model
-from django.urls import reverse
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import tag
+from django.urls import reverse
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,14 +17,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from webdriver_manager.firefox import GeckoDriverManager
 
-class IntegrationTests(object):
+
+class IntegrationTests:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         if not hasattr(cls, 'browser') or cls.browser is None:
-            raise Exception(
-                'This is a base class and its tests should not run.'
-            )
+            raise Exception('This is a base class and its tests should not run.')
         cls.wait = WebDriverWait(cls.browser, 5)
 
     @classmethod
@@ -71,7 +69,7 @@ class IntegrationTests(object):
         )
 
     def test_signup_success(self):
-        self.browser.get(self.live_server_url + reverse('signup') )
+        self.browser.get(self.live_server_url + reverse('signup'))
         # Fill in the username and password fields
         username_input = self.browser.find_element(By.NAME, 'username')
         password1_input = self.browser.find_element(By.NAME, 'password1')
@@ -92,7 +90,7 @@ class IntegrationTests(object):
         self.wait.until(EC.url_to_be(self.find_url('welcome')))
 
         # Assert that the browser redirects to the home page
-        self.assertEqual(self.browser.current_url, self.find_url('welcome') )
+        self.assertEqual(self.browser.current_url, self.find_url('welcome'))
 
 @tag('slow')
 class TestUserLoginChrome(IntegrationTests, StaticLiveServerTestCase):
@@ -147,8 +145,6 @@ class PostIntegrationTests(object):
     def find_url(self, *args, **kwargs):
         return self.live_server_url + reverse(*args, **kwargs)
 
-   
-
 
 class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
     @classmethod
@@ -165,7 +161,7 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
         cls.browser = webdriver.Chrome(options)
 
         super().setUpClass()
-        
+
     def test_post_visibility(self):
         # Create three users
         User = get_user_model()
@@ -193,25 +189,21 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
         # Publish a post to Friends
         # Checkbox input for circle
 
-        
         nav_xpath = "//nav[contains(., 'Friends') or ./svg[@unique_attribute='Friends']]"
         checkbox = self.browser.find_element(By.XPATH, f"{nav_xpath}//input[@type='checkbox']")
         checkbox.click()
 
-        
-
         post_input = self.browser.find_element(By.NAME, 'text')
         post_input.send_keys('This is a test post for Friends')
-        
-        wait = WebDriverWait(self.browser, 10)
 
+        wait = WebDriverWait(self.browser, 10)
 
         create_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'create')]")))
         create_button.click()
 
         self.wait.until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'post'), 'This is a test post for Friends'))
 
-        # Log out as user 0, Post is created by create_button click and shown in the post feed 
+        # Log out as user 0, Post is created by create_button click and shown in the post feed
         logout_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
         logout_button.click()
 
@@ -223,8 +215,6 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
         password_input.send_keys('password1')
         submit_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
         submit_button.click()
-
-
 
         # Verify that user 1 can view the post
         self.wait.until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'post'), 'This is a test post for Friends'))
