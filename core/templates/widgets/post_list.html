@@ -11,6 +11,14 @@
       {% endlocaltime %}
 
       <header>
+        {% if post.owner.avatar %}
+          {% include 'widgets/crop_apply.html' with img_url=post.owner.avatar.url crop=post.owner.avatar_crop width='5rem' height='5rem' %}
+        {% else %}
+          <section class='avatar-placeholder'>
+            {% include 'snippets/user.svg' %}
+          </section>
+        {% endif %}
+
         <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a> said:
       </header>
       <main>

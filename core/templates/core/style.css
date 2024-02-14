@@ -396,6 +396,13 @@ body {
   }
 }
 
+.post {
+  & .avatar-placeholder {
+    height: 10rem;
+    width: 10rem;
+  }
+}
+
 #feed {
   .post:not(:first-child) {
     padding-top: 1rem;
@@ -411,6 +418,11 @@ body {
 
     & > header {
       display: block;
+    }
+
+    & .avatar-placeholder {
+      width: 5rem;
+      height: 5rem;
     }
   }
 }
