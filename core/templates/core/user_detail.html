@@ -22,7 +22,7 @@
     {% for circle in in_circles %}
       {% include 'widgets/circle.html' with circle=circle %}
     {% empty %}
-      Not in any circles.
+      <em>Not in any circles.</em>
     {% endfor %}
   </p>
 {% endif %}
