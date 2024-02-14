@@ -18,7 +18,7 @@ class User(auth_models.AbstractUser):
 
     # Profile Fields
     name = models.CharField(
-        help_text='If no name is given, your public display will default to your username.',
+        help_text='If blank, defaults to your username.',
         max_length=256,
     )
     avatar = models.ImageField(
@@ -256,8 +256,9 @@ class Connection(models.Model):
         else:
             create_opposite = False
 
+        existing_connection_count = self.owner.connections.count()
         if self._state.adding:
-            if self.owner.connections.count() >= settings.MAX_CONNECTIONS_PER_USER:
+            if existing_connection_count >= settings.MAX_CONNECTIONS_PER_USER:
                 raise ConnectionLimitException()
 
         result = super().save(*args, **kwargs)
@@ -406,7 +407,7 @@ class PostCircle(models.Model):
         result = super().save(*args, **kwargs)
 
         if link_to_users:
-            for circle_membership in CircleMembership.objects.filter(circle=self.circle):
+            for circle_membership in self.circle.circle_memberships.all():
                 PostUser.objects.create(
                     post_circle=self,
                     circle_membership=circle_membership,
