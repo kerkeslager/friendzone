@@ -97,7 +97,10 @@ class ConnectionListView(ListView):
     template_name = 'core/connection_list.html'
 
     def get_queryset(self):
-        return self.request.user.connections.order_by('other_user__name', 'other_user__username')
+        return self.request.user.connections.order_by(
+            'other_user__name',
+            'other_user__username',
+        )
 
 connection_list = ConnectionListView.as_view()
 
@@ -285,7 +288,9 @@ class IndexView(TemplateView):
         data = super().get_context_data(*args, **kwargs)
 
         if self.request.user.is_authenticated:
-            data['post_form'] = forms.PostForm(circles=self.request.user.circles)
+            data['post_form'] = forms.PostForm(
+                circles=self.request.user.circles,
+            )
 
         return data
 
@@ -358,7 +363,7 @@ settings = SettingsView.as_view()
 
 class SignupView(CreateView):
     form_class = forms.SignupForm
-    success_url = reverse_lazy('welcome') # TODO Redirect to a welcome page
+    success_url = reverse_lazy('welcome')
     template_name = 'registration/signup.html'
 
     def form_valid(self, form):
@@ -407,7 +412,9 @@ class UserDetailView(DetailView):
                 connections__other_user=result['object']
             )
 
-        result['feed_for_user'] = self.request.user.feed_for_user(result['object'])
+        result['feed_for_user'] = self.request.user.feed_for_user(
+            result['object'],
+        )
 
         return result
 
