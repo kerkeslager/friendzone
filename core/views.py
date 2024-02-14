@@ -1,4 +1,5 @@
 import io
+import uuid
 
 from django.contrib.auth import authenticate, login
 from django.db.models import Q
@@ -314,7 +315,16 @@ class PostCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
-        return super().form_valid(form)
+        result = super().form_valid(form)
+        circle_ids = set(
+            uuid.UUID(circle_id)
+            for circle_id in form.data.getlist('circles')
+        )
+        circles = self.request.user.circles.filter(
+            pk__in=circle_ids,
+        )
+        form.instance.publish(circles=circles)
+        return result
 
 post_create = PostCreateView.as_view()
 
