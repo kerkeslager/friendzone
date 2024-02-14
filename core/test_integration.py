@@ -195,7 +195,8 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
         # Publish a post to Friends
         # Checkbox input for circle
 
-        nav_xpath = "//nav[contains(., 'Friends') or ./svg[@unique_attribute='Friends']]"
+        nav_xpath = ("//nav[contains(., 'Friends') or " +
+                     "./svg[@unique_attribute='Friends']]")
         checkbox = self.browser.find_element(
             By.XPATH, f"{nav_xpath}//input[@type='checkbox']")
         checkbox.click()
