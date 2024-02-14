@@ -16,22 +16,37 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from webdriver_manager.firefox import GeckoDriverManager
 
+class IntegrationTests(object):
+    '''
+    Write integration tests in this base class.
 
-class IntegrationTests:
+    All tests will be inherited by the ChromeIntegrationTests and
+    FirefoxIntegrationTests classes. The tests on this base class won't
+    run because it doesn't inherit from TestCase. But ChromeIntegrationTests
+    and FirefoxIntegrationTests DO inherit from TestCase (indirectly), so
+    the test_-prefixed methods they inherit from this base class will be run.
+
+    The purpose of all this is to let us write tests once on this base class
+    and have them run twice, once on Chrome and once on Firefox.
+    This way we don't have to write two tests for every integration feature.
+    '''
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not hasattr(cls, 'browser') or cls.browser is None:
-            raise Exception(
-                'This is a base class and its tests should not run.')
+
+        # Subclasses should set cls.browser
+        assert getattr(cls, 'browser') is not None
+
         cls.wait = WebDriverWait(cls.browser, 5)
 
     @classmethod
     def tearDownClass(cls):
-        if hasattr(cls, 'browser') and cls.browser is not None:
+        super().tearDownClass()
+
+        if getattr(cls, 'browser') is not None:
             time.sleep(2)  # Keep the browser open for 2 seconds
             cls.browser.quit()
-        super().tearDownClass()
 
     def find_url(self, *args, **kwargs):
         return self.live_server_url + reverse(*args, **kwargs)
@@ -91,70 +106,6 @@ class IntegrationTests:
 
         # Assert that the browser redirects to the home page
         self.assertEqual(self.browser.current_url, self.find_url('welcome'))
-
-@tag('slow')
-class TestUserLoginChrome(IntegrationTests, StaticLiveServerTestCase):
-    @classmethod
-    def setUpClass(cls):
-        options = ChromeOptions()
-
-        if settings.TEST_INTEGRATION_HEADLESS:
-            options.add_argument('--headless=new')
-
-            # The default window is very small which causes footer to cover
-            # buttons which we want to click, causing tests to fail.
-            options.add_argument('--window-size=1920,1080')
-
-        cls.browser = webdriver.Chrome(options)
-
-        super().setUpClass()
-
-@tag('slow')
-class TestUserLoginFirefox(IntegrationTests, StaticLiveServerTestCase):
-    @classmethod
-    def setUpClass(cls):
-        options = FirefoxOptions()
-
-        if settings.TEST_INTEGRATION_HEADLESS:
-            options.headless = True
-
-        cls.browser = webdriver.Firefox(
-            options=options,
-            service=FirefoxService(GeckoDriverManager().install()),
-        )
-        cls.browser.set_window_size(1920, 1080)
-
-        super().setUpClass()
-
-class PostIntegrationTests(object):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        if not hasattr(cls, 'browser') or cls.browser is None:
-            raise Exception(
-                "This is a base class and its tests should not run.")
-        # WebDriverWait, che
-        cls.wait = WebDriverWait(cls.browser, 5)
-
-    @classmethod
-    def tearDownClass(cls):
-        if hasattr(cls, 'browser') and cls.browser is not None:
-            time.sleep(2)  # Keep the browser open for 2 seconds
-            cls.browser.quit()
-        super().tearDownClass()
-
-    def find_url(self, *args, **kwargs):
-        return self.live_server_url + reverse(*args, **kwargs)
-
-class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
-    @classmethod
-    def setUpClass(cls):
-        options = ChromeOptions()
-        if settings.TEST_INTEGRATION_HEADLESS:
-            options.add_argument('--headless=new')
-            options.add_argument('--window-size=1920,1080')
-        cls.browser = webdriver.Chrome(options)
-        super().setUpClass()
 
     def test_post_visibility(self):
         # Create three users
@@ -254,3 +205,37 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
 
         # Verify that user 2 CANNOT view the post
         self.wait.until(EC.invisibility_of_element((By.CLASS_NAME, 'post')))
+
+@tag('slow')
+class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        options = ChromeOptions()
+
+        if settings.TEST_INTEGRATION_HEADLESS:
+            options.add_argument('--headless=new')
+
+            # The default window is very small which causes footer to cover
+            # buttons which we want to click, causing tests to fail.
+            options.add_argument('--window-size=1920,1080')
+
+        cls.browser = webdriver.Chrome(options)
+
+        super().setUpClass()
+
+@tag('slow')
+class FirefoxIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        options = FirefoxOptions()
+
+        if settings.TEST_INTEGRATION_HEADLESS:
+            options.headless = True
+
+        cls.browser = webdriver.Firefox(
+            options=options,
+            service=FirefoxService(GeckoDriverManager().install()),
+        )
+        cls.browser.set_window_size(1920, 1080)
+
+        super().setUpClass()
