@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+
+{% block title %}confirm delete invite{% endblock %}
+
+{% block main %}
+  <form method="post">
+    {% csrf_token %}
+
+    <p>Are you sure you want to delete the {{ object.name }} invite?</p>
+
+    {{ form }}
+
+    <nav>
+      <button type='submit'>confirm</button>
+      <a class='as-button' href='{% url "invite_detail" pk=object.pk %}'>cancel</a>
+    </nav>
+  </form>
+{% endblock %}

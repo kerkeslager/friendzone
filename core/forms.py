@@ -9,6 +9,16 @@ COLOR_HELP_TEXT = 'Accepts HTML color names and hex codes starting with "#".'
 class CircleWidget(forms.CheckboxSelectMultiple):
     option_template_name = 'widgets/circle_checkbox.html'
 
+class CircleMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            models.Circle.objects.none(),
+            *args,
+            widget=CircleWidget,
+            **kwargs,
+        )
+
+
 class CircleForm(forms.ModelForm):
     class Meta:
         model = models.Circle
@@ -32,10 +42,7 @@ class MessageForm(forms.ModelForm):
         }
 
 class InvitationAcceptForm(forms.Form):
-    circles = forms.ModelMultipleChoiceField(
-        queryset=models.Circle.objects.none(),
-        widget=CircleWidget,
-    )
+    circles = CircleMultipleChoiceField()
 
     def __init__(self, *args, **kwargs):
         circles = kwargs.pop('circles')
@@ -43,14 +50,32 @@ class InvitationAcceptForm(forms.Form):
         self.fields['circles'].queryset = circles
 
 class InvitationForm(forms.ModelForm):
-    message = forms.CharField(widget=forms.Textarea)
+    circles = CircleMultipleChoiceField(
+        help_text=
+            'If a user accepts this invite, they will be added to the '
+            'selected circles.',
+    )
+    message = forms.CharField(
+        help_text='This message will be shown to the user you invite.',
+        widget=forms.Textarea,
+    )
 
     class Meta:
         model = models.Invitation
         fields = ('name', 'circles', 'message')
+        help_texts = {
+            'name':
+                'This name will be used to identify the invite on your list '
+                'of invites. It will not be shown to other users.',
+        }
         widgets = {
             'circles': CircleWidget,
         }
+
+    def __init__(self, *args, **kwargs):
+        circles = kwargs.pop('circles')
+        super().__init__(*args, **kwargs)
+        self.fields['circles'].queryset = circles
 
 class PostForm(forms.ModelForm):
     circles = forms.ModelMultipleChoiceField(
