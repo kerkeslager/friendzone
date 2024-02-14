@@ -50,11 +50,7 @@ class InvitationAcceptForm(forms.Form):
         self.fields['circles'].queryset = circles
 
 class InvitationForm(forms.ModelForm):
-    circles = CircleMultipleChoiceField(
-        help_text=
-            'If a user accepts this invite, they will be added to the '
-            'selected circles.',
-    )
+    circles = CircleMultipleChoiceField()
     message = forms.CharField(
         help_text='This message will be shown to the user you invite.',
         widget=forms.Textarea,
@@ -75,6 +71,10 @@ class InvitationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
+        self.fields['circles'].help_text = (
+            'If a user accepts this invite, they will be added to the '
+            'selected circles.',
+        )
         self.fields['circles'].queryset = circles
 
 class PostForm(forms.ModelForm):
