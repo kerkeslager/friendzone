@@ -112,8 +112,14 @@ class ProfileForm(forms.ModelForm):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = ('allow_js', 'foreground_color', 'background_color')
+        fields = (
+            'timezone',
+            'allow_js',
+            'foreground_color',
+            'background_color',
+        )
         help_texts = {
+            'timezone': 'The timezone to display dates in.',
             'allow_js':
                 'All major functionality of the site works without JS, but '
                 'some features may have fewer page loads and more '
