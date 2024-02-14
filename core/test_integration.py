@@ -228,10 +228,7 @@ class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
 
 
         # Verify that user 1 can view the post
-        ''' Currently Not Working with the real test'''
-        #self.wait.until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'post'), 'This is a test post for Friends'))
-        #The test passes for 
-        self.wait.until(EC.text_to_be_present_in_element((By.ID,'feed'), 'There are no posts in your feed'))
+        self.wait.until(EC.text_to_be_present_in_element((By.CLASS_NAME, 'post'), 'This is a test post for Friends'))
 
         # Log out as user 1
         logout_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')

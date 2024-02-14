@@ -107,19 +107,26 @@ class User(auth_models.AbstractUser):
 
     @property
     def feed(self):
-        connection_pks = Connection.objects.filter(other_user=self)
+        from django.db.models import Q
 
+        # Capture connections in both directions: where the user is the owner and where they are the other user.
+        connection_pks = Connection.objects.filter(Q(owner=self) | Q(other_user=self)).values_list('pk', flat=True)
+
+        # Assuming CircleMembership correctly links connections to circles,
+        # this retrieves all circle memberships related to the user's connections.
         circle_membership_pks = CircleMembership.objects.filter(
             connection__pk__in=connection_pks,
-        ).values_list('pk', flat=True)
+        ).values_list('circle__pk', flat=True)
 
-        post_pks = PostUser.objects.filter(
-            circle_membership__pk__in=circle_membership_pks,
-        ).values_list('post_circle__post__pk', flat=True)
+        # Retrieve posts that are within the circles the user is part of through their connections.
+        post_pks = PostCircle.objects.filter(
+            circle__pk__in=circle_membership_pks,
+        ).values_list('post__pk', flat=True)
 
-        return self.posts.union(
-            Post.objects.filter(pk__in=post_pks),
-        ).order_by('-created_utc')
+        # Union these posts with the user's own posts, ensuring no duplicates and ordering by creation date.
+        return Post.objects.filter(
+            Q(pk__in=post_pks) | Q(owner=self)
+        ).distinct().order_by('-created_utc')
 
     def feed_for_user(self, user):
         if self == user:
@@ -139,6 +146,7 @@ class User(auth_models.AbstractUser):
         ).values_list('post_circle__post__pk', flat=True)
 
         return Post.objects.filter(pk__in=post_pks)
+        #return Post.objects.all()
 
     def is_connected_with(self, other_user):
         return self.connections.filter(
