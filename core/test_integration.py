@@ -128,7 +128,6 @@ class TestUserLoginFirefox(IntegrationTests, StaticLiveServerTestCase):
 
         super().setUpClass()
 
-
 class PostIntegrationTests(object):
     @classmethod
     def setUpClass(cls):
