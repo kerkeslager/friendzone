@@ -157,6 +157,11 @@ class InvitationCreateView(CreateView):
     success_url = reverse_lazy('invite_list')
     form_class = forms.InvitationForm
 
+    def get_form_kwargs(self):
+        result = super().get_form_kwargs()
+        result['circles'] = self.request.user.circles
+        return result
+
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
