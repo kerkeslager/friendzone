@@ -22,8 +22,9 @@ class IntegrationTests(object):
     def setUpClass(cls):
         super().setUpClass()
         if not hasattr(cls, 'browser') or cls.browser is None:
-            raise Exception("This is a base class and its tests should not run.")
-        # WebDriverWait, che
+            raise Exception(
+                'This is a base class and its tests should not run.'
+            )
         cls.wait = WebDriverWait(cls.browser, 5)
 
     @classmethod
@@ -39,7 +40,10 @@ class IntegrationTests(object):
     def test_login_success(self):
         # Navigate to the login page
         User = get_user_model()
-        user = User.objects.create_user(username='testuser', password='testpassword')
+        user = User.objects.create_user(
+            username='testuser',
+            password='testpassword',
+        )
         self.browser.get(self.live_server_url + reverse('login'))
 
         # Fill in the username and password fields
@@ -50,14 +54,20 @@ class IntegrationTests(object):
         password_input.send_keys('testpassword')
 
         # Submit the form
-        submit_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
+        submit_button = self.browser.find_element(
+            By.XPATH,
+            '//button[@type="submit"]',
+        )
         submit_button.click()
 
         # Wait until the home page is loaded
         self.wait.until(EC.url_to_be(self.find_url('index')))
 
         # Assert that the browser redirects to the home page
-        self.assertEqual(self.browser.current_url,  self.live_server_url + reverse('index'))
+        self.assertEqual(
+            self.browser.current_url,
+            self.live_server_url + reverse('index'),
+        )
 
     def test_signup_success(self):
         self.browser.get(self.live_server_url + reverse('signup') )
@@ -71,7 +81,10 @@ class IntegrationTests(object):
         password2_input.send_keys('newpassword12')
 
         # Submit the form
-        submit_button = self.browser.find_element(By.XPATH, '//button[@type="submit"]')
+        submit_button = self.browser.find_element(
+            By.XPATH,
+            '//button[@type="submit"]',
+        )
         submit_button.click()
 
         # Wait until the home page is loaded

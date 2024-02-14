@@ -172,8 +172,10 @@ def validate_color(color:str):
         return
 
     if color.startswith('#'):
-        HEX_CHARS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' }
-        if len(color) in [4,7] and all(ch in HEX_CHARS for ch in color[1:]):
+        HEX_CHARS = set('0123456789abcdef')
+        if len(color) in [4, 7] and all(ch in HEX_CHARS for ch in color[1:]):
             return
 
-    raise ValidationError('Only HTML color names or hex codes starting with # are supported')
+    raise ValidationError(
+        'Only HTML color names or hex codes starting with # are supported',
+    )

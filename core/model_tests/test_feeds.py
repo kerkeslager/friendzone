@@ -33,9 +33,11 @@ class FeedTests(TransactionTestCase):
             username='reading_user',
             password='12345',
         )
-        post = models.Post.objects.create(owner=posting_user, text='Hello, world')
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
         post.publish(circles=posting_user.circles.all())
-
 
         invitation = posting_user.create_invitation(
             circles=posting_user.circles.filter(name='Friends'),
@@ -323,9 +325,11 @@ class FeedForUserTests(TransactionTestCase):
             username='reading_user',
             password='12345',
         )
-        post = models.Post.objects.create(owner=posting_user, text='Hello, world')
+        post = models.Post.objects.create(
+            owner=posting_user,
+            text='Hello, world',
+        )
         post.publish(circles=posting_user.circles.filter(name='Friends'))
-
 
         invitation = posting_user.create_invitation(
             circles=posting_user.circles.filter(name='Friends'),

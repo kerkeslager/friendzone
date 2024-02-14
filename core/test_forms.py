@@ -20,6 +20,8 @@ class InvitationFormTests(TestCase):
 
         invitation = form.save()
 
-        self.assertIn(user.circles.get(name='Friends'), invitation.circles.all())
+        self.assertIn(
+            user.circles.get(name='Friends'),
+            invitation.circles.all(),
+        )
         self.assertEqual(invitation.circles.count(), 1)
-

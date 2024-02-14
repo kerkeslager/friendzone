@@ -29,6 +29,3 @@ class ValidateColorTests(TestCase):
     def test_does_not_allox_non_hex_characters(self):
         with self.assertRaises(ValidationError):
             validators.validate_color('#haxxor')
-
-
-

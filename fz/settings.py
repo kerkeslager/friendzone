@@ -22,7 +22,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+(8!jve8c)xgtk+d)e4kxk0m)4zw3i$7e1_(%1ysbci)x@5%=r'
+SECRET_KEY = 'changeme!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -97,18 +97,13 @@ AUTH_USER_MODEL = 'core.User'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    { 'NAME': 'django.contrib.auth.password_validation.{}'.format(n) }
+    for n in [
+        'UserAttributeSimilarityValidator',
+        'MinimumLengthValidator',
+        'CommonPasswordValidator',
+        'NumericPasswordValidator',
+    ]
 ]
 
 
@@ -134,7 +129,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-def environment_var_truthiness(v):
+def env_truthiness(v):
     return {
         '0': False,
         '1': True,
@@ -144,4 +139,4 @@ def environment_var_truthiness(v):
         'true': True,
     }[str(v).lower()]
 
-TEST_INTEGRATION_HEADLESS = environment_var_truthiness(os.environ.get('HEADLESS', 1))
+TEST_INTEGRATION_HEADLESS = env_truthiness(os.environ.get('HEADLESS', 1))

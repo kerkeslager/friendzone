@@ -1,6 +1,18 @@
 from collections import namedtuple
 
-class ImageCrop(namedtuple('ImageCrop', ('image_width', 'image_height', 'x0', 'x1', 'y0', 'y1'))):
+_ImageCrop = namedtuple(
+    'ImageCrop',
+    (
+        'image_width',
+        'image_height',
+        'x0',
+        'x1',
+        'y0',
+        'y1',
+    ),
+)
+
+class ImageCrop(_ImageCrop):
     @property
     def crop_width(self):
         return self.x1 - self.x0
