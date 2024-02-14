@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.test import TransactionTestCase
+from django.test import tag, TransactionTestCase
 
 from .. import models
 
@@ -83,6 +83,7 @@ class CreateInvitationTests(TransactionTestCase):
                 circles=other_user.circles.all(),
             )
 
+    @tag('slow')
     def test_user_cannot_create_invitation_if_max_connections_reached(self):
         inviting_user = models.User.objects.create_user(
             username='testuser',
@@ -181,6 +182,7 @@ class AcceptInvitationTests(TransactionTestCase):
                 circles=other_user.circles.all(),
             )
 
+    @tag('slow')
     def test_user_cannot_accept_invitation_if_inviting_user_maxed(self):
         '''
         Test that users cannot accept invitations if the inviting user
@@ -226,6 +228,7 @@ class AcceptInvitationTests(TransactionTestCase):
                 circles=accepting_user.circles.all(),
             )
 
+    @tag('slow')
     def test_user_cannot_accept_invitation_if_accepting_user_maxed(self):
         '''
         Test that users cannot accept invitations if the accepting user

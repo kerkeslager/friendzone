@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.test import tag
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
@@ -93,6 +94,7 @@ class IntegrationTests(object):
         # Assert that the browser redirects to the home page
         self.assertEqual(self.browser.current_url, self.find_url('welcome') )
 
+@tag('slow')
 class TestUserLoginChrome(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -109,6 +111,7 @@ class TestUserLoginChrome(IntegrationTests, StaticLiveServerTestCase):
 
         super().setUpClass()
 
+@tag('slow')
 class TestUserLoginFirefox(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
