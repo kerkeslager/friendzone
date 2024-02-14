@@ -1,5 +1,4 @@
 import time
-import unittest
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -145,21 +144,14 @@ class PostIntegrationTests(object):
     def find_url(self, *args, **kwargs):
         return self.live_server_url + reverse(*args, **kwargs)
 
-
 class TestPostVisibility(PostIntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         options = ChromeOptions()
-
         if settings.TEST_INTEGRATION_HEADLESS:
             options.add_argument('--headless=new')
-
-            # The default window is very small which causes footer to cover
-            # buttons which we want to click, causing tests to fail.
             options.add_argument('--window-size=1920,1080')
-
         cls.browser = webdriver.Chrome(options)
-
         super().setUpClass()
 
     def test_post_visibility(self):
