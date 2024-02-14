@@ -1,4 +1,5 @@
 import uuid
+import zoneinfo
 
 from django.conf import settings
 from django.db import models, transaction
@@ -6,6 +7,12 @@ from django.urls import reverse
 import django.contrib.auth.models as auth_models
 
 from . import images, validators
+
+TIMEZONE_CHOICES = [
+    ('', '(default)'),
+] + [
+    (tz, tz) for tz in sorted(zoneinfo.available_timezones())
+]
 
 class ConnectionLimitException(Exception):
     pass
@@ -21,6 +28,7 @@ class User(auth_models.AbstractUser):
         help_text='If blank, defaults to your username.',
         max_length=256,
     )
+
     avatar = models.ImageField(
         null=True,
         blank=True,
@@ -31,6 +39,13 @@ class User(auth_models.AbstractUser):
     avatar_width = models.PositiveIntegerField(default=0)
 
     # Settings Fields
+    timezone = models.CharField(
+        default='',
+        blank=True,
+        max_length=64,
+        choices=TIMEZONE_CHOICES,
+        help_text='The timezone to display dates in.',
+    )
     allow_js = models.BooleanField(default=True)
     foreground_color = models.CharField(
         blank=True,

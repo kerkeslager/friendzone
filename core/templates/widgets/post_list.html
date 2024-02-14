@@ -1,11 +1,15 @@
 {% load markdown %}
+{% load tz %}
 
 <section id='feed'>
   <h3>Feed</h3>
 
   {% for post in post_list %}
     <section class='post'>
-      <date>{{ post.created_utc|date:"l, F j, Y g:ia T" }}</date>
+      {% localtime on %}
+        <date>{{ post.created_utc|date:"l, F j, Y g:ia T" }}</date>
+      {% endlocaltime %}
+
       <header>
         <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a> said:
       </header>
