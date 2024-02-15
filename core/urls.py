@@ -16,8 +16,8 @@ circle_urlpatterns = [
 ]
 
 connection_urlpatterns = [
-    path('<uuid:pk>/delete', views.connection_delete, name='connection_delete'),
-    path('bulk-edit', views.connection_bulk_edit, name='connection_bulk_edit'),
+    path('<uuid:pk>/delete', views.conn_delete, name='connection_delete'),
+    path('bulk-edit', views.conn_bulk_edit, name='connection_bulk_edit'),
 ]
 
 convo_urlpatterns = [

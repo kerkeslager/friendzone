@@ -147,7 +147,7 @@ class ConnectionBulkUpdate(View):
 
         return redirect(reverse('connection_list'))
 
-connection_bulk_edit = ConnectionBulkUpdate.as_view()
+conn_bulk_edit = ConnectionBulkUpdate.as_view()
 
 class ConnectionDeleteView(DeleteView):
     model = models.Connection
@@ -160,7 +160,7 @@ class ConnectionDeleteView(DeleteView):
             other_user__pk=self.kwargs['pk'],
         )
 
-connection_delete = ConnectionDeleteView.as_view()
+conn_delete = ConnectionDeleteView.as_view()
 
 class ConnectionListView(ListView):
     model = models.Connection
