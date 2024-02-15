@@ -3,9 +3,10 @@ import uuid
 
 from django.contrib.auth import authenticate, login
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
+from django.views import View
 from django.views.generic import CreateView, DeleteView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
@@ -92,6 +93,74 @@ class CircleListView(ListView):
         return self.request.user.circles.order_by('name')
 
 circle_list = CircleListView.as_view()
+
+class ConnectionBulkUpdate(View):
+    def post(self, request, *args, **kwargs):
+        circles_by_pk = {
+            str(circle.pk): circle
+            for circle in request.user.circles.all()
+        }
+        connections_by_other_user_pk = {
+            str(conn.other_user.pk): conn
+            for conn in request.user.connections.all()
+        }
+
+        selections = [
+            item[len('selection:'):].split('/')
+            for item in request.POST.keys()
+            if item.startswith('selection:')
+        ]
+
+        # Note that the dictionaries only contain Circles/Connections owned
+        # by the request.user, so KeyErrors here might mean request.user
+        # is trying to modify CircleMemberships that don't belong to them
+        selected_circle_memberships = [
+            (
+                circles_by_pk[circle_pk],
+                connections_by_other_user_pk[conn_other_user_pk],
+            )
+            for circle_pk, conn_other_user_pk in selections
+        ]
+
+        existing_circle_memberships = models.CircleMembership.objects.filter(
+            connection__owner=request.user,
+        )
+
+        # Delete existing CircleMemberships that aren't selected
+        for existing_cm in existing_circle_memberships:
+            ecm_as_tuple = (existing_cm.circle, existing_cm.connection)
+            if ecm_as_tuple not in selected_circle_memberships:
+                existing_cm.delete()
+
+        # Add selected CircleMemberships that don't already exist
+        for circle, conn in selected_circle_memberships:
+            selected_cm_exists = existing_circle_memberships.filter(
+                circle=circle,
+                connection=conn,
+            ).count() == 1
+
+            if not selected_cm_exists:
+                models.CircleMembership.objects.create(
+                    circle=circle,
+                    connection=conn,
+                )
+
+        return redirect(reverse('connection_list'))
+
+conn_bulk_edit = ConnectionBulkUpdate.as_view()
+
+class ConnectionDeleteView(DeleteView):
+    model = models.Connection
+    success_url = reverse_lazy('invite_list')
+
+    def get_object(self):
+        return get_object_or_404(
+            self.get_queryset(),
+            owner=self.request.user,
+            other_user__pk=self.kwargs['pk'],
+        )
+
+conn_delete = ConnectionDeleteView.as_view()
 
 class ConnectionListView(ListView):
     model = models.Connection

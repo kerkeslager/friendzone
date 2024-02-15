@@ -3,18 +3,59 @@
 {% block title %}connections{% endblock %}
 
 {% block main %}
-  {% for connection in object_list %}
-    <nav>
-      <a href='{% url "user_detail" pk=connection.other_user.pk %}'>{{ connection.other_user.display_name }}</a>
-      {% for circle in connection.circles.all %}
-        {% include 'widgets/circle.html' with circle=circle %}
-      {% endfor %}
-    </nav>
-  {% empty %}
-    <p>You don't have any connections.</p>
-    <p>
-      <a href='{% url "invite_create" %}'>Create an invite</a> to connect with
-      people you know.
-    </p>
-  {% endfor %}
+  <h1>Connections</h1>
+
+  <form id='connection-bulk-edit' method='post' action='{% url "connection_bulk_edit" %}'>
+    {% csrf_token %}
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          {% for circle in request.user.circles.all %}
+            <th> {% include 'widgets/circle.html' with circle=circle %} </th>
+          {% endfor %}
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for connection in object_list %}
+          <tr>
+            <td class='user'><a href='{% url "user_detail" pk=connection.other_user.pk %}'>{{ connection.other_user.display_name }}</a></td>
+
+            {% for circle in request.user.circles.all %}
+              <td>
+                <input
+                  type='checkbox'
+                  {% if circle in connection.circles.all %}
+                    checked
+                  {% endif %}
+                  name='selection:{{ circle.pk }}/{{ connection.other_user.pk }}'
+                />
+              </td>
+            {% endfor %}
+
+            <td><a href='{% url "connection_delete" pk=connection.other_user.pk %}'>disconnect</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan='100%'>
+            <em>
+              You don't have any connections.
+              <a href='{% url "invite_create" %}'>Create an invite</a> to connect with
+              people you know.
+            </em>
+          </td></tr>
+        {% endfor %}
+      </tbody>
+
+      {% if object_list %}
+        <tfoot>
+          <tr><td colspan='100%'>
+            <button type='submit'>save</button>
+            <a class='as-button' href='{% url "connection_list" %}'>reset</a>
+          </td></tr>
+        </tfoot>
+      {% endif %}
+    </table>
+  </form>
 {% endblock %}

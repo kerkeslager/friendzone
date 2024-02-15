@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+
+{% block title %}confirm delete circle{% endblock %}
+
+{% block main %}
+  <form method="post">
+    {% csrf_token %}
+
+    <p>Are you sure you want to disconnect from {{ object.other_user.display_name }}?</p>
+
+    {% if object.other_user.avatar %}
+      {% include 'widgets/crop_apply.html' with img_url=object.other_user.avatar.url crop=object.other_user.avatar_crop width='10rem' height='10rem' %}
+    {% else %}
+      <section class='avatar-placeholder'>
+        {% include 'snippets/user.svg' %}
+      </section>
+    {% endif %}
+    <a href='{% url "user_detail" pk=object.owner.pk %}'>{{ object.other_user.display_name }}</a>
+
+    {{ form }}
+
+    <nav>
+      <button type='submit'>confirm</button>
+      <a class='as-button' href='{% url "connection_list" %}'>cancel</a>
+    </nav>
+  </form>
+{% endblock %}

@@ -249,6 +249,12 @@ class Connection(models.Model):
         through_fields=('connection', 'circle'),
     )
 
+    def __repr__(self):
+        return "<Connection: {}'s connection with {}>".format(
+            self.owner.display_name,
+            self.other_user.display_name,
+        )
+
     @property
     def incoming_messages(self):
         return self.opposite.outgoing_messages.all()
@@ -333,6 +339,12 @@ class Circle(models.Model):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return "<Circle: {}'s {} circle>".format(
+            self.owner.display_name,
+            self.name,
+        )
+
     def get_absolute_url(self):
         return reverse('circle_detail', args=[str(self.pk)])
 
@@ -354,6 +366,12 @@ class CircleMembership(models.Model):
         on_delete=models.CASCADE,
         related_name='circle_memberships',
     )
+
+    def __repr__(self):
+        return "<CircleMembership: {} is a member of {}>".format(
+            self.connection.other_user.display_name,
+            repr(self.circle),
+        )
 
     class Meta:
         unique_together = (('circle', 'connection'),)
