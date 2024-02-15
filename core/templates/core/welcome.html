@@ -3,11 +3,24 @@
 {% block title %}welcome{% endblock %}
 
 {% block main %}
+  <h1>Welcome</h1>
+
   <p>Welcome to FriendZone!</p>
 
   <p>
-    To get started using FriendZone,
-    <a href='{% url "profile_edit" %}'>create your profile</a> or
-    <a href='{% url "invite_create" %}'>invite someone to connect</a>.
+    There are a few ways you can get started using FriendZone:
   </p>
+
+  <ul>
+    <li>
+      <a href='{% url "profile_edit" %}'>Create your profile</a>. Add some
+      information about yourself to let other users know who they're connecting
+      with.
+    </li>
+
+    <li>
+      <a href='{% url "invite_create" %}'>Invite someone you know to connect</a>.
+      The point of FriendZone is to keep connected with other people.
+    </li>
+  </ul>
 {% endblock %}

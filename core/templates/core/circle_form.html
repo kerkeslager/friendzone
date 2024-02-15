@@ -3,6 +3,12 @@
 {% block title %}new circle{% endblock %}
 
 {% block main %}
+{% if is_new %}
+  <h1>New circle</h1>
+{% else %}
+  <h1>Edit circle</h1>
+{% endif %}
+
 <form method='post'>
   {% csrf_token %}
   {{ form }}

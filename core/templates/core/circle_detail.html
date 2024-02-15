@@ -3,21 +3,27 @@
 {% block title %}{{ object.name }} circle{% endblock %}
 
 {% block main %}
-<p>{{ object.name }} circle</p>
+<h1>{{ object.name }} circle</h1>
 
 <p>
   <a href='{% url "circle_edit" pk=object.pk %}'>edit</a>
   <a href='{% url "circle_delete" pk=object.pk %}'>delete</a>
 </p>
 
+<h3>Connections in this circle:</h3>
 {% for member in object.members %}
   <p><a href='{% url "user_detail" pk=member.pk %}'>{{ member.display_name }}</a></p>
 {% empty %}
-  <p>
-    There are no people in this circle. Add people to this circle by
-    <a href='{% url "invite_create" %}'>creating an invite</a>
-    or <a href=''>adding an existing connection</a>.
-  </p>
+  <p><em>
+    There are no people in this circle.
+
+    {% if request.user.connections.count > 0 %}
+      <a href='{% url "invite_create" %}'>Invite someone to this circle</a>
+      or <a href='{% url "connection_list" %}'>add existing connections to this circle</a>.
+    {% else %}
+      <a href='{% url "invite_create" %}'>Invite someone to this circle</a>.
+    {% endif %}
+  </em></p>
 {% endfor %}
 
 {% endblock %}

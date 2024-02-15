@@ -3,7 +3,7 @@
 {% block title %}{{ object.display_name }}{% endblock %}
 
 {% block main %}
-<p>{{ object.display_name }}'s profile</p>
+<h1>{{ object.display_name }}'s profile</h1>
 
 {% if object.avatar %}
   {% include 'widgets/crop_apply.html' with img_url=object.avatar.url crop=object.avatar_crop width='20rem' height='20rem' %}

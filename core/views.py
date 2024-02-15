@@ -42,6 +42,11 @@ class CircleCreateView(CreateView):
     form_class = forms.CircleForm
     success_url = reverse_lazy('circle_list')
 
+    def get_context_data(self):
+        result = super().get_context_data()
+        result['is_new'] = True
+        return result
+
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
@@ -64,6 +69,11 @@ circle_delete = CircleDeleteView.as_view()
 class CircleEditView(UpdateView):
     model = models.Circle
     form_class = forms.CircleForm
+
+    def get_context_data(self):
+        result = super().get_context_data()
+        result['is_new'] = False
+        return result
 
     def get_object(self):
         return get_object_or_404(
@@ -227,6 +237,11 @@ class InvitationCreateView(CreateView):
     success_url = reverse_lazy('invite_list')
     form_class = forms.InvitationForm
 
+    def get_context_data(self):
+        result = super().get_context_data()
+        result['is_new'] = True
+        return result
+
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
@@ -280,6 +295,16 @@ invite_delete = InvitationDeleteView.as_view()
 class InvitationEditView(UpdateView):
     model = models.Invitation
     form_class = forms.InvitationForm
+
+    def get_context_data(self):
+        result = super().get_context_data()
+        result['is_new'] = False
+        return result
+
+    def get_form_kwargs(self):
+        result = super().get_form_kwargs()
+        result['circles'] = self.request.user.circles
+        return result
 
     def get_object(self):
         return get_object_or_404(

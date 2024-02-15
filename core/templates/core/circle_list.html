@@ -3,6 +3,8 @@
 {% block title %}circles{% endblock %}
 
 {% block main %}
+  <h1>Circles</h1>
+
   {% for circle in object_list %}
     {% include 'widgets/circle.html' with circle=circle %}
   {% endfor %}
