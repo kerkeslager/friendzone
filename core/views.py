@@ -439,6 +439,11 @@ class PostEditView(UpdateView):
     model = models.Post
     form_class = forms.PostForm
 
+    def get_form_kwargs(self):
+        result = super().get_form_kwargs()
+        result['circles'] = self.request.user.circles
+        return result
+
     def get_object(self):
         return get_object_or_404(
             self.get_queryset(),
