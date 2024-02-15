@@ -15,6 +15,11 @@ circle_urlpatterns = [
     path('<uuid:pk>', views.circle_detail, name='circle_detail'),
 ]
 
+connection_urlpatterns = [
+    path('<uuid:pk>/delete', views.connection_delete, name='connection_delete'),
+    path('bulk-edit', views.connection_bulk_edit, name='connection_bulk_edit'),
+]
+
 convo_urlpatterns = [
     path('<uuid:pk>', views.convo_detail, name='convo_detail'),
     path('<uuid:pk>/new', views.message_create, name='message_create'),
@@ -43,6 +48,7 @@ urlpatterns = [
     path('circles/', include(circle_urlpatterns)),
 
     path('connections', views.connection_list, name='connection_list'),
+    path('connections/', include(connection_urlpatterns)),
 
     path('convos', views.convo_list, name='convo_list'),
     path('convos/', include(convo_urlpatterns)),
