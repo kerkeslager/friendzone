@@ -5,6 +5,7 @@
 {% block main %}
   <form method='post'>
     {% csrf_token %}
+    <input type='hidden' name='next' value='{{ request.GET.next }}'/>
     {{ form }}
     <button type='submit'>sign up</button>
   </form>
