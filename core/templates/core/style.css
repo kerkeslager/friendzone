@@ -635,3 +635,67 @@ h1:has(+ #connection-bulk-edit) {
     }
   }
 }
+
+nav.dropdown {
+  & > label {
+    cursor: pointer;
+
+    & > .open-state {
+      display: none;
+    }
+  }
+
+  & > label {
+    text-decoration: underline;
+    text-decoration-thickness: var(--line-thickness);
+  }
+
+  & > label > span {
+    transition: transform 0.2s ease-in-out;
+    transform-origin: center;
+  }
+
+  & > label:hover > span {
+    transform: scale(1.2);
+  }
+
+  & > nav {
+    display: none;
+  }
+}
+
+nav.dropdown:has(> label > .open-state:checked) {
+  & > label {
+    border: var(--line-thickness) solid var(--fg);
+    border-bottom-color: var(--bg);
+    border-radius: 0.5rem 0.5rem 0 0;
+
+    margin: calc(-0.8rem - var(--line-thickness));
+    margin-top: calc(-0.5rem - var(--line-thickness));
+    margin-bottom: calc(-0.6rem - var(--line-thickness));
+
+    padding: 0.8rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.6rem;
+
+    z-index: 1;
+  }
+
+  & > nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    left: calc(-0.8rem - var(--line-thickness));
+
+    padding: 1rem 1.5rem 1rem 1rem;
+
+    border: var(--line-thickness) solid var(--fg);
+    border-radius: 0 0.5rem 0.5rem 0.5rem;
+
+    z-index: 0;
+  }
+}
