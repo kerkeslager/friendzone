@@ -3,49 +3,58 @@
 {% block title %}connections{% endblock %}
 
 {% block main %}
-  <form method='post' action='{% url "connection_bulk_edit" %}'>
+  <h1>Connections</h1>
+
+  <form id='connection-bulk-edit' method='post' action='{% url "connection_bulk_edit" %}'>
     {% csrf_token %}
     <table>
-      <th>
-        {% for circle in request.user.circles.all %}
-          <td> {% include 'widgets/circle.html' with circle=circle %} </td>
-        {% endfor %}
-      </th>
-
-      {% for connection in object_list %}
+      <thead>
         <tr>
-          <td><a href='{% url "user_detail" pk=connection.other_user.pk %}'>{{ connection.other_user.display_name }}</a></td>
-
+          <th></th>
           {% for circle in request.user.circles.all %}
-            <td>
-              <input
-                type='checkbox'
-                {% if circle in connection.circles.all %}
-                  checked
-                {% endif %}
-                name='selection:{{ circle.pk }}/{{ connection.other_user.pk }}'
-              />
-            </td>
+            <th> {% include 'widgets/circle.html' with circle=circle %} </th>
           {% endfor %}
-
-          <td><a href='{% url "connection_delete" pk=connection.other_user.pk %}'>disconnect</a></td>
+          <th></th>
         </tr>
-      {% empty %}
-      {% endfor %}
+      </thead>
+
+      <tbody>
+        {% for connection in object_list %}
+          <tr>
+            <td class='user'><a href='{% url "user_detail" pk=connection.other_user.pk %}'>{{ connection.other_user.display_name }}</a></td>
+
+            {% for circle in request.user.circles.all %}
+              <td>
+                <input
+                  type='checkbox'
+                  {% if circle in connection.circles.all %}
+                    checked
+                  {% endif %}
+                  name='selection:{{ circle.pk }}/{{ connection.other_user.pk }}'
+                />
+              </td>
+            {% endfor %}
+
+            <td><a href='{% url "connection_delete" pk=connection.other_user.pk %}'>disconnect</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan='100%'>
+            <em>
+              You don't have any connections.
+              <a href='{% url "invite_create" %}'>Create an invite</a> to connect with
+              people you know.
+            </em>
+          </td></tr>
+        {% endfor %}
+      </tbody>
 
       {% if object_list %}
-        <tr><td colspan='100%'>
-          <button type='submit'>save</button>
-          <a class='as-button' href='{% url "connection_list" %}'>reset</a>
-        </td></tr>
-      {% else %}
-        <tr><td colspan='100%'>
-          <em>
-            You don't have any connections.
-            <a href='{% url "invite_create" %}'>Create an invite</a> to connect with
-            people you know.
-          </em>
-        </td></tr>
+        <tfoot>
+          <tr><td colspan='100%'>
+            <button type='submit'>save</button>
+            <a class='as-button' href='{% url "connection_list" %}'>reset</a>
+          </td></tr>
+        </tfoot>
       {% endif %}
     </table>
   </form>
