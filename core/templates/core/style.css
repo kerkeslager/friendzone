@@ -16,6 +16,7 @@
   --footer-height: 3.425rem;
 
   --drop-shadow: drop-shadow(0.1rem 0.1rem 0.1rem rgba(0,0,0,0.1));
+  --header-clip-path: inset(0 0 -1rem 0);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -614,6 +615,7 @@ h1:has(+ #connection-bulk-edit) {
       top: var(--header-height);
       z-index: 1;
       filter: var(--drop-shadow);
+      clip-path: var(--header-clip-path);
     }
 
     & tbody {
