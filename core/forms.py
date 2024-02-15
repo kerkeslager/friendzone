@@ -24,6 +24,7 @@ class CircleForm(forms.ModelForm):
         model = models.Circle
         fields = ('name', 'color')
         help_texts = {
+            'name': 'This will not be shown to other users.',
             'color': f"The color of the circle's icon. { COLOR_HELP_TEXT }",
         }
 
@@ -60,9 +61,7 @@ class InvitationForm(forms.ModelForm):
         model = models.Invitation
         fields = ('name', 'circles', 'message')
         help_texts = {
-            'name':
-                'This name will be used to identify the invite on your list '
-                'of invites. It will not be shown to other users.',
+            'name': 'Who is this invite for?',
         }
         widgets = {
             'circles': CircleWidget,
@@ -73,7 +72,7 @@ class InvitationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['circles'].help_text = (
             'If a user accepts this invite, they will be added to the '
-            'selected circles.',
+            'selected circles.'
         )
         self.fields['circles'].queryset = circles
 

@@ -1,10 +1,12 @@
 {% extends 'core/base.html' %}
 
-{% block title %}circles{% endblock %}
+{% block title %}invites{% endblock %}
 
 {% block main %}
-  {% for circle in object_list %}
-    <p><a href='{{ circle.get_absolute_url }}'>{{ circle.name }}</a></p>
+  <h1>Invites</h1>
+
+  {% for invite in object_list %}
+    <p><a href='{{ invite.get_absolute_url }}'>{{ invite.name }}</a></p>
   {% endfor %}
 
   <a href='{% url "invite_create" %}'>new</a>

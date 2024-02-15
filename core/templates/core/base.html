@@ -28,7 +28,11 @@
         <a href='{% url "about_main" %}'>about</a>
         <a href='{% url "circle_list" %}'>circles</a>
         <a href='{% url "invite_list" %}'>invites</a>
-        <a href='{% url "connection_list" %}'>connections</a>
+
+        {% if request.user.connections.count > 0 %}
+          <a href='{% url "connection_list" %}'>connections</a>
+        {% endif %}
+
         <span style='margin-left: auto;'>
           Logged in as <a href='{% url "profile_detail" %}'>{{request.user.username}}</a>.
         </span>

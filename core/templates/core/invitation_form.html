@@ -3,6 +3,12 @@
 {% block title %}new invite{% endblock %}
 
 {% block main %}
+{% if is_new %}
+  <h1>Create Invite</h1>
+{% else %}
+  <h1>Edit Invite</h1>
+{% endif %}
+
 <form method='post'>
   {% csrf_token %}
   {{ form }}
