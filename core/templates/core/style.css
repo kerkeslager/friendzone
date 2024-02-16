@@ -10,6 +10,8 @@
   {% else %}
     --bg: #eee;
   {% endif %}
+
+  --error: #dd0000;
   --line-thickness: 0.1rem;
 
   --header-height: 5.1rem;
@@ -32,6 +34,8 @@
     {% else %}
       --bg: #333;
     {% endif %}
+
+    --error: #ff0000;
 
     --drop-shadow: drop-shadow(0.2rem 0.2rem 0.2rem rgba(0,0,0,0.2));
   }
@@ -103,6 +107,10 @@ p {
 img {
   max-width: 100%;
   height: auto; /* relative to width */
+}
+
+.errorlist > li {
+  color: var(--error);
 }
 
 a.as-button,
