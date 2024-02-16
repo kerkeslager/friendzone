@@ -213,7 +213,7 @@ class ConvoList(ListView):
         return self.request.user.connections.annotate(
             outgoing_count=Count('outgoing_messages'),
             incoming_count=Count('opposite__outgoing_messages'),
-        ).filter(Q(outgoing_count__gt = 0) | Q(incoming_count__gt = 0))
+        ).filter(Q(outgoing_count__gt=0) | Q(incoming_count__gt=0))
 
 convo_list = ConvoList.as_view()
 
