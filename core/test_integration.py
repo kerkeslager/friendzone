@@ -151,7 +151,7 @@ class IntegrationTests(object):
         # Checkbox input for circle
 
         form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
-        checkbox_parent_xpath = "//*[contains(., 'Friends')]"
+        checkbox_parent_xpath = "//label[contains(., 'Friends')]"
         checkbox_xpath = "//input[@type='checkbox']"
         checkbox = self.browser.find_element(
             By.XPATH,
