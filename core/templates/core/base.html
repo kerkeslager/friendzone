@@ -47,6 +47,8 @@
           <a href='{% url "connection_list" %}'>connections</a>
         {% endif %}
 
+        <a href='{% url "convo_list" %}'>messages</a>
+
         <span style='margin-left: auto;'>
           Logged in as <a href='{% url "profile_detail" %}'>{{request.user.username}}</a>.
         </span>
