@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+
+{% block title %}convos{% endblock %}
+
+{% block main %}
+  <h1>Conversations</h1>
+
+  {% for object in object_list %}
+    <a href='{% url "convo_detail" pk=object.other_user.pk %}'>
+      <p><strong>{{ object.other_user.display_name }}</strong></p>
+      <p>{{ object.messages.first.text }}</p>
+    </a>
+  {% empty %}
+    <p><em>You have no conversations. Start one!</em></p>
+  {% endfor %}
+{% endblock %}
