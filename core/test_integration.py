@@ -142,12 +142,13 @@ class IntegrationTests(object):
         username_input.send_keys('user0')
         password_input.send_keys('password0')
         submit_button = self.browser.find_element(
-            By.XPATH, '//button[@type="submit"]')
+            By.XPATH,
+            '//button[@type="submit"]',
+        )
         submit_button.click()
 
         # Publish a post to Friends
         # Checkbox input for circle
-
 
         form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
         checkbox_parent_xpath = "//*[contains(., 'Friends')]"

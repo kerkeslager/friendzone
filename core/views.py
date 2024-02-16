@@ -481,7 +481,7 @@ class SignupView(CreateView):
     template_name = 'registration/signup.html'
 
     def get_success_url(self):
-        return self.request.POST.get('next', reverse('welcome'))
+        return self.request.POST.get('next', None) or reverse('welcome')
 
     def form_valid(self, form):
         result = super().form_valid(form)
