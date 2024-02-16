@@ -2,7 +2,7 @@ import io
 import uuid
 
 from django.contrib.auth import authenticate, login
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
@@ -206,7 +206,14 @@ class ConvoDetail(ListView):
 convo_detail = ConvoDetail.as_view()
 
 class ConvoList(ListView):
-    model = models.Message
+    model = models.Connection
+    template_name = 'core/convo_list.html'
+
+    def get_queryset(self):
+        return self.request.user.connections.annotate(
+            outgoing_count=Count('outgoing_messages'),
+            incoming_count=Count('opposite__outgoing_messages'),
+        ).filter(Q(outgoing_count__gt = 0) | Q(incoming_count__gt = 0))
 
 convo_list = ConvoList.as_view()
 
