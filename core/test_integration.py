@@ -119,19 +119,21 @@ class IntegrationTests(object):
 
         # Make users 0 and 1 Friends
         invitation = user0.create_invitation(
-            circles=user0.circles.filter(name='Friends'))
+            circles=user0.circles.filter(name='Friends'),
+        )
         user1.accept_invitation(
             invitation,
-            circles=user1.circles.filter(
-                name='Friends'))
+            circles=user1.circles.filter(name='Friends'),
+        )
 
         # Make users 0 and 2 Family
         invitation = user0.create_invitation(
-            circles=user0.circles.filter(name='Family'))
+            circles=user0.circles.filter(name='Family'),
+        )
         user2.accept_invitation(
             invitation,
-            circles=user2.circles.filter(
-                name='Family'))
+            circles=user2.circles.filter(name='Family'),
+        )
 
         # Log in as user 0
         self.browser.get(self.live_server_url + reverse('login'))
@@ -140,16 +142,25 @@ class IntegrationTests(object):
         username_input.send_keys('user0')
         password_input.send_keys('password0')
         submit_button = self.browser.find_element(
-            By.XPATH, '//button[@type="submit"]')
+            By.XPATH,
+            '//button[@type="submit"]',
+        )
         submit_button.click()
 
         # Publish a post to Friends
         # Checkbox input for circle
 
-        nav_xpath = ("//nav[contains(., 'Friends') or "
-                     "./svg[@unique_attribute='Friends']]")
+        form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
+        checkbox_parent_xpath = "//*[contains(., 'Friends')]"
+        checkbox_xpath = "//input[@type='checkbox']"
         checkbox = self.browser.find_element(
-            By.XPATH, f"{nav_xpath}//input[@type='checkbox']")
+            By.XPATH,
+            '{}{}{}'.format(
+                form_xpath,
+                checkbox_parent_xpath,
+                checkbox_xpath,
+            ),
+        )
         checkbox.click()
 
         post_input = self.browser.find_element(By.NAME, 'text')
