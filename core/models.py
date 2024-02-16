@@ -228,7 +228,7 @@ class Invitation(models.Model):
 class Connection(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_utc = models.DateTimeField(auto_now_add=True)
-    opposite = models.ForeignKey(
+    opposite = models.OneToOneField(
         'Connection',
         on_delete=models.CASCADE,
         null=True,
