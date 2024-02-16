@@ -11,7 +11,12 @@
     --bg: #eee;
   {% endif %}
 
-  --error: #dd0000;
+  {% if request.user.error_color %}
+    --error: {{ request.user.error_color }};
+  {% else %}
+    --error: #dd0000;
+  {% endif %}
+
   --line-thickness: 0.1rem;
 
   --header-height: 5.1rem;
@@ -35,7 +40,12 @@
       --bg: #333;
     {% endif %}
 
-    --error: #ff0000;
+
+    {% if request.user.error_color %}
+      --error: {{ request.user.error_color }};
+    {% else %}
+      --error: #ff0000;
+    {% endif %}
 
     --drop-shadow: drop-shadow(0.2rem 0.2rem 0.2rem rgba(0,0,0,0.2));
   }
