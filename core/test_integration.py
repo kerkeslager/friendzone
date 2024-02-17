@@ -151,7 +151,7 @@ class IntegrationTests(object):
         # Checkbox input for circle
 
         form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
-        checkbox_parent_xpath = "//*[contains(., 'Friends')]"
+        checkbox_parent_xpath = "//label[contains(., 'Friends')]"
         checkbox_xpath = "//input[@type='checkbox']"
         checkbox = self.browser.find_element(
             By.XPATH,
@@ -206,6 +206,9 @@ class IntegrationTests(object):
 
         # Log in as user 2
         self.browser.get(self.live_server_url + reverse('login'))
+        username_input = wait.until(
+            EC.presence_of_element_located(
+                (By.NAME, 'username')))
         username_input = self.browser.find_element(By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user2')
