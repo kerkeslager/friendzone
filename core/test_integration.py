@@ -15,6 +15,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 class IntegrationTests(object):
     '''
@@ -233,7 +235,10 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
             # buttons which we want to click, causing tests to fail.
             options.add_argument('--window-size=1920,1080')
 
-        cls.browser = webdriver.Chrome(options)
+        cls.browser = webdriver.Chrome(
+            service=ChromeService(ChromeDriverManager().install()),
+            options=options
+        )
 
         super().setUpClass()
 
