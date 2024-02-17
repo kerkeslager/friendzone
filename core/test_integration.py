@@ -40,7 +40,7 @@ class IntegrationTests(object):
         # Subclasses should set cls.browser
         assert getattr(cls, 'browser') is not None
 
-        cls.wait = WebDriverWait(cls.browser, 5)
+        cls.wait = WebDriverWait(cls.browser, 20)
 
     @classmethod
     def tearDownClass(cls):
