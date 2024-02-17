@@ -2,5 +2,5 @@ Django==4.2.10
 markdown-it-py==3.0.0
 pillow==10.2.0
 PyQRCode==1.2.1
-Selenium==4.11.0
+Selenium==4.11.2
 webdriver_manager==4.0.1
