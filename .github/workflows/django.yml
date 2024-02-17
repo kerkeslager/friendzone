@@ -28,10 +28,10 @@ jobs:
       run: |
         CHROMEDRIVER_VERSION="121.0.6167.184"
         wget https://storage.googleapis.com/chrome-for-testing-public/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/local/bin/  # Adjust this path if necessary
-        sudo chmod +x /usr/local/bin/chromedriver
-        rm chromedriver_linux64.zip
+        unzip chromedriver-linux64.zip
+        sudo mv chromedriver /usr/bin/  
+        sudo chmod +x /usr/bin/chromedriver
+        rm chromedriver-linux64.zip
     - name: Run Tests
       run: |
         python manage.py test
