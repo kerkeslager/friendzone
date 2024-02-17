@@ -7,6 +7,8 @@ from django.test import tag
 from django.urls import reverse
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -233,7 +235,8 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
             # buttons which we want to click, causing tests to fail.
             options.add_argument('--window-size=1920,1080')
 
-        cls.browser = webdriver.Chrome(options)
+        s = Service(ChromeDriverManager().install())
+        cls.browser = webdriver.Chrome(service=s, options=options)
 
         super().setUpClass()
 
