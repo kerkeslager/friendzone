@@ -7,6 +7,8 @@ from django.test import tag
 from django.urls import reverse
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -151,7 +153,7 @@ class IntegrationTests(object):
         # Checkbox input for circle
 
         form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
-        checkbox_parent_xpath = "//*[contains(., 'Friends')]"
+        checkbox_parent_xpath = "//label[contains(., 'Friends')]"
         checkbox_xpath = "//input[@type='checkbox']"
         checkbox = self.browser.find_element(
             By.XPATH,
@@ -206,6 +208,9 @@ class IntegrationTests(object):
 
         # Log in as user 2
         self.browser.get(self.live_server_url + reverse('login'))
+        username_input = wait.until(
+            EC.presence_of_element_located(
+                (By.NAME, 'username')))
         username_input = self.browser.find_element(By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user2')
@@ -230,7 +235,8 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
             # buttons which we want to click, causing tests to fail.
             options.add_argument('--window-size=1920,1080')
 
-        cls.browser = webdriver.Chrome(options)
+        s = Service(ChromeDriverManager().install())
+        cls.browser = webdriver.Chrome(service=s, options=options)
 
         super().setUpClass()
 
