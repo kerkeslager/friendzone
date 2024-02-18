@@ -1,9 +1,11 @@
+from datetime import timedelta
 import uuid
 import zoneinfo
 
 from django.conf import settings
 from django.db import models, transaction
 from django.urls import reverse
+from django.utils import timezone
 import django.contrib.auth.models as auth_models
 
 from . import images, validators
@@ -194,6 +196,11 @@ class User(auth_models.AbstractUser):
 
         if self.is_connected_with(invitation.owner):
             raise AlreadyConnectedException('You are already connected')
+        
+        if not invitation.is_open and invitation.is_expired():
+            raise Exception('The invitation has expired.')
+        
+        
 
         connection = Connection.objects.create(
             owner=invitation.owner,
@@ -212,6 +219,9 @@ class User(auth_models.AbstractUser):
                 connection=connection.opposite,
             )
 
+        if not invitation.is_open:
+            invitation.delete()
+
 
 class Invitation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -226,6 +236,23 @@ class Invitation(models.Model):
         'Circle',
         related_name='+',
     )
+    DEFAULT_EXPIRATION = timedelta(days=7)
+    
+    is_open = models.BooleanField(default=False)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    def is_expired(self):
+        if not self.is_open and self.expires_at:
+            return timezone.now() > self.expires_at
+        return False
+
+    @property
+    def type(self):
+        """Return the type of the invitation for convenience."""
+        return "Open" if self.is_open else "Personal"
+
+    def __str__(self):
+        return f"Invitation from {self.owner.username} ({'Open' if self.is_open else 'Personal'})"
 
     def get_absolute_url(self):
         return reverse('invite_detail', args=[str(self.pk)])
