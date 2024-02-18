@@ -250,7 +250,7 @@ class Invitation(models.Model):
         return "Open" if self.is_open else "Personal"
 
     def __str__(self):
-        return f"Invitation from {self.owner.username} ({'Open' if self.is_open else 'Personal'})"
+        return f"{self.name} from {self.owner.display_name}"
 
     def get_absolute_url(self):
         return reverse('invite_detail', args=[str(self.pk)])

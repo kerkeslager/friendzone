@@ -263,7 +263,8 @@ class InvitationCreateView(CreateView):
             pass
         else:
             # personal invitations (e.g., expiration)
-            invitation.expires_at = timezone.now() + models.Invitation.DEFAULT_EXPIRATION
+            invitation.expires_at = timezone.now()
+            invitation.expires_at += models.Invitation.DEFAULT_EXPIRATION
         invitation.save()
         return super().form_valid(form)
 

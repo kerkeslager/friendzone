@@ -50,7 +50,8 @@ class InvitationExpirationTests(TransactionTestCase):
         self.assertFalse(invitation.is_expired())
 
         # Create an invitation that expires in the future
-        future_date = timezone.now() + timedelta(days=7)  # Expires a week from now
+        future_date = timezone.now()
+        future_date += timedelta(days=7)
         invitation = models.Invitation.objects.create(
             owner=test_user,
             is_open=False,
@@ -85,7 +86,8 @@ class InvitationExpirationTests(TransactionTestCase):
         self.assertFalse(invitation.is_expired())
 
         # Create an invitation that expires in the future
-        future_date = timezone.now() + timedelta(days=7)  # Expires a week from now
+        future_date = timezone.now()
+        future_date += timedelta(days=7)
         invitation = models.Invitation.objects.create(
             owner=test_user,
             is_open=False,
