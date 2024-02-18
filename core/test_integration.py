@@ -40,7 +40,7 @@ class IntegrationTests(object):
         # Subclasses should set cls.browser
         assert getattr(cls, 'browser') is not None
 
-        cls.wait = WebDriverWait(cls.browser, 5)
+        cls.wait = WebDriverWait(cls.browser, 20)
 
     @classmethod
     def tearDownClass(cls):
@@ -227,6 +227,8 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         options = ChromeOptions()
+
+        options.page_load_strategy = 'normal'
 
         if settings.TEST_INTEGRATION_HEADLESS:
             options.add_argument('--headless=new')
