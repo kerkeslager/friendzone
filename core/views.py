@@ -244,8 +244,8 @@ class InvitationCreateView(CreateView):
     success_url = reverse_lazy('invite_list')
     form_class = forms.InvitationForm
 
-    def get_context_data(self):
-        result = super().get_context_data()
+    def get_context_data(self, **kwargs):
+        result = super().get_context_data(**kwargs)
         result['is_new'] = True
         return result
 
@@ -303,8 +303,8 @@ class InvitationEditView(UpdateView):
     model = models.Invitation
     form_class = forms.InvitationForm
 
-    def get_context_data(self):
-        result = super().get_context_data()
+    def get_context_data(self, **kwargs):
+        result = super().get_context_data(**kwargs)
         result['is_new'] = False
         return result
 

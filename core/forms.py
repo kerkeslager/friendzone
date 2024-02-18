@@ -116,6 +116,7 @@ class SettingsForm(forms.ModelForm):
             'allow_js',
             'foreground_color',
             'background_color',
+            'error_color',
         )
         help_texts = {
             'timezone': 'The timezone to display dates in.',
@@ -125,6 +126,7 @@ class SettingsForm(forms.ModelForm):
                 'interactivity.',
             'foreground_color': COLOR_HELP_TEXT,
             'background_color': COLOR_HELP_TEXT,
+            'error_color': COLOR_HELP_TEXT,
         }
 
 class SignupForm(UserCreationForm):

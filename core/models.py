@@ -57,6 +57,11 @@ class User(auth_models.AbstractUser):
         max_length=16,
         validators=[validators.validate_color],
     )
+    error_color = models.CharField(
+        blank=True,
+        max_length=16,
+        validators=[validators.validate_color],
+    )
 
     def __str__(self):
         return self.display_name
