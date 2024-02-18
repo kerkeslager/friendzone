@@ -266,7 +266,7 @@ class InvitationCreateView(CreateView):
             invitation.expires_at = timezone.now() + models.Invitation.DEFAULT_EXPIRATION
         invitation.save()
         # If your model uses a ManyToMany field that needs to be saved after the instance:
-        #form.save_m2m()
+        # form.save_m2m()
         return super().form_valid(form)
 
 invite_create = InvitationCreateView.as_view()

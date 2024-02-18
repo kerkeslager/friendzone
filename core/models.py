@@ -196,11 +196,9 @@ class User(auth_models.AbstractUser):
 
         if self.is_connected_with(invitation.owner):
             raise AlreadyConnectedException('You are already connected')
-        
+
         if not invitation.is_open and invitation.is_expired():
             raise Exception('The invitation has expired.')
-        
-        
 
         connection = Connection.objects.create(
             owner=invitation.owner,
@@ -237,7 +235,7 @@ class Invitation(models.Model):
         related_name='+',
     )
     DEFAULT_EXPIRATION = timedelta(days=7)
-    
+
     is_open = models.BooleanField(default=False)
     expires_at = models.DateTimeField(null=True, blank=True)
 
