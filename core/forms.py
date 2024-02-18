@@ -59,8 +59,9 @@ class InvitationForm(forms.ModelForm):
     is_open = forms.BooleanField(
         required=False,  # Make optional if you want users to explicitly choose
         label='Open Invitation',
-        help_text='Mark this if you want the invitation to be open (it will not expire and can be accepted by multiple users).'
+        help_text='(it will not expire and can be accepted by multiple users).'
     )
+
     class Meta:
         model = models.Invitation
         fields = ('name', 'circles', 'message', 'is_open')

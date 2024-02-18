@@ -259,14 +259,12 @@ class InvitationCreateView(CreateView):
         invitation = form.save(commit=False)
         invitation.owner = self.request.user
         if invitation.is_open:
-            # Logic for open invitations (if any adjustments are needed)
+            # Logic for open invitations
             pass
         else:
-            # Logic for personal invitations (e.g., setting expiration)
+            # personal invitations (e.g., expiration)
             invitation.expires_at = timezone.now() + models.Invitation.DEFAULT_EXPIRATION
         invitation.save()
-        # If your model uses a ManyToMany field that needs to be saved after the instance:
-        # form.save_m2m()
         return super().form_valid(form)
 
 invite_create = InvitationCreateView.as_view()

@@ -18,14 +18,14 @@ class InvitationExpirationTests(TransactionTestCase):
         )
 
         # Create an invitation that is supposed to expire a week ago
-        past_date = timezone.now() - timedelta(weeks=1, days=1)  # More than a week ago
+        past_date = timezone.now() - timedelta(weeks=1, days=1)
         invitation = models.Invitation.objects.create(
             owner=test_user,
-            is_open=False,  # Ensure this is a personal invitation
+            is_open=False,  # personal invitation
             expires_at=past_date
         )
 
-        # Check that the invitation is considered expired
+        # Invitation should be expired
         self.assertTrue(
             invitation.is_expired(),
             "The invitation should be expired.")
