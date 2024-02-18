@@ -359,6 +359,15 @@ class Circle(models.Model):
             pk__in=self.connections.all().values_list('other_user', flat=True),
         )
 
+    @property
+    def posts(self):
+        return Post.objects.filter(
+            pk__in=PostCircle.objects.filter(circle=self).values_list(
+                'post',
+                flat=True,
+            ),
+        )
+
 class CircleMembership(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     circle = models.ForeignKey(
