@@ -10,6 +10,13 @@
   {% else %}
     --bg: #eee;
   {% endif %}
+
+  {% if request.user.error_color %}
+    --error: {{ request.user.error_color }};
+  {% else %}
+    --error: #dd0000;
+  {% endif %}
+
   --line-thickness: 0.1rem;
 
   --header-height: 5.1rem;
@@ -31,6 +38,13 @@
       --bg: {{ request.user.background_color }};
     {% else %}
       --bg: #333;
+    {% endif %}
+
+
+    {% if request.user.error_color %}
+      --error: {{ request.user.error_color }};
+    {% else %}
+      --error: #ff0000;
     {% endif %}
 
     --drop-shadow: drop-shadow(0.2rem 0.2rem 0.2rem rgba(0,0,0,0.2));
@@ -103,6 +117,10 @@ p {
 img {
   max-width: 100%;
   height: auto; /* relative to width */
+}
+
+.errorlist > li {
+  color: var(--error);
 }
 
 a.as-button,
