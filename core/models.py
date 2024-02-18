@@ -232,7 +232,7 @@ class Invitation(models.Model):
 
 class Intro(models.Model):
     '''
-    An Intro is created by `owner` and sent to ONE user, `introed_user`.
+    An Intro is created by `owner` and sent to ONE user, `receiver`.
     Introes are sent two at a time, one for each user being introduced to
     the other; the second Intro is created by the save method of the first.
     This means each user being introduced to the other has their own Intro;
@@ -241,7 +241,7 @@ class Intro(models.Model):
     Put another way, DO NOT write queries like:
 
     ```
-    Intro.objects.filter(Q(introed_user=user) | Q(other_user=user))
+    Intro.objects.filter(Q(receiver=user) | Q(other_user=user))
     ```
 
     This is not correct, THIS IS WRONG, as it will return Intros not directed
@@ -255,25 +255,25 @@ class Intro(models.Model):
         related_name='+',
         help_text='The user who is introducing the other two.',
     )
-    introed_user = models.ForeignKey(
+    receiver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='intros',
         help_text='The user the intro is sent to, who can accept the intro.',
     )
-    other_user = models.ForeignKey(
+    introduced = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='+',
-        help_text='The user the introed user is being introduced to.',
+        help_text='The user the receiving user is being introduced to.',
     )
     opposite = models.OneToOneField(
         'Intro',
         on_delete=models.CASCADE,
         null=True,
         help_text=(
-            'The corresponding Intro which was sent to other_user; ensures '
-            'that deleting one intro deletes the other.'
+            'The corresponding Intro which was sent to indroduced user; '
+            'ensures that deleting one intro deletes the other.'
         ),
     )
     is_accepted = models.BooleanField(default=False)
@@ -292,8 +292,8 @@ class Intro(models.Model):
             opposite = Intro(
                 opposite=self,
                 sender=self.sender,
-                introed_user=self.other_user,
-                other_user=self.introed_user,
+                receiver=self.introduced,
+                introduced=self.receiver,
             )
             opposite.save()
             self.opposite = opposite

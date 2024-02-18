@@ -8,19 +8,19 @@ class IntroTests(TransactionTestCase):
             username='user0',
             password='password',
         )
-        introed_user = models.User.objects.create_user(
+        receiver = models.User.objects.create_user(
             username='user1',
             password='password',
         )
-        other_user = models.User.objects.create_user(
+        introduced = models.User.objects.create_user(
             username='user2',
             password='password',
         )
 
         intro = models.Intro(
             sender=sender,
-            introed_user=introed_user,
-            other_user=other_user,
+            receiver=receiver,
+            introduced=introduced,
         )
         intro.save()
 
@@ -29,10 +29,10 @@ class IntroTests(TransactionTestCase):
             sender,
         )
         self.assertEqual(
-            intro.opposite.introed_user,
-            other_user,
+            intro.opposite.receiver,
+            introduced,
         )
         self.assertEqual(
-            intro.opposite.other_user,
-            introed_user,
+            intro.opposite.introduced,
+            receiver,
         )
