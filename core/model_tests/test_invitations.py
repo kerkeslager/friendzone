@@ -31,8 +31,6 @@ class InvitationExpirationTests(TransactionTestCase):
             invitation.is_expired(),
             "The invitation should be expired.",
         )
-        # Check that the invitation is considered expired
-        self.assertTrue(invitation.is_expired(), "The invitation should be expired.")
 
         with self.assertRaises(Exception, msg="The invitation has expired."):
             accepting_user.accept_invitation(
@@ -89,6 +87,6 @@ class InvitationExpirationTests(TransactionTestCase):
             circles=accepting_user.circles.filter(name='Family'),
         )
 
-        # If we reach here, the invitation acceptance was successful
+        # If throws exception, the invitation acceptance was successful
         with self.assertRaises(models.Invitation.DoesNotExist):
             models.Invitation.objects.get(id=invitation.id)

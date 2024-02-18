@@ -219,11 +219,9 @@ class User(auth_models.AbstractUser):
 
         if self.is_connected_with(invitation.owner):
             raise AlreadyConnectedException('You are already connected')
-        
+
         if not invitation.is_open and invitation.is_expired():
             raise Exception('The invitation has expired.')
-        
-        
 
         if not invitation.is_open and invitation.is_expired():
             raise Exception('The invitation has expired.')
@@ -264,7 +262,7 @@ class Invitation(models.Model):
         related_name='+',
     )
     DEFAULT_EXPIRATION = timedelta(days=7)
-    
+
     is_open = models.BooleanField(default=False)
     expires_at = models.DateTimeField(null=True, blank=True)
 
@@ -279,7 +277,7 @@ class Invitation(models.Model):
         return "Open" if self.is_open else "Personal"
 
     def __str__(self):
-        return f"Invitation from {self.owner.username} ({'Open' if self.is_open else 'Personal'})"
+        return f"{self.name} from {self.owner.display_name}"
 
     is_open = models.BooleanField(default=False)
 
