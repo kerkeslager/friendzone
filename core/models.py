@@ -1,4 +1,3 @@
-from datetime import timedelta
 import uuid
 import zoneinfo
 
@@ -263,12 +262,13 @@ class Invitation(models.Model):
 
     @property
     def expires_at(self):
-        return self.created_utc + timedelta(days=settings.INVITE_LIFESPAN)
+        return self.created_utc + settings.INVITE_LIFESPAN
 
     def is_expired(self):
-        if not self.is_open and self.expires_at:
-            return timezone.now() > self.expires_at
-        return False
+        if self.is_open:
+            return False
+
+        return timezone.now() > self.expires_at
 
     @property
     def type(self):

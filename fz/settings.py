@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 
@@ -121,7 +122,7 @@ USE_I18N = True
 USE_TZ = True
 
 # Invitation Expiration
-INVITE_LIFESPAN = 7
+INVITE_LIFESPAN = timedelta(days=7)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
