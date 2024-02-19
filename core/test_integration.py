@@ -47,7 +47,6 @@ class IntegrationTests(object):
         super().tearDownClass()
 
         if getattr(cls, 'browser') is not None:
-            time.sleep(2)  # Keep the browser open for 2 seconds
             cls.browser.quit()
 
     def find_url(self, *args, **kwargs):
