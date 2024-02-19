@@ -64,7 +64,7 @@ class IntroForm(forms.ModelForm):
 
 class IntroAcceptForm(forms.ModelForm):
     is_accepted = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={'style': 'display: none;'}), 
+        widget=forms.CheckboxInput(attrs={'style': 'display: none;'}),
         initial=True,
     )
 
