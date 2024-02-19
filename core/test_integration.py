@@ -154,6 +154,9 @@ class IntegrationTests(object):
         form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
         checkbox_parent_xpath = "//label[contains(., 'Friends')]"
         checkbox_xpath = "//input[@type='checkbox']"
+        self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '{}{}'.format(form_xpath, checkbox_parent_xpath))))
+        
         checkbox = self.browser.find_element(
             By.XPATH,
             '{}{}{}'.format(
@@ -227,7 +230,7 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
     def setUpClass(cls):
         options = ChromeOptions()
 
-        options.page_load_strategy = 'none'
+        options.page_load_strategy = 'eager'
 
         if settings.TEST_INTEGRATION_HEADLESS:
             options.add_argument('--headless=new')
