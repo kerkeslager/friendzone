@@ -325,15 +325,6 @@ class InvitationCreateView(CreateView):
     def form_valid(self, form):
         invitation = form.save(commit=False)
         invitation.owner = self.request.user
-        if invitation.is_open:
-            # Logic for open invitations
-            pass
-        else:
-            # personal invitations (e.g., expiration)
-            # invitation.expires_at = timezone.now()
-            # invitation.expires_at += models.Invitation.DEFAULT_EXPIRATION
-            pass
-        invitation.save()
         return super().form_valid(form)
 
 invite_create = InvitationCreateView.as_view()
