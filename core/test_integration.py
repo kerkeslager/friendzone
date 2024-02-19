@@ -229,7 +229,7 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
     def setUpClass(cls):
         options = ChromeOptions()
 
-        options.page_load_strategy = 'eager'
+        options.page_load_strategy = 'normal'
 
         if settings.TEST_INTEGRATION_HEADLESS:
             options.add_argument('--headless=new')
