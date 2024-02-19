@@ -86,10 +86,15 @@ class InvitationForm(forms.ModelForm):
         help_text='This message will be shown to the user you invite.',
         widget=forms.Textarea,
     )
+    is_open = forms.BooleanField(
+        required=False,  # Make optional if you want users to explicitly choose
+        label='Open Invitation',
+        help_text='(it will not expire and can be accepted by multiple users).'
+    )
 
     class Meta:
         model = models.Invitation
-        fields = ('name', 'circles', 'message')
+        fields = ('name', 'circles', 'message', 'is_open')
         help_texts = {
             'name': 'Who is this invite for?',
         }

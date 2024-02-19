@@ -47,7 +47,6 @@ class IntegrationTests(object):
         super().tearDownClass()
 
         if getattr(cls, 'browser') is not None:
-            time.sleep(2)  # Keep the browser open for 2 seconds
             cls.browser.quit()
 
     def find_url(self, *args, **kwargs):
@@ -155,6 +154,8 @@ class IntegrationTests(object):
         form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
         checkbox_parent_xpath = "//label[contains(., 'Friends')]"
         checkbox_xpath = "//input[@type='checkbox']"
+        self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '{}{}'.format(form_xpath, checkbox_parent_xpath))))
         checkbox = self.browser.find_element(
             By.XPATH,
             '{}{}{}'.format(

@@ -12,6 +12,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
+from django.utils import timezone
 
 import pyqrcode
 
@@ -322,7 +323,8 @@ class InvitationCreateView(CreateView):
         return result
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user
+        invitation = form.save(commit=False)
+        invitation.owner = self.request.user
         return super().form_valid(form)
 
 invite_create = InvitationCreateView.as_view()
