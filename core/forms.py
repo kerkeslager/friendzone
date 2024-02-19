@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 
 from . import models
 
@@ -41,6 +42,35 @@ class MessageForm(forms.ModelForm):
                 },
             ),
         }
+
+class IntroForm(forms.ModelForm):
+    class Meta:
+        model = models.Intro
+        fields = ('receiver', 'introduced')
+
+    def __init__(self, *args, **kwargs):
+        connections = kwargs.pop('connections')
+        super().__init__(*args, **kwargs)
+        self.fields['receiver'].queryset = connections
+        self.fields['introduced'].queryset = connections
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if cleaned_data['receiver'] == cleaned_data['introduced']:
+            raise ValidationError('Cannot introduce user to themself!')
+
+        return cleaned_data
+
+class IntroAcceptForm(forms.ModelForm):
+    is_accepted = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={'style': 'display: none;'}),
+        initial=True,
+    )
+
+    class Meta:
+        model = models.Intro
+        fields = ('is_accepted',)
 
 class InvitationAcceptForm(forms.Form):
     circles = CircleMultipleChoiceField()
