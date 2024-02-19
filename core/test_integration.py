@@ -156,7 +156,6 @@ class IntegrationTests(object):
         checkbox_xpath = "//input[@type='checkbox']"
         self.wait.until(EC.presence_of_element_located(
             (By.XPATH, '{}{}'.format(form_xpath, checkbox_parent_xpath))))
-        
         checkbox = self.browser.find_element(
             By.XPATH,
             '{}{}{}'.format(
