@@ -223,6 +223,118 @@ class IntegrationTests(object):
         # Verify that user 2 CANNOT view the post
         self.wait.until(EC.invisibility_of_element((By.CLASS_NAME, 'post')))
 
+    def test_invitation_process(self):
+        # Create two users
+        User = get_user_model()
+        user0 = User.objects.create_user(
+            username='user0', password='password0')
+        user1 = User.objects.create_user(
+            username='user1', password='password1')
+
+        # Log in as user 0
+        self.browser.get(self.live_server_url + reverse('login'))
+        username_input = self.browser.find_element(By.NAME, 'username')
+        password_input = self.browser.find_element(By.NAME, 'password')
+        username_input.send_keys('user0')
+        password_input.send_keys('password0')
+        submit_button = self.browser.find_element(
+            By.XPATH,
+            '//button[@type="submit"]',
+        )
+        submit_button.click()
+
+        # Create an invitation
+        self.browser.get(self.live_server_url + reverse('invite_create'))
+        # time.sleep(20)
+        # Fill in the form
+        name_input = self.browser.find_element(By.NAME, 'name')
+        name_input.send_keys('Test Invitation')
+
+        message_input = self.browser.find_element(By.NAME, 'message')
+        message_input.send_keys('This is a test invitation message.')
+        # time.sleep(20)
+        # Selecting a circle (e.g., 'Friends')
+        # This assumes you know the value or can identify the checkbox for the
+        # 'Friends' circle.
+        family_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Family']")
+        family_circle_checkbox = family_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+        family_circle_checkbox.click()
+
+        cb = self.wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[contains(text(), 'save')]")))
+        self.browser.execute_script("arguments[0].scrollIntoView();", cb)
+        cb.click()
+        invite_link = self.browser.find_element(
+            By.LINK_TEXT, "Test Invitation")
+
+        # Extract the href attribute to get the URL
+        invitation_url = invite_link.get_attribute('href')
+
+        # Output the extracted URL (for demonstration purposes)
+        # print("Extracted Invitation URL:", invitation_url)
+
+        # Log out as user 0
+        logout_button = self.browser.find_element(
+            By.XPATH, '//button[@type="submit"]')
+        logout_button.click()
+
+        # Log in as user 1
+        self.browser.get(self.live_server_url + reverse('login'))
+        username_input = self.browser.find_element(By.NAME, 'username')
+        password_input = self.browser.find_element(By.NAME, 'password')
+        username_input.send_keys('user1')
+        password_input.send_keys('password1')
+        submit_button = self.browser.find_element(
+            By.XPATH, '//button[@type="submit"]')
+        submit_button.click()
+
+        # Accept the invitation
+        self.browser.get(invitation_url)
+
+        family_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Family']")
+        family_circle_checkbox = family_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+        family_circle_checkbox.click()
+
+        accept_button = self.wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[contains(text(), 'accept')]")))
+        accept_button.click()
+
+        # Verify that user 1 can view user 0's profile page
+        self.wait.until(EC.text_to_be_present_in_element(
+            (By.TAG_NAME, 'h1'),
+            user0.username,
+        ))
+
+        # Log out as user 1
+        logout_button = self.browser.find_element(
+            By.XPATH, '//button[@type="submit"]')
+        logout_button.click()
+
+        # Log in as user 0
+        self.browser.get(self.live_server_url + reverse('login'))
+        username_input = self.browser.find_element(By.NAME, 'username')
+        password_input = self.browser.find_element(By.NAME, 'password')
+        username_input.send_keys('user0')
+        password_input.send_keys('password0')
+        submit_button = self.browser.find_element(
+            By.XPATH, '//button[@type="submit"]')
+        submit_button.click()
+
+        # Verify that user 0 can view user 1's profile page
+        self.browser.get(
+            self.live_server_url + reverse(
+                'user_detail',
+                args=[
+                    user1.id]))
+        self.wait.until(EC.text_to_be_present_in_element(
+            (By.TAG_NAME, 'h1'),
+            user1.username,
+        ))
+
 @tag('slow')
 class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
     @classmethod

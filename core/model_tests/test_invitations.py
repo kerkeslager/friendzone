@@ -17,7 +17,7 @@ class InvitationExpirationTests(TransactionTestCase):
             password='12345',
         )
 
-        # Create an invitation that is supposed to expire a week ago
+        # Create an invitation that is expired
         past_date = timezone.now() - timedelta(weeks=1, days=1)
         invitation = models.Invitation.objects.create(
             owner=test_user,
@@ -29,7 +29,8 @@ class InvitationExpirationTests(TransactionTestCase):
         # Invitation should be expired
         self.assertTrue(
             invitation.is_expired(),
-            "The invitation should be expired.")
+            "The invitation should be expired.",
+        )
 
         with self.assertRaises(Exception, msg="The invitation has expired."):
             accepting_user.accept_invitation(
@@ -40,54 +41,40 @@ class InvitationExpirationTests(TransactionTestCase):
     def test_invitation_acceptance_before_expiration(self):
         # Create a test user for the owner of the invitation
         test_user = models.User.objects.create_user(
-            username='inviting_user_before', password='12345')
+            username='inviting_user_before',
+            password='12345',
+        )
         accepting_user = models.User.objects.create_user(
-            username='accepting_user_before', password='12345')
-        # Invitation expires in the future
-        future_date = timezone.now()
-        invitation = models.Invitation.objects.create(
-            owner=test_user, is_open=False)
-        invitation.created_utc = future_date
-        invitation.save(update_fields=['created_utc'])
+            username='accepting_user_before',
+            password='12345',
+        )
 
-        self.assertFalse(invitation.is_expired())
-
-        # Create an invitation that expires in the future
-        future_date = timezone.now()
         invitation = models.Invitation.objects.create(
             owner=test_user,
             is_open=False,
         )
 
-        # Attempt to accept the invitation before it expires
-        try:
-            accepting_user.accept_invitation(
-                invitation,
-                circles=accepting_user.circles.filter(name='Family'),
-            )
-            # If we reach here, the invitation acceptance was successful
-            self.assertFalse(
-                invitation.is_expired(),
-                "The invitation should not be expired yet.")
-        except Exception as e:
-            # If an exception is raised, the test should fail
-            self.fail(f"Accepting the invitation raised an exception: {e}")
+        self.assertFalse(invitation.is_expired())
+
+        accepting_user.accept_invitation(
+            invitation,
+            circles=accepting_user.circles.filter(
+                name='Family',
+            ),
+        )
 
     def test_invitation_deletion_after_accepting(self):
         # Create a test user for the owner of the invitation
         test_user = models.User.objects.create_user(
-            username='inviting_user_before', password='12345')
+            username='inviting_user_before',
+            password='12345',
+        )
         accepting_user = models.User.objects.create_user(
-            username='accepting_user_before', password='12345')
-        # Invitation expires in the future
-
-        invitation = models.Invitation.objects.create(
-            owner=test_user, is_open=False)
-
-        self.assertFalse(invitation.is_expired())
+            username='accepting_user_before',
+            password='12345',
+        )
 
         # Create an invitation that expires in the future
-
         invitation = models.Invitation.objects.create(
             owner=test_user,
             is_open=False,
@@ -99,6 +86,7 @@ class InvitationExpirationTests(TransactionTestCase):
             invitation,
             circles=accepting_user.circles.filter(name='Family'),
         )
-        # If we reach here, the invitation acceptance was successful
+
+        # If throws exception, the invitation acceptance was successful
         with self.assertRaises(models.Invitation.DoesNotExist):
             models.Invitation.objects.get(id=invitation.id)
