@@ -41,6 +41,12 @@
           </nav>
         </nav>
 
+        {% if request.user.open_intros.count > 0 %}
+          <a href='{% url "intro_list" %}'>intros ({{ request.user.open_intros.count }})</a>
+        {% else %}
+          <a href='{% url "intro_list" %}'>intros</a>
+        {% endif %}
+
         <a href='{% url "invite_list" %}'>invites</a>
 
         {% if request.user.connections.count > 0 %}

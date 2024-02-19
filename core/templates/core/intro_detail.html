@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}intro{% endblock %}
+
+{% block main %}
+  {% if request.user == object.sender %}
+    <h1>Introduction for {{ object.receiver.display_name }} and {{ object.introduced.display_name }}</h1>
+  {% else %}
+    <h3>{{ object.sender.display_name }} would like to introduce you to {{ object.introduced.display_name }}</h3>
+    <form method='post' action='{% url "intro_accept" pk=object.pk %}'>
+      {% csrf_token %}
+      {{ form }}
+      <button type='submit'>save</button>
+    </form>
+  {% endif %}
+
+{% endblock %}
