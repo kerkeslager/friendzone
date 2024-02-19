@@ -186,7 +186,6 @@ class IntegrationTests(object):
 
         # Log in as user 1
         self.browser.get(self.live_server_url + reverse('login'))
-       
         username_input = self.browser.find_element(By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user1')
