@@ -25,6 +25,12 @@ convo_urlpatterns = [
     path('<uuid:pk>/new', views.message_create, name='message_create'),
 ]
 
+intro_urlpatterns = [
+    path('new', views.intro_create, name='intro_create'),
+    path('<uuid:pk>/accept', views.intro_accept, name='intro_accept'),
+    path('<uuid:pk>', views.intro_detail, name='intro_detail'),
+]
+
 invite_urlpatterns = [
     path('new', views.invite_create, name='invite_create'),
     path('<uuid:pk>/accept', views.invite_accept, name='invite_accept'),
@@ -56,6 +62,9 @@ urlpatterns = [
     path('style.css', views.css_style, name='css_style'),
 
     path('posts/', include(post_urlpatterns)),
+
+    path('intros', views.intro_list, name='intro_list'),
+    path('intros/', include(intro_urlpatterns)),
 
     path('invites', views.invite_list, name='invite_list'),
     path('invites/', include(invite_urlpatterns)),

@@ -145,6 +145,29 @@ class User(auth_models.AbstractUser):
 
         return Post.objects.filter(pk__in=post_pks)
 
+    @property
+    def open_intros(self):
+        connected_users = self.connections.values_list(
+            'other_user',
+            flat=True,
+        )
+
+        # Filter out intros to users you're already conneted with. We shouldn't
+        # need to filter on is_accepted because accepted intros will be
+        # deleted.
+        return self.intros.exclude(
+            pk__in=connected_users,
+        )
+
+    @property
+    def connected_users(self):
+        return User.objects.filter(
+            pk__in=self.connections.values_list(
+                'other_user',
+                flat=True,
+            ),
+        )
+
     def is_connected_with(self, other_user):
         return self.connections.filter(
             other_user=other_user,
@@ -287,6 +310,12 @@ class Intro(models.Model):
             create_opposite = False
 
         result = super().save(*args, **kwargs)
+
+        if self.is_accepted and self.opposite and self.opposite.is_accepted:
+            connection = Connection.objects.create(
+                owner=self.receiver,
+                other_user=self.introduced,
+            )
 
         if create_opposite:
             opposite = Intro(
