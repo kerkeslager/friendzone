@@ -11,7 +11,8 @@
 </p>
 
 <h3>Connections in this circle:</h3>
-{% for member in object.members %}
+
+{% for member in object.members.all %}
   <p><a href='{% url "user_detail" pk=member.pk %}'>{{ member.display_name }}</a></p>
 {% empty %}
   <p><em>
@@ -25,5 +26,7 @@
     {% endif %}
   </em></p>
 {% endfor %}
+
+{% include 'widgets/post_list.html' with post_list=object.posts.all %}
 
 {% endblock %}
