@@ -147,6 +147,29 @@ class User(auth_models.AbstractUser):
 
         return Post.objects.filter(pk__in=post_pks)
 
+    @property
+    def open_intros(self):
+        connected_users = self.connections.values_list(
+            'other_user',
+            flat=True,
+        )
+
+        # Filter out intros to users you're already conneted with. We shouldn't
+        # need to filter on is_accepted because accepted intros will be
+        # deleted.
+        return self.intros.exclude(
+            pk__in=connected_users,
+        )
+
+    @property
+    def connected_users(self):
+        return User.objects.filter(
+            pk__in=self.connections.values_list(
+                'other_user',
+                flat=True,
+            ),
+        )
+
     def is_connected_with(self, other_user):
         return self.connections.filter(
             other_user=other_user,
@@ -255,13 +278,112 @@ class Invitation(models.Model):
     def get_absolute_url(self):
         return reverse('invite_detail', args=[str(self.pk)])
 
+class Intro(models.Model):
+    '''
+    An Intro is created by `owner` and sent to ONE user, `receiver`.
+    Introes are sent two at a time, one for each user being introduced to
+    the other; the second Intro is created by the save method of the first.
+    This means each user being introduced to the other has their own Intro;
+    you DO NOT need to query against both sides if finding Intros for a user.
+
+    Put another way, DO NOT write queries like:
+
+    ```
+    Intro.objects.filter(Q(receiver=user) | Q(other_user=user))
+    ```
+
+    This is not correct, THIS IS WRONG, as it will return Intros not directed
+    at `user`. ONLY list intros directed at a user through through
+    `user.intros`.
+    '''
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='+',
+        help_text='The user who is introducing the other two.',
+    )
+    receiver = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='intros',
+        help_text='The user the intro is sent to, who can accept the intro.',
+    )
+    introduced = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='+',
+        help_text='The user the receiving user is being introduced to.',
+    )
+    opposite = models.OneToOneField(
+        'Intro',
+        on_delete=models.CASCADE,
+        null=True,
+        help_text=(
+            'The corresponding Intro which was sent to indroduced user; '
+            'ensures that deleting one intro deletes the other.'
+        ),
+    )
+    is_accepted = models.BooleanField(default=False)
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        if self.opposite is None:
+            assert self._state.adding
+            create_opposite = True
+        else:
+            create_opposite = False
+
+        result = super().save(*args, **kwargs)
+
+        if self.is_accepted and self.opposite and self.opposite.is_accepted:
+            connection = Connection.objects.create(
+                owner=self.receiver,
+                other_user=self.introduced,
+            )
+
+        if create_opposite:
+            opposite = Intro(
+                opposite=self,
+                sender=self.sender,
+                receiver=self.introduced,
+                introduced=self.receiver,
+            )
+            opposite.save()
+            self.opposite = opposite
+            self.save()
+
+        return result
+
 class Connection(models.Model):
+    '''
+    Every connection has an opposite connection, which is created on save.
+    This means that if Alice and Bob are connected, Alice has a connection with
+    other_user=Bob, and Bob has a connection with other_user=Alice. This is so
+    that you user.connections contains ALL the user's connections. You DO NOT
+    need to query Connections from both sides to get all the connections for
+    a user--if you do that you'll get the connection AND its opposite.
+
+    To reiterate in another way DO NOT write queries like:
+
+    ```
+    Connection.objects.filter(Q(owner=user) | Q(other_user=user))
+    ```
+
+    The above query is slow and IS WRONG.
+    '''
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_utc = models.DateTimeField(auto_now_add=True)
     opposite = models.OneToOneField(
         'Connection',
         on_delete=models.CASCADE,
         null=True,
+        help_text=(
+            'The corresponding Connection which belongs to the other user. '
+            'This is to ensure that if the owner disconnects from the other '
+            'user, the other user also disconnects from the owner.'
+        )
     )
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -278,6 +400,9 @@ class Connection(models.Model):
         through='CircleMembership',
         through_fields=('connection', 'circle'),
     )
+
+    class Meta:
+        unique_together = (('owner', 'other_user'),)
 
     def __repr__(self):
         return "<Connection: {}'s connection with {}>".format(
@@ -382,6 +507,15 @@ class Circle(models.Model):
     def members(self):
         return User.objects.filter(
             pk__in=self.connections.all().values_list('other_user', flat=True),
+        )
+
+    @property
+    def posts(self):
+        return Post.objects.filter(
+            pk__in=PostCircle.objects.filter(circle=self).values_list(
+                'post',
+                flat=True,
+            ),
         )
 
 class CircleMembership(models.Model):

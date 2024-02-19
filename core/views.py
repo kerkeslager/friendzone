@@ -240,6 +240,73 @@ class CSSView(TemplateView):
 
 css_style = CSSView.as_view()
 
+class IntroAccept(UpdateView):
+    model = models.Intro
+    form_class = forms.IntroAcceptForm
+    success_url = reverse_lazy('connection_list')
+
+intro_accept = IntroAccept.as_view()
+
+class IntroCreate(CreateView):
+    model = models.Intro
+    form_class = forms.IntroForm
+
+    def get_form_kwargs(self):
+        result = super().get_form_kwargs()
+        result['connections'] = self.request.user.connected_users
+        return result
+
+    def get_success_url(self):
+        return reverse('intro_detail', kwargs={ 'pk': self.object.pk })
+
+    def form_valid(self, form):
+        form.instance.sender = self.request.user
+        return super().form_valid(form)
+
+intro_create = IntroCreate.as_view()
+
+class IntroDetail(DetailView):
+    model = models.Intro
+
+    def get_context_data(self, *args, **kwargs):
+        result = super().get_context_data(*args, **kwargs)
+
+        if self.request.user == self.object.receiver:
+            result['form'] = forms.IntroAcceptForm()
+
+        return result
+
+    def get_object(self):
+        intro = get_object_or_404(
+            models.Intro,
+            pk=self.kwargs['pk'],
+        )
+
+        if self.request.user == intro.sender:
+            return intro
+
+        if self.request.user == intro.receiver:
+            return intro
+
+        raise Http404()
+
+intro_detail = IntroDetail.as_view()
+
+class IntroList(ListView):
+    model = models.Intro
+
+    def get_queryset(self):
+        return self.request.user.open_intros
+
+    def get_context_data(self, *args, **kwargs):
+        result = super().get_context_data(*args, **kwargs)
+        result['form'] = forms.IntroForm(
+            connections=self.request.user.connected_users,
+        )
+        return result
+
+intro_list = IntroList.as_view()
+
 class InvitationCreateView(CreateView):
     model = models.Invitation
     success_url = reverse_lazy('invite_list')

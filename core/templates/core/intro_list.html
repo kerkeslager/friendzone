@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% block title %}intros{% endblock %}
+
+{% block main %}
+  <h1>Intros</h1>
+
+  <h2>Intros for you</h2>
+
+  {% for intro in object_list %}
+    <p>
+      <a href='{% url "user_detail" pk=intro.sender.pk %}'>{{ intro.sender.display_name }}</a>
+      wants to introduce you to
+      <a href='{% url "intro_detail" pk=intro.pk %}'>{{ intro.introduced.display_name }}</a>!
+    </p>
+  {% empty %}
+    <p><em>You don't have any intros.</em></p>
+  {% endfor %}
+
+  <h2>Intros for your friends</h2>
+  <form method='post' action='{% url "intro_create" %}'>
+    {% csrf_token %}
+    {{ form }}
+    <button type='submit'>save</button>
+  </form>
+{% endblock %}
