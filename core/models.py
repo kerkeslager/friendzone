@@ -251,16 +251,19 @@ class Invitation(models.Model):
         on_delete=models.CASCADE,
         related_name='invitations'
     )
+    created_utc = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=256)
     message = models.CharField(max_length=1024)
     circles = models.ManyToManyField(
         'Circle',
         related_name='+',
     )
-    DEFAULT_EXPIRATION = timedelta(days=7)
 
     is_open = models.BooleanField(default=False)
-    expires_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def expires_at(self):
+        return self.created_utc + timedelta(days=settings.INVITE_LIFESPAN)
 
     def is_expired(self):
         if not self.is_open and self.expires_at:

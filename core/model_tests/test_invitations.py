@@ -22,8 +22,9 @@ class InvitationExpirationTests(TransactionTestCase):
         invitation = models.Invitation.objects.create(
             owner=test_user,
             is_open=False,  # personal invitation
-            expires_at=past_date
         )
+        invitation.created_utc = past_date
+        invitation.save(update_fields=['created_utc'])
 
         # Invitation should be expired
         self.assertTrue(
@@ -43,19 +44,19 @@ class InvitationExpirationTests(TransactionTestCase):
         accepting_user = models.User.objects.create_user(
             username='accepting_user_before', password='12345')
         # Invitation expires in the future
-        future_date = timezone.now() + timedelta(days=7)
+        future_date = timezone.now()
         invitation = models.Invitation.objects.create(
-            owner=test_user, is_open=False, expires_at=future_date)
+            owner=test_user, is_open=False)
+        invitation.created_utc = future_date
+        invitation.save(update_fields=['created_utc'])
 
         self.assertFalse(invitation.is_expired())
 
         # Create an invitation that expires in the future
         future_date = timezone.now()
-        future_date += timedelta(days=7)
         invitation = models.Invitation.objects.create(
             owner=test_user,
             is_open=False,
-            expires_at=future_date
         )
 
         # Attempt to accept the invitation before it expires
@@ -79,19 +80,17 @@ class InvitationExpirationTests(TransactionTestCase):
         accepting_user = models.User.objects.create_user(
             username='accepting_user_before', password='12345')
         # Invitation expires in the future
-        future_date = timezone.now() + timedelta(days=7)
+
         invitation = models.Invitation.objects.create(
-            owner=test_user, is_open=False, expires_at=future_date)
+            owner=test_user, is_open=False)
 
         self.assertFalse(invitation.is_expired())
 
         # Create an invitation that expires in the future
-        future_date = timezone.now()
-        future_date += timedelta(days=7)
+
         invitation = models.Invitation.objects.create(
             owner=test_user,
             is_open=False,
-            expires_at=future_date
         )
 
         # Attempt to accept the invitation before it expires
