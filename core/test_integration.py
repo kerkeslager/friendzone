@@ -28,7 +28,7 @@ def find_e_with_retry(driver, by, value, attempts=10, delay=2):
             if attempt < attempts - 1:
                 time.sleep(delay)  # Wait for a bit before retrying
             else:
-                print(f"Could not find element {value} after {attempts} attempts")
+                print(f"Could not find element {value}")
                 print(driver.page_source)
                 raise Exception("Could not find element")
 
@@ -197,8 +197,11 @@ class IntegrationTests(object):
             By.XPATH, '//button[@type="submit"]')
         logout_button.click()
 
+        self.browser.get(self.live_server_url + reverse('logout'))
+
         # Log in as user 1
         self.browser.get(self.live_server_url + reverse('login'))
+
         username_input = find_e_with_retry(
             self.browser, By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
@@ -364,7 +367,7 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
 
             # The default window is very small which causes footer to cover
             # buttons which we want to click, causing tests to fail.
-            options.add_argument('--window-size=1920,1080')
+            
 
         s = Service(ChromeDriverManager().install())
         cls.browser = webdriver.Chrome(service=s, options=options)
