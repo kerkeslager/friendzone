@@ -18,6 +18,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from webdriver_manager.firefox import GeckoDriverManager
 
+from selenium.common.exceptions import NoSuchElementException
+
+def find_e_with_retry(driver, by, value, attempts=10, delay=2):
+    for attempt in range(attempts):
+        try:
+            return driver.find_element(by, value)
+        except NoSuchElementException:
+            if attempt < attempts - 1:
+                time.sleep(delay)  # Wait for a bit before retrying
+            else:
+                print(f"Could not find element {value}")
+                print(driver.page_source)
+                raise Exception("Could not find element")
+
+
 class IntegrationTests(object):
     '''
     Write integration tests in this base class.
@@ -169,9 +184,7 @@ class IntegrationTests(object):
         post_input = self.browser.find_element(By.NAME, 'text')
         post_input.send_keys('This is a test post for Friends')
 
-        wait = WebDriverWait(self.browser, 10)
-
-        create_button = wait.until(EC.element_to_be_clickable(
+        create_button = self.wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//button[contains(text(), 'create')]")))
         create_button.click()
 
@@ -184,9 +197,13 @@ class IntegrationTests(object):
             By.XPATH, '//button[@type="submit"]')
         logout_button.click()
 
+        self.browser.get(self.live_server_url + reverse('logout'))
+
         # Log in as user 1
         self.browser.get(self.live_server_url + reverse('login'))
-        username_input = self.browser.find_element(By.NAME, 'username')
+
+        username_input = find_e_with_retry(
+            self.browser, By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user1')
         password_input.send_keys('password1')
@@ -209,7 +226,7 @@ class IntegrationTests(object):
 
         # Log in as user 2
         self.browser.get(self.live_server_url + reverse('login'))
-        username_input = wait.until(
+        username_input = self.wait.until(
             EC.presence_of_element_located(
                 (By.NAME, 'username')))
         username_input = self.browser.find_element(By.NAME, 'username')
@@ -282,7 +299,8 @@ class IntegrationTests(object):
 
         # Log in as user 1
         self.browser.get(self.live_server_url + reverse('login'))
-        username_input = self.browser.find_element(By.NAME, 'username')
+        username_input = find_e_with_retry(
+            self.browser, By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user1')
         password_input.send_keys('password1')
@@ -316,7 +334,8 @@ class IntegrationTests(object):
 
         # Log in as user 0
         self.browser.get(self.live_server_url + reverse('login'))
-        username_input = self.browser.find_element(By.NAME, 'username')
+        username_input = find_e_with_retry(
+            self.browser, By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user0')
         password_input.send_keys('password0')
