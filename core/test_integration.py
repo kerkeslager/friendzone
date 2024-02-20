@@ -367,6 +367,7 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
 
             # The default window is very small which causes footer to cover
             # buttons which we want to click, causing tests to fail.
+            options.add_argument('--window-size=1920,1080')
 
         s = Service(ChromeDriverManager().install())
         cls.browser = webdriver.Chrome(service=s, options=options)
