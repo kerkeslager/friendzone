@@ -28,7 +28,9 @@ def find_e_with_retry(driver, by, value, attempts=10, delay=2):
             if attempt < attempts - 1:
                 time.sleep(delay)  # Wait for a bit before retrying
             else:
-                raise
+                print(f"Could not find element {value} after {attempts} attempts")
+                print(driver.page_source)
+                raise Exception("Could not find element")
 
 
 class IntegrationTests(object):
@@ -294,7 +296,8 @@ class IntegrationTests(object):
 
         # Log in as user 1
         self.browser.get(self.live_server_url + reverse('login'))
-        username_input = self.browser.find_element(By.NAME, 'username')
+        username_input = find_e_with_retry(
+            self.browser, By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user1')
         password_input.send_keys('password1')
