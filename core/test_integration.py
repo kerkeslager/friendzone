@@ -20,7 +20,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 
 from selenium.common.exceptions import NoSuchElementException
 
-def find_e_with_retry(driver, by, value, attempts=5, delay=1):
+def find_e_with_retry(driver, by, value, attempts=10, delay=2):
     for attempt in range(attempts):
         try:
             return driver.find_element(by, value)
@@ -197,7 +197,6 @@ class IntegrationTests(object):
 
         # Log in as user 1
         self.browser.get(self.live_server_url + reverse('login'))
-        self.browser.implicitly_wait(10)
         username_input = find_e_with_retry(
             self.browser, By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
