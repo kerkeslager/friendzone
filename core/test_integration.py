@@ -182,8 +182,6 @@ class IntegrationTests(object):
         post_input = self.browser.find_element(By.NAME, 'text')
         post_input.send_keys('This is a test post for Friends')
 
-        #wait = WebDriverWait(self.browser, 10)
-
         create_button = self.wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//button[contains(text(), 'create')]")))
         create_button.click()
