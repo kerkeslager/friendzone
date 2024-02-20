@@ -331,7 +331,6 @@ class IntegrationTests(object):
 
         # Log in as user 0
         self.browser.get(self.live_server_url + reverse('login'))
-        self.browser.implicitly_wait(10)
         username_input = find_e_with_retry(
             self.browser, By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
