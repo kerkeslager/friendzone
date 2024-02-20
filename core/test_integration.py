@@ -28,7 +28,7 @@ def find_e_with_retry(driver, by, value, attempts=10, delay=2):
             if attempt < attempts - 1:
                 time.sleep(delay)  # Wait for a bit before retrying
             else:
-                print(f"Could not find element {value} after {attempts} attempts")
+                print(f"Could not find element {value}")
                 print(driver.page_source)
                 raise Exception("Could not find element")
 
