@@ -239,12 +239,12 @@ class IntegrationTests(object):
 
         # Verify that user 2 CANNOT view the post
         self.wait.until(EC.invisibility_of_element((By.CLASS_NAME, 'post')))
-    
+
     def test_post_circles_prechecked_on_edit(self):
         User = get_user_model()
         user0 = User.objects.create_user(
             username='user0', password='password0')
-        
+
         # Log in as user 0
         self.browser.get(self.live_server_url + reverse('login'))
         username_input = self.browser.find_element(By.NAME, 'username')
@@ -292,9 +292,6 @@ class IntegrationTests(object):
         self.assertTrue(
             family_circle_checkbox.is_selected(),
             "Circle 1 should be pre-checked.")
-
-
-
 
     def test_invitation_process(self):
         # Create two users
