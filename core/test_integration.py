@@ -239,6 +239,62 @@ class IntegrationTests(object):
 
         # Verify that user 2 CANNOT view the post
         self.wait.until(EC.invisibility_of_element((By.CLASS_NAME, 'post')))
+    
+    def test_post_circles_prechecked_on_edit(self):
+        User = get_user_model()
+        user0 = User.objects.create_user(
+            username='user0', password='password0')
+        
+        # Log in as user 0
+        self.browser.get(self.live_server_url + reverse('login'))
+        username_input = self.browser.find_element(By.NAME, 'username')
+        password_input = self.browser.find_element(By.NAME, 'password')
+        username_input.send_keys('user0')
+        password_input.send_keys('password0')
+        submit_button = self.browser.find_element(
+            By.XPATH,
+            '//button[@type="submit"]',
+        )
+        submit_button.click()
+
+        # Publish a post to Friends
+        # Checkbox input for circle
+
+        form_xpath = '//form[@action="{}"]'.format(reverse('post_create'))
+        checkbox_parent_xpath = "//label[contains(., 'Friends')]"
+        checkbox_xpath = "//input[@type='checkbox']"
+        self.wait.until(EC.presence_of_element_located(
+            (By.XPATH, '{}{}'.format(form_xpath, checkbox_parent_xpath))))
+        checkbox = self.browser.find_element(
+            By.XPATH,
+            '{}{}{}'.format(
+                form_xpath,
+                checkbox_parent_xpath,
+                checkbox_xpath,
+            ),
+        )
+        checkbox.click()
+
+        post_input = self.browser.find_element(By.NAME, 'text')
+        post_input.send_keys('This is a test post for Friends')
+
+        create_button = self.wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[contains(text(), 'create')]")))
+        create_button.click()
+
+        self.browser.find_element(By.LINK_TEXT, "View").click()
+        self.browser.find_element(By.LINK_TEXT, "Edit").click()
+        family_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Family']")
+        family_circle_checkbox = family_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+
+        self.assertTrue(
+            family_circle_checkbox.is_selected(),
+            "Circle 1 should be pre-checked.")
+
+
+
 
     def test_invitation_process(self):
         # Create two users
