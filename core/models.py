@@ -600,7 +600,7 @@ class Post(models.Model):
     def publish(self, *, circles):
         for circle in circles:
             PostCircle.objects.create(circle=circle, post=self)
-    
+
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.pk)])
 
