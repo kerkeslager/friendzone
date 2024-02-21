@@ -353,6 +353,7 @@ class IntegrationTests(object):
             (By.TAG_NAME, 'h1'),
             user1.username,
         ))
+
     def test_invitation_circles_prechecked_on_edit(self):
         User = get_user_model()
         user0 = User.objects.create_user(
@@ -434,7 +435,7 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
 
         super().setUpClass()
 
-    
+
 @tag('slow')
 class FirefoxIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
