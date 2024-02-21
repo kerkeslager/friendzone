@@ -373,13 +373,12 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
         cls.browser = webdriver.Chrome(service=s, options=options)
 
         super().setUpClass()
+
     def test_invitation_circles_prechecked_on_edit(self):
         User = get_user_model()
         user0 = User.objects.create_user(
             username='user0', password='password0')
-        #invitation = user0.create_invitation(
-            #circles=user0.circles.filter(name='Family'),
-        #)
+
         # Log in as user 0
         self.browser.get(self.live_server_url + reverse('login'))
         username_input = self.browser.find_element(By.NAME, 'username')
@@ -391,10 +390,10 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
             '//button[@type="submit"]',
         )
         submit_button.click()
-        
+
         # Create an invitation
         self.browser.get(self.live_server_url + reverse('invite_create'))
-        #time.sleep(5)
+
         # Fill in the form
         name_input = self.browser.find_element(By.NAME, 'name')
         name_input.send_keys('Test Invitation')
@@ -403,19 +402,17 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
         message_input.send_keys('This is a test invitation message.')
         time.sleep(2)
         # Selecting a circle (e.g., 'Friends')
-        # This assumes you know the value or can identify the checkbox for the
-        # 'Friends' circle.
+
         family_circle_label = self.browser.find_element(
             By.XPATH, "//label[normalize-space()='Family']")
         family_circle_checkbox = family_circle_label.find_element(
             By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
         family_circle_checkbox.click()
-        time.sleep(1)
+
         cb = self.wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//button[contains(text(), 'save')]")))
         self.browser.execute_script("arguments[0].scrollIntoView();", cb)
         cb.click()
-        time.sleep(1)
 
         invite_link = self.browser.find_element(
             By.LINK_TEXT, "Test Invitation")
@@ -428,16 +425,15 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
         edit_url = edit_link.get_attribute('href')
         self.browser.get(edit_url)
 
-
-        #time.sleep(30)
         family_circle_label = self.browser.find_element(
             By.XPATH, "//label[normalize-space()='Family']")
         family_circle_checkbox = family_circle_label.find_element(
             By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
-        #family_circle_checkbox.click()
 
-        self.assertTrue(family_circle_checkbox.is_selected(), "Circle 1 should be pre-checked.")
-        
+        self.assertTrue(
+            family_circle_checkbox.is_selected(),
+            "Circle 1 should be pre-checked.")
+
 @tag('slow')
 class FirefoxIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
