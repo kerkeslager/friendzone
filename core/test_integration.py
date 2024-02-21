@@ -353,27 +353,6 @@ class IntegrationTests(object):
             (By.TAG_NAME, 'h1'),
             user1.username,
         ))
-
-@tag('slow')
-class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
-    @classmethod
-    def setUpClass(cls):
-        options = ChromeOptions()
-
-        options.page_load_strategy = 'normal'
-
-        if settings.TEST_INTEGRATION_HEADLESS:
-            options.add_argument('--headless=new')
-
-            # The default window is very small which causes footer to cover
-            # buttons which we want to click, causing tests to fail.
-            options.add_argument('--window-size=1920,1080')
-
-        s = Service(ChromeDriverManager().install())
-        cls.browser = webdriver.Chrome(service=s, options=options)
-
-        super().setUpClass()
-
     def test_invitation_circles_prechecked_on_edit(self):
         User = get_user_model()
         user0 = User.objects.create_user(
@@ -434,6 +413,28 @@ class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
             family_circle_checkbox.is_selected(),
             "Circle 1 should be pre-checked.")
 
+
+@tag('slow')
+class ChromeIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        options = ChromeOptions()
+
+        options.page_load_strategy = 'normal'
+
+        if settings.TEST_INTEGRATION_HEADLESS:
+            options.add_argument('--headless=new')
+
+            # The default window is very small which causes footer to cover
+            # buttons which we want to click, causing tests to fail.
+            options.add_argument('--window-size=1920,1080')
+
+        s = Service(ChromeDriverManager().install())
+        cls.browser = webdriver.Chrome(service=s, options=options)
+
+        super().setUpClass()
+
+    
 @tag('slow')
 class FirefoxIntegrationTests(IntegrationTests, StaticLiveServerTestCase):
     @classmethod
