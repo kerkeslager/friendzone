@@ -292,8 +292,6 @@ class IntegrationTests(object):
         self.assertTrue(
             friends_circle_checkbox.is_selected(),
             "Circle 1 should be pre-checked.")
-        
-       
 
     def test_invitation_process(self):
         # Create two users

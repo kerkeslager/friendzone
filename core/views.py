@@ -375,13 +375,13 @@ class InvitationEditView(UpdateView):
     def get_context_data(self, **kwargs):
         result = super().get_context_data(**kwargs)
         result['is_new'] = False
-      
+
         return result
 
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
-        
+
         return result
 
     def get_object(self):
@@ -505,7 +505,7 @@ class PostCreateView(CreateView):
         )
         form.instance.publish(circles=circles)
         return super().form_valid(form)
-    
+
 
 post_create = PostCreateView.as_view()
 
@@ -525,7 +525,7 @@ post_delete = PostDeleteView.as_view()
 class PostEditView(UpdateView):
     model = models.Post
     form_class = forms.PostForm
-    
+
     def get_context_data(self, **kwargs):
         result = super().get_context_data(**kwargs)
         result['is_new'] = False
@@ -534,7 +534,7 @@ class PostEditView(UpdateView):
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
-        
+
         return result
 
     def get_object(self):
@@ -544,8 +544,6 @@ class PostEditView(UpdateView):
             pk=self.kwargs['pk'],
         )
 
-
-    
 
 post_edit = PostEditView.as_view()
 
@@ -557,12 +555,13 @@ class PostDetailView(DetailView):
             self.get_queryset(),
             pk=self.kwargs['pk'],
         )
+
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
         data['form'] = forms.PostForm(
-                    circles=self.request.user.circles.all())
+            circles=self.request.user.circles.all())
         return data
-    
+
 
 post_detail = PostDetailView.as_view()
 

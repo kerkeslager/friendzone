@@ -600,19 +600,17 @@ class Post(models.Model):
         'Circle',
         related_name='+',
     )
-    
+
     def publish(self, *, circles):
         for circle in circles:
             PostCircle.objects.create(circle=circle, post=self)
 
-            
-
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.pk)])
-    
+
     def __str__(self):
         return f"Post by {self.owner.display_name}"
-    
+
 class PostCircle(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     circle = models.ForeignKey(
