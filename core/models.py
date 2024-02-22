@@ -272,16 +272,6 @@ class Invitation(models.Model):
         return False
 
     @property
-    def type(self):
-        """Return the type of the invitation for convenience."""
-        return "Open" if self.is_open else "Personal"
-
-    def __str__(self):
-        return f"{self.name} from {self.owner.display_name}"
-
-    is_open = models.BooleanField(default=False)
-
-    @property
     def expires_at(self):
         return self.created_utc + settings.INVITE_LIFESPAN
 
