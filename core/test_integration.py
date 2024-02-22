@@ -380,9 +380,8 @@ class IntegrationTests(object):
         logout_button.click()
 
         # Log in as user 0
-        self.browser.get(self.live_server_url + reverse('login'))
-        username_input = find_e_with_retry(
-            self.browser, By.NAME, 'username')
+        self.browser.find_element(By.LINK_TEXT, "login").click()
+        username_input = self.browser.find_element(By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user0')
         password_input.send_keys('password0')
