@@ -495,6 +495,15 @@ class PostCreateView(CreateView):
     def form_valid(self, form):
         post = form.save(commit=False)
         post.owner = self.request.user
+        post.save()
+        circle_ids = set(
+            uuid.UUID(circle_id)
+            for circle_id in form.data.getlist('circles')
+        )
+        circles = self.request.user.circles.filter(
+            pk__in=circle_ids,
+        )
+        form.instance.publish(circles=circles)
         return super().form_valid(form)
     
 
