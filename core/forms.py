@@ -110,7 +110,7 @@ class InvitationForm(forms.ModelForm):
             'selected circles.'
         )
         self.fields['circles'].queryset = circles
-        
+
 
 class PostForm(forms.ModelForm):
     circles = CircleMultipleChoiceField()
@@ -132,7 +132,7 @@ class PostForm(forms.ModelForm):
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
-    
+
 
 class ProfileForm(forms.ModelForm):
     name = forms.CharField(required=False)
