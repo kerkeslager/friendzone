@@ -113,13 +113,16 @@ class InvitationForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
-    circles = CircleMultipleChoiceField()
+    circles = forms.ModelMultipleChoiceField(
+        queryset=models.Circle.objects.none(),
+        help_text='This post will be visible to these circles.',
+        widget=CircleWidget,
+    )
 
     class Meta:
         model = models.Post
         fields = ('circles', 'text')
         widgets = {
-            'circles': CircleWidget(),
             'text': forms.Textarea(
                 attrs={
                     'placeholder': "What's on your mind?",
