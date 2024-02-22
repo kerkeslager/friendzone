@@ -223,10 +223,7 @@ class IntegrationTests(object):
         logout_button.click()
 
         # Log in as user 2
-        self.browser.get(self.live_server_url + reverse('login'))
-        username_input = self.wait.until(
-            EC.presence_of_element_located(
-                (By.NAME, 'username')))
+        self.browser.find_element(By.LINK_TEXT, "login").click()
         username_input = self.browser.find_element(By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user2')
