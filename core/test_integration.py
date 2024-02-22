@@ -430,6 +430,7 @@ class IntegrationTests(object):
 
         message_input = self.browser.find_element(By.NAME, 'message')
         message_input.send_keys('This is a test invitation message.')
+
         # Selecting a circle (e.g., 'Friends')
 
         family_circle_label = self.browser.find_element(
