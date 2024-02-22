@@ -348,8 +348,6 @@ class IntegrationTests(object):
             By.XPATH, '//button[@type="submit"]')
         logout_button.click()
 
-        
-
         # Log in as user 1
         self.browser.find_element(By.LINK_TEXT, "login").click()
         username_input = self.browser.find_element(By.NAME, 'username')
