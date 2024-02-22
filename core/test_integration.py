@@ -200,10 +200,8 @@ class IntegrationTests(object):
         self.browser.get(self.live_server_url + reverse('logout'))
 
         # Log in as user 1
-        self.browser.get(self.live_server_url + reverse('login'))
-
-        username_input = find_e_with_retry(
-            self.browser, By.NAME, 'username')
+        self.browser.find_element(By.LINK_TEXT, "login").click()
+        username_input = self.browser.find_element(By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user1')
         password_input.send_keys('password1')
@@ -350,10 +348,11 @@ class IntegrationTests(object):
             By.XPATH, '//button[@type="submit"]')
         logout_button.click()
 
+        
+
         # Log in as user 1
-        self.browser.get(self.live_server_url + reverse('login'))
-        username_input = find_e_with_retry(
-            self.browser, By.NAME, 'username')
+        self.browser.find_element(By.LINK_TEXT, "login").click()
+        username_input = self.browser.find_element(By.NAME, 'username')
         password_input = self.browser.find_element(By.NAME, 'password')
         username_input.send_keys('user1')
         password_input.send_keys('password1')
@@ -433,7 +432,6 @@ class IntegrationTests(object):
 
         message_input = self.browser.find_element(By.NAME, 'message')
         message_input.send_keys('This is a test invitation message.')
-        time.sleep(2)
         # Selecting a circle (e.g., 'Friends')
 
         family_circle_label = self.browser.find_element(
