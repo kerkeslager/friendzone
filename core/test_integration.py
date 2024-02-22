@@ -284,14 +284,16 @@ class IntegrationTests(object):
 
         self.browser.find_element(By.LINK_TEXT, "View").click()
         self.browser.find_element(By.LINK_TEXT, "Edit").click()
-        family_circle_label = self.browser.find_element(
-            By.XPATH, "//label[normalize-space()='Family']")
-        family_circle_checkbox = family_circle_label.find_element(
+        friends_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Friends']")
+        friends_circle_checkbox = friends_circle_label.find_element(
             By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
 
         self.assertTrue(
-            family_circle_checkbox.is_selected(),
+            friends_circle_checkbox.is_selected(),
             "Circle 1 should be pre-checked.")
+        
+       
 
     def test_invitation_process(self):
         # Create two users

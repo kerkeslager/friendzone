@@ -110,18 +110,16 @@ class InvitationForm(forms.ModelForm):
             'selected circles.'
         )
         self.fields['circles'].queryset = circles
+        
 
 class PostForm(forms.ModelForm):
-    circles = forms.ModelMultipleChoiceField(
-        queryset=models.Circle.objects.none(),
-        help_text='This post will be visible to these circles.',
-        widget=CircleWidget,
-    )
+    circles = CircleMultipleChoiceField()
 
     class Meta:
         model = models.Post
         fields = ('circles', 'text')
         widgets = {
+            'circles': CircleWidget(),
             'text': forms.Textarea(
                 attrs={
                     'placeholder': "What's on your mind?",
@@ -134,6 +132,7 @@ class PostForm(forms.ModelForm):
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
+    
 
 class ProfileForm(forms.ModelForm):
     name = forms.CharField(required=False)
