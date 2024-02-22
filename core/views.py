@@ -375,11 +375,13 @@ class InvitationEditView(UpdateView):
     def get_context_data(self, **kwargs):
         result = super().get_context_data(**kwargs)
         result['is_new'] = False
+
         return result
 
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
+
         return result
 
     def get_object(self):
@@ -388,6 +390,7 @@ class InvitationEditView(UpdateView):
             owner=self.request.user,
             pk=self.kwargs['pk'],
         )
+
 
 invite_edit = InvitationEditView.as_view()
 
@@ -474,9 +477,9 @@ class IndexView(TemplateView):
 index = IndexView.as_view()
 
 class PostCreateView(CreateView):
-    form_class = forms.PostForm
     model = models.Post
     success_url = reverse_lazy('index')
+    form_class = forms.PostForm
 
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
@@ -484,8 +487,9 @@ class PostCreateView(CreateView):
         return result
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user
-        result = super().form_valid(form)
+        post = form.save(commit=False)
+        post.owner = self.request.user
+        post.save()
         circle_ids = set(
             uuid.UUID(circle_id)
             for circle_id in form.data.getlist('circles')
@@ -494,7 +498,8 @@ class PostCreateView(CreateView):
             pk__in=circle_ids,
         )
         form.instance.publish(circles=circles)
-        return result
+        return super().form_valid(form)
+
 
 post_create = PostCreateView.as_view()
 
@@ -518,6 +523,7 @@ class PostEditView(UpdateView):
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
+
         return result
 
     def get_object(self):
@@ -526,6 +532,7 @@ class PostEditView(UpdateView):
             owner=self.request.user,
             pk=self.kwargs['pk'],
         )
+
 
 post_edit = PostEditView.as_view()
 
