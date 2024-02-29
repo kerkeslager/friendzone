@@ -13,6 +13,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 from django.utils import timezone
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
 
 import pyqrcode
 
@@ -446,6 +448,42 @@ class ProfileEditView(UpdateView):
 
 profile_edit = ProfileEditView.as_view()
 
+class ConnectedUserCircleEditView(UpdateView):
+    model = models.User  # or CircleMembership, depending on your data model
+    form_class = forms.ConnectedUserCircleForm
+    template_name = 'core/edit_connected_user_circles.html'
+    success_url = reverse_lazy('connection_list')  # Adjust as necessary
+
+    def get_object(self):
+        # Ensure the user being edited is connected to the request.user
+        target_user = get_object_or_404(models.User, pk=self.kwargs['pk'])
+        if not self.request.user.is_connected_with(target_user):
+            raise PermissionDenied
+        return target_user
+
+    def form_valid(self, form):
+        circles = form.cleaned_data['circles']
+        target_user = self.get_object()
+        selected_circles = form.cleaned_data['circles']
+        non_selected = models.Circle.objects.exclude(id__in=[c.id for c in selected_circles])
+
+        models.CircleMembership.objects.filter(
+            circle__in=non_selected, 
+            connection__other_user=target_user
+        ).delete()
+
+        for circle in circles:
+            models.Circle.objects.get_or_create(name=circle.name, owner=self.request.user)
+        return super().form_valid(form)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['circles'] = self.request.user.circles
+        kwargs['user'] = self.get_object()  # Pass the target user to the form
+        return kwargs
+
+edit_circles = ConnectedUserCircleEditView.as_view()
+
 class DeleteUserView(DeleteView):
     model = models.User
     success_url = reverse_lazy('delete_done')
@@ -523,7 +561,6 @@ class PostEditView(UpdateView):
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
-
         return result
 
     def get_object(self):
@@ -532,7 +569,19 @@ class PostEditView(UpdateView):
             owner=self.request.user,
             pk=self.kwargs['pk'],
         )
-
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.owner = self.request.user
+        post.save()
+        circle_ids = set(
+            uuid.UUID(circle_id)
+            for circle_id in form.data.getlist('circles')
+        )
+        circles = self.request.user.circles.filter(
+            pk__in=circle_ids,
+        )
+        form.instance.publish(circles=circles)
+        return super().form_valid(form)
 
 post_edit = PostEditView.as_view()
 

@@ -19,12 +19,32 @@
   <a href='{% url "convo_detail" pk=object.pk %}'>view messages with this user</a>
   <p>
     In circles:
-    {% for circle in in_circles %}
-      {% include 'widgets/circle.html' with circle=circle %}
+    <form method="post" action="{% url 'edit_circles' pk=object.pk %}">
+      {% csrf_token %}
+      {% for circle in in_circles %}
+      <div class="circle-checkbox">
+        <label>
+            <input
+                type="checkbox"
+                name="circles"
+                value="{{ circle.pk }}"
+                {% if circle in in_circles %} checked {% endif %}
+                
+            >
+            <div class="circle-widget">
+                {% include 'widgets/circle.html' with circle=circle %}
+            </div>
+        </label>
+    </div>
+       
+    
     {% empty %}
       <em>Not in any circles.</em>
     {% endfor %}
+    <button type="submit">Save Changes</button>
+    </form>
   </p>
+  
 {% endif %}
 
 {% include 'widgets/post_list.html' with post_list=feed_for_user %}
