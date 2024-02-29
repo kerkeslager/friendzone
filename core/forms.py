@@ -180,8 +180,7 @@ class ConnectedUserCircleForm(forms.ModelForm):
     )
 
     class Meta:
-        model = get_user_model()  
-        # We're only using this form for the circles field
+        model = get_user_model()
         fields = ('circles', )
 
     def __init__(self, *args, **kwargs):
