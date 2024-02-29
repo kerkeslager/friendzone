@@ -287,7 +287,7 @@ class IntegrationTests(object):
         self.assertTrue(
             friends_circle_checkbox.is_selected(),
             "Circle 1 should be pre-checked.")
-        
+
     def test_post_visibility_after_post_edit(self):
         # Create three users
         User = get_user_model()
@@ -359,14 +359,12 @@ class IntegrationTests(object):
         post_input = self.browser.find_element(By.NAME, 'text')
         post_input.clear()
         post_input.send_keys('This is a test post for Family')
-        
-        
+
         friends_circle_label = self.browser.find_element(
             By.XPATH, "//label[normalize-space()='Friends']")
         friends_circle_checkbox = friends_circle_label.find_element(
             By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
 
-        
         family_circle_label = self.browser.find_element(
             By.XPATH, "//label[normalize-space()='Family']")
         family_circle_checkbox = family_circle_label.find_element(
@@ -418,7 +416,7 @@ class IntegrationTests(object):
         submit_button.click()
 
         # Verify that user 2 CANNOT view the post
-        
+
         self.wait.until(
             EC.text_to_be_present_in_element(
                 (By.CLASS_NAME, 'post'),
