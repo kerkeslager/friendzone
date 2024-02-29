@@ -172,7 +172,6 @@ class SignupForm(UserCreationForm):
         fields = UserCreationForm.Meta.fields
 
 
-
 class ConnectedUserCircleForm(forms.ModelForm):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
@@ -181,16 +180,14 @@ class ConnectedUserCircleForm(forms.ModelForm):
     )
 
     class Meta:
-        model = get_user_model() # or CircleMembership if using an intermediary model
-        fields = ('circles', )  # We're only using this form for the circles field
+        model = get_user_model()  # or CircleMembership if using an intermediary model
+        # We're only using this form for the circles field
+        fields = ('circles', )
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')  # Pass the target user as an argument
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
-        
-        
 
         # Update the queryset for the circles field based on the user
-      

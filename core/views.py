@@ -465,24 +465,26 @@ class ConnectedUserCircleEditView(UpdateView):
         circles = form.cleaned_data['circles']
         target_user = self.get_object()
         selected_circles = form.cleaned_data['circles']
-        non_selected = models.Circle.objects.exclude(id__in=[c.id for c in selected_circles])
+        non_selected = models.Circle.objects.exclude(
+            id__in=[c.id for c in selected_circles])
 
         models.CircleMembership.objects.filter(
-            circle__in=non_selected, 
+            circle__in=non_selected,
             connection__other_user=target_user
         ).delete()
 
         for circle in circles:
-            models.Circle.objects.get_or_create(name=circle.name, owner=self.request.user)
+            models.Circle.objects.get_or_create(
+                name=circle.name, owner=self.request.user)
         return super().form_valid(form)
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['circles'] = self.request.user.circles
         kwargs['user'] = self.get_object()  # Pass the target user to the form
         return kwargs
 
-edit_circles = ConnectedUserCircleEditView.as_view()
+e_c = ConnectedUserCircleEditView.as_view()
 
 class DeleteUserView(DeleteView):
     model = models.User
@@ -569,6 +571,7 @@ class PostEditView(UpdateView):
             owner=self.request.user,
             pk=self.kwargs['pk'],
         )
+
     def form_valid(self, form):
         post = form.save(commit=False)
         post.owner = self.request.user

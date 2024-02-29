@@ -75,7 +75,7 @@ urlpatterns = [
     path('users/me/edit', views.profile_edit, name='profile_edit'),
     path('users/me', views.user_detail, name='profile_detail'),
     path('users/<uuid:pk>', views.user_detail, name='user_detail'),
-    path('users/<uuid:pk>/edit_circles/', views.edit_circles, name='edit_circles'),
+    path('users/<uuid:pk>/edit_circles/', views.e_c, name='edit_circles'),
 
 
     path('welcome', views.welcome, name='welcome'),
