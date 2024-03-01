@@ -176,6 +176,7 @@ class ConnectedUserCircleForm(forms.ModelForm):
     circles = forms.ModelMultipleChoiceField(
         queryset=models.Circle.objects.none(),
         help_text='This post will be visible to these circles.',
+        required=False,
         widget=CircleWidget,
     )
 
@@ -188,5 +189,3 @@ class ConnectedUserCircleForm(forms.ModelForm):
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
-
-        # Update the queryset for the circles field based on the user
