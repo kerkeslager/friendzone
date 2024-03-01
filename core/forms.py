@@ -170,3 +170,21 @@ class SignupForm(UserCreationForm):
     class Meta:
         model = get_user_model()
         fields = UserCreationForm.Meta.fields
+
+
+class ConnectedUserCircleForm(forms.ModelForm):
+    circles = forms.ModelMultipleChoiceField(
+        queryset=models.Circle.objects.none(),
+        help_text='This post will be visible to these circles.',
+        required=False,
+        widget=CircleWidget,
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ('circles', )
+
+    def __init__(self, *args, **kwargs):
+        circles = kwargs.pop('circles')
+        super().__init__(*args, **kwargs)
+        self.fields['circles'].queryset = circles
