@@ -13,8 +13,6 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 from django.utils import timezone
-from django.http import Http404
-from django.core.exceptions import PermissionDenied
 
 import pyqrcode
 
@@ -450,11 +448,11 @@ class ConnectedUserCircleEditView(UpdateView):
         return self.object.get_absolute_url()
 
     def get_object(self):
-        # Ensure the user being edited is connected to the request.user
-        target_user = get_object_or_404(models.User, pk=self.kwargs['pk'])
-        if not self.request.user.is_connected_with(target_user):
-            raise PermissionDenied
-        return target_user
+        return get_object_or_404(
+            # Ensure the user being edited is connected to the request.user
+            self.request.user.connected_users,
+            pk=self.kwargs['pk'],
+        )
 
     def form_valid(self, form):
         target_user = self.object
@@ -644,18 +642,11 @@ class UserDetailView(DetailView):
         if 'pk' not in self.kwargs:
             return self.request.user
 
-        user = get_object_or_404(
-            models.User,
+        return get_object_or_404(
+            # Ensure that user is viewing a user they're connected with
+            self.request.user.connected_users,
             pk=self.kwargs['pk'],
         )
-
-        if self.request.user == user:
-            return user
-
-        if not self.request.user.is_connected_with(user):
-            raise Http404()
-
-        return user
 
     def get_context_data(self, *args, **kwargs):
         result = super().get_context_data(*args, **kwargs)
