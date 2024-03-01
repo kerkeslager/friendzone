@@ -445,7 +445,6 @@ profile_edit = ProfileEditView.as_view()
 class ConnectedUserCircleEditView(UpdateView):
     model = models.User
     form_class = forms.ConnectedUserCircleForm
-    template_name = 'core/edit_connected_user_circles.html'
 
     def get_success_url(self):
         return self.object.get_absolute_url()
