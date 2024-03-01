@@ -147,16 +147,10 @@ class ConnectionBulkUpdate(View):
 
         # Add selected CircleMemberships that don't already exist
         for circle, conn in selected_circle_memberships:
-            selected_cm_exists = existing_circle_memberships.filter(
+            models.CircleMembership.objects.get_or_create(
                 circle=circle,
                 connection=conn,
-            ).count() == 1
-
-            if not selected_cm_exists:
-                models.CircleMembership.objects.create(
-                    circle=circle,
-                    connection=conn,
-                )
+            )
 
         return redirect(reverse('connection_list'))
 
@@ -449,10 +443,12 @@ class ProfileEditView(UpdateView):
 profile_edit = ProfileEditView.as_view()
 
 class ConnectedUserCircleEditView(UpdateView):
-    model = models.User  # or CircleMembership, depending on your data model
+    model = models.User
     form_class = forms.ConnectedUserCircleForm
     template_name = 'core/edit_connected_user_circles.html'
-    success_url = reverse_lazy('connection_list')  # Adjust as necessary
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
     def get_object(self):
         # Ensure the user being edited is connected to the request.user
@@ -462,20 +458,26 @@ class ConnectedUserCircleEditView(UpdateView):
         return target_user
 
     def form_valid(self, form):
-        circles = form.cleaned_data['circles']
-        target_user = self.get_object()
-        selected_circles = form.cleaned_data['circles']
-        non_selected = models.Circle.objects.exclude(
-            id__in=[c.id for c in selected_circles])
+        target_user = self.object
+        connection = get_object_or_404(
+            self.request.user.connections,
+            other_user=target_user,
+        )
 
-        models.CircleMembership.objects.filter(
-            circle__in=non_selected,
-            connection__other_user=target_user
+        selected_circles = form.cleaned_data['circles']
+
+        models.CircleMembership.objects.exclude(
+            circle__in=selected_circles,
+        ).filter(
+            connection=connection,
         ).delete()
 
-        for circle in circles:
-            models.Circle.objects.get_or_create(
-                name=circle.name, owner=self.request.user)
+        for circle in selected_circles:
+            models.CircleMembership.objects.get_or_create(
+                circle=circle,
+                connection=connection,
+            )
+
         return super().form_valid(form)
 
     def get_form_kwargs(self):
@@ -484,7 +486,7 @@ class ConnectedUserCircleEditView(UpdateView):
         kwargs['user'] = self.get_object()  # Pass the target user to the form
         return kwargs
 
-e_c = ConnectedUserCircleEditView.as_view()
+edit_connection_circles = ConnectedUserCircleEditView.as_view()
 
 class DeleteUserView(DeleteView):
     model = models.User

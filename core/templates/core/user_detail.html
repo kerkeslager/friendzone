@@ -18,7 +18,7 @@
 {% else %}
   <a href='{% url "convo_detail" pk=object.pk %}'>view messages with this user</a>
   <p>
-    <form method="post" action="{% url 'edit_circles' pk=object.pk %}">
+    <form method='post' action='{% url 'edit_connection_circles' pk=object.pk %}'>
       {% csrf_token %}
 
       {% comment %}
@@ -31,7 +31,7 @@
         <div class='helptext'>This user is part of these circles.</div>
 
         <div>
-        {% for circle in in_circles %}
+        {% for circle in request.user.circles.all %}
           <div>
             <label>
               <nav>
