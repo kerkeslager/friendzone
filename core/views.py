@@ -561,6 +561,7 @@ class PostEditView(UpdateView):
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
+
         return result
 
     def get_object(self):
