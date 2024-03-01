@@ -145,16 +145,10 @@ class ConnectionBulkUpdate(View):
 
         # Add selected CircleMemberships that don't already exist
         for circle, conn in selected_circle_memberships:
-            selected_cm_exists = existing_circle_memberships.filter(
+            models.CircleMembership.objects.get_or_create(
                 circle=circle,
                 connection=conn,
-            ).count() == 1
-
-            if not selected_cm_exists:
-                models.CircleMembership.objects.create(
-                    circle=circle,
-                    connection=conn,
-                )
+            )
 
         return redirect(reverse('connection_list'))
 
@@ -446,6 +440,50 @@ class ProfileEditView(UpdateView):
 
 profile_edit = ProfileEditView.as_view()
 
+class ConnectedUserCircleEditView(UpdateView):
+    model = models.User
+    form_class = forms.ConnectedUserCircleForm
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+    def get_object(self):
+        return get_object_or_404(
+            # Ensure the user being edited is connected to the request.user
+            self.request.user.connected_users,
+            pk=self.kwargs['pk'],
+        )
+
+    def form_valid(self, form):
+        target_user = self.object
+        connection = get_object_or_404(
+            self.request.user.connections,
+            other_user=target_user,
+        )
+
+        selected_circles = form.cleaned_data['circles']
+
+        models.CircleMembership.objects.exclude(
+            circle__in=selected_circles,
+        ).filter(
+            connection=connection,
+        ).delete()
+
+        for circle in selected_circles:
+            models.CircleMembership.objects.get_or_create(
+                circle=circle,
+                connection=connection,
+            )
+
+        return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['circles'] = self.request.user.circles
+        return kwargs
+
+edit_connection_circles = ConnectedUserCircleEditView.as_view()
+
 class DeleteUserView(DeleteView):
     model = models.User
     success_url = reverse_lazy('delete_done')
@@ -533,6 +571,19 @@ class PostEditView(UpdateView):
             pk=self.kwargs['pk'],
         )
 
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.owner = self.request.user
+        post.save()
+        circle_ids = set(
+            uuid.UUID(circle_id)
+            for circle_id in form.data.getlist('circles')
+        )
+        circles = self.request.user.circles.filter(
+            pk__in=circle_ids,
+        )
+        form.instance.publish(circles=circles)
+        return super().form_valid(form)
 
 post_edit = PostEditView.as_view()
 
@@ -591,18 +642,11 @@ class UserDetailView(DetailView):
         if 'pk' not in self.kwargs:
             return self.request.user
 
-        user = get_object_or_404(
-            models.User,
+        return get_object_or_404(
+            # Ensure that user is viewing a user they're connected with
+            self.request.user.connected_users,
             pk=self.kwargs['pk'],
         )
-
-        if self.request.user == user:
-            return user
-
-        if not self.request.user.is_connected_with(user):
-            raise Http404()
-
-        return user
 
     def get_context_data(self, *args, **kwargs):
         result = super().get_context_data(*args, **kwargs)
