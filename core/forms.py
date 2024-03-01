@@ -185,7 +185,6 @@ class ConnectedUserCircleForm(forms.ModelForm):
         fields = ('circles', )
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user')  # Pass the target user as an argument
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles

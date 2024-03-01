@@ -480,7 +480,6 @@ class ConnectedUserCircleEditView(UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['circles'] = self.request.user.circles
-        kwargs['user'] = self.get_object()  # Pass the target user to the form
         return kwargs
 
 edit_connection_circles = ConnectedUserCircleEditView.as_view()
