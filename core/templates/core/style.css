@@ -609,21 +609,6 @@ h1:has(+ #connection-bulk-edit) {
   align-self: center;
 }
 
-.circle-checkbox label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px; /* Adjust as needed */
-  cursor: pointer; /* Change cursor to indicate clickable area */
-}
-
-.circle-widget {
-  width: 30px; /* Adjust as needed */
-  height: 30px; /* Adjust as needed */
-  margin-right: 10px; /* Adjust as needed */
-  /* Add any other styles to the circle widget */
-}
-
-
 #connection-bulk-edit {
   align-self: center;
 
