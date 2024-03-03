@@ -4,3 +4,4 @@ pillow==10.2.0
 PyQRCode==1.2.1
 Selenium==4.11.2
 webdriver_manager==4.0.1
+gunicorn==20.0.4
