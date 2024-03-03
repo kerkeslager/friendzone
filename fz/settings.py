@@ -28,7 +28,7 @@ SECRET_KEY = 'changeme!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['lionfish-app-8p5lw.ondigitalocean.app', 'localhost', 'rk-8.com']
 
 
 # Application definition
