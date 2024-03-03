@@ -1,6 +1,6 @@
 import io
 import uuid
-
+from django.db import transaction
 from django.contrib.auth import authenticate, login
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect
@@ -561,7 +561,6 @@ class PostEditView(UpdateView):
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
-
         return result
 
     def get_object(self):
@@ -572,18 +571,21 @@ class PostEditView(UpdateView):
         )
 
     def form_valid(self, form):
-        post = form.save(commit=False)
-        post.owner = self.request.user
-        post.save()
-        circle_ids = set(
-            uuid.UUID(circle_id)
-            for circle_id in form.data.getlist('circles')
-        )
-        circles = self.request.user.circles.filter(
-            pk__in=circle_ids,
-        )
-        form.instance.publish(circles=circles)
-        return super().form_valid(form)
+        with transaction.atomic():
+            post = form.save(commit=False)
+            post.owner = self.request.user
+            post.save()
+
+            selected_circles = form.cleaned_data.get('circles')
+
+            existing_post_circles = models.PostCircle.objects.filter(post=post)
+            existing_post_circles.exclude(circle__in=selected_circles).delete()
+
+            for circle in selected_circles:
+                models.PostCircle.objects.get_or_create(
+                    circle=circle, post=post)
+            return super().form_valid(form)
+
 
 post_edit = PostEditView.as_view()
 
