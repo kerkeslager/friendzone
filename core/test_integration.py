@@ -364,6 +364,19 @@ class IntegrationTests(object):
             By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
         family_circle_checkbox.click()
 
+        friends_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Friends']")
+        friends_circle_checkbox = friends_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+
+        self.assertTrue(
+            family_circle_checkbox.is_selected(),
+            "Circle 1 should be checked.")
+
+        self.assertFalse(
+            friends_circle_checkbox.is_selected(),
+            "User 1 should not have Friends circle pre-checked.")
+
         accept_button = self.wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//button[contains(text(), 'accept')]")))
         accept_button.click()
@@ -373,6 +386,22 @@ class IntegrationTests(object):
             (By.TAG_NAME, 'h1'),
             user0.username,
         ))
+
+        family_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Family']")
+        family_circle_checkbox = family_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+
+        friends_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Friends']")
+        friends_circle_checkbox = friends_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+        self.assertTrue(
+            family_circle_checkbox.is_selected(),
+            "Circle 1 should be checked.")
+        self.assertFalse(
+            friends_circle_checkbox.is_selected(),
+            "Circle 2 should be pre-checked.")
 
         # Log out as user 1
         logout_button = self.browser.find_element(
@@ -399,6 +428,25 @@ class IntegrationTests(object):
             (By.TAG_NAME, 'h1'),
             user1.username,
         ))
+
+        family_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Family']")
+        family_circle_checkbox = family_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+
+        friends_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Friends']")
+        friends_circle_checkbox = friends_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+
+        time.sleep(5)
+
+        self.assertTrue(
+            family_circle_checkbox.is_selected(),
+            "Circle 1 should be pre-checked.")
+        self.assertFalse(
+            friends_circle_checkbox.is_selected(),
+            "Circle 2 should be pre-checked.")
 
     def test_invitation_circles_prechecked_on_edit(self):
         User = get_user_model()
@@ -456,9 +504,17 @@ class IntegrationTests(object):
         family_circle_checkbox = family_circle_label.find_element(
             By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
 
+        friends_circle_label = self.browser.find_element(
+            By.XPATH, "//label[normalize-space()='Friends']")
+        friends_circle_checkbox = friends_circle_label.find_element(
+            By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
+
         self.assertTrue(
             family_circle_checkbox.is_selected(),
             "Circle 1 should be pre-checked.")
+        self.assertFalse(
+            friends_circle_checkbox.is_selected(),
+            "Circle 2 should be pre-checked.")
 
 
 @tag('slow')
