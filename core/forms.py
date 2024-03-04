@@ -20,7 +20,11 @@ class CircleMultipleChoiceField(forms.ModelMultipleChoiceField):
         )
 
 
+class ColorInput(forms.TextInput):
+    input_type = 'color'
 class CircleForm(forms.ModelForm):
+    color = forms.CharField(widget=ColorInput, help_text=COLOR_HELP_TEXT)
+
     class Meta:
         model = models.Circle
         fields = ('name', 'color')
@@ -28,7 +32,6 @@ class CircleForm(forms.ModelForm):
             'name': 'This will not be shown to other users.',
             'color': f"The color of the circle's icon. { COLOR_HELP_TEXT }",
         }
-
 class MessageForm(forms.ModelForm):
     class Meta:
         model = models.Message
