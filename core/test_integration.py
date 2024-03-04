@@ -399,6 +399,7 @@ class IntegrationTests(object):
         self.assertTrue(
             family_circle_checkbox.is_selected(),
             "Circle 1 should be checked.")
+
         self.assertFalse(
             friends_circle_checkbox.is_selected(),
             "Circle 2 should be pre-checked.")
@@ -438,8 +439,6 @@ class IntegrationTests(object):
             By.XPATH, "//label[normalize-space()='Friends']")
         friends_circle_checkbox = friends_circle_label.find_element(
             By.XPATH, ".//preceding-sibling::input[@type='checkbox']")
-
-        time.sleep(5)
 
         self.assertTrue(
             family_circle_checkbox.is_selected(),

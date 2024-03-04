@@ -340,7 +340,7 @@ class InvitationAcceptView(FormView):
             models.Invitation,
             pk=self.kwargs['pk'],
         )
-        circles = form.fields['circles'].queryset
+        circles = form.cleaned_data['circles']
         self.request.user.accept_invitation(invitation, circles=circles)
 
         self.redirect_user = invitation.owner
