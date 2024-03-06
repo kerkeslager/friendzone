@@ -13,4 +13,17 @@
   {% empty %}
     <p><em>You have no conversations. Start one!</em></p>
   {% endfor %}
+  <h2>Start a New Conversation</h2>
+  <form action="{% url 'convo_redirect' %}" method="post">
+    {% csrf_token %}
+    <label for="connection">Choose a connection:</label>
+    <select name="connection" id="connection">
+      {% for connection in available_connections %}
+        <option value="{{ connection.other_user.pk }}">{{ connection.other_user.display_name }}</option>
+      {% empty %}
+        <option disabled>No available connections to start a new conversation.</option>
+      {% endfor %}
+    </select>
+    <button type="submit" {% if not available_connections %}disabled{% endif %}>Go</button>
+  </form>
 {% endblock %}

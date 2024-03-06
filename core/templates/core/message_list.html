@@ -21,7 +21,7 @@
     </p>
   {% endfor %}
 
-  <form class='message-form' method='post' action='{% url "message_create" pk=other_user.pk %}'>
+  <form class='message-form' method='post' action='{% url "convo_detail" pk=other_user.pk %}'>
     {% csrf_token %}
     {{ form }}
     <button type='submit'>send</button>

@@ -22,7 +22,7 @@ connection_urlpatterns = [
 
 convo_urlpatterns = [
     path('<uuid:pk>', views.convo_detail, name='convo_detail'),
-    path('<uuid:pk>/new', views.message_create, name='message_create'),
+    path('convo_redirect/', views.convo_redirect, name='convo_redirect'),
 ]
 
 intro_urlpatterns = [
