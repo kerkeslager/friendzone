@@ -1,3 +1,6 @@
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import HttpResponseRedirect
 import io
 import uuid
 
@@ -181,24 +184,52 @@ connection_list = ConnectionListView.as_view()
 
 class ConvoDetail(ListView):
     model = models.Message
+    form_class = forms.MessageForm
+    template_name = 'core/message_list.html'
 
     def get_queryset(self):
-        other_user = get_object_or_404(
-            models.User,
-            pk=self.kwargs['pk'],
+        self.other_user = get_object_or_404(models.User, pk=self.kwargs['pk'])
+        self.connection, created = self.request.user.connections.get_or_create(
+            other_user=self.other_user,
+            defaults={'user': self.request.user,
+                      'other_user': self.other_user}
         )
-        connection = self.request.user.connections.get(other_user=other_user)
-        return models.Message.objects.filter(
-            Q(connection=connection) | Q(connection=connection.opposite)
-        ).order_by('created_utc')
+        objects = models.Message.objects
+        return objects.filter( Q(connection=self.connection) | Q(
+            connection=self.connection.opposite) ).order_by('created_utc')
 
-    def get_context_data(self, *args, **kwargs):
-        result = super().get_context_data(*args, **kwargs)
-        result['form'] = forms.MessageForm()
-        result['other_user'] = models.User.objects.get(pk=self.kwargs['pk'])
-        return result
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form_class()
+        context['other_user'] = self.other_user
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.instance.connection = self.request.user.connections.get(
+                other_user=models.User.objects.get(pk=self.kwargs['pk']),
+            )
+            form.save()
+            return redirect(self.get_success_url())
+        else:
+            self.object_list = self.get_queryset()
+            context = self.get_context_data(
+                object_list=self.object_list, form=form)
+            return self.render_to_response(context)
+
+    def get_success_url(self):
+        return reverse('convo_detail', args=[self.kwargs['pk']])
 
 convo_detail = ConvoDetail.as_view()
+
+
+@login_required
+@require_POST
+def convo_redirect(request):
+    other_user_pk = request.POST.get('connection')
+    return HttpResponseRedirect(reverse('convo_detail',
+                                        args=[other_user_pk]))
 
 class ConvoList(ListView):
     model = models.Connection
@@ -210,23 +241,17 @@ class ConvoList(ListView):
             incoming_count=Count('opposite__outgoing_messages'),
         ).filter(Q(outgoing_count__gt=0) | Q(incoming_count__gt=0))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        existing_conv = set(
+            [c.other_user.pk for c in context['object_list']])
+        all_conn = set(self.request.user.connections.all())
+        available_connections = [
+            c for c in all_conn if c.other_user.pk not in existing_conv]
+        context['available_connections'] = available_connections
+        return context
+
 convo_list = ConvoList.as_view()
-
-# TODO Can we join this into the convo_detail view?
-class MessageCreateView(CreateView):
-    model = models.Message
-    form_class = forms.MessageForm
-
-    def form_valid(self, form):
-        form.instance.connection = self.request.user.connections.get(
-            other_user=models.User.objects.get(pk=self.kwargs['pk']),
-        )
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('convo_detail', args=[self.kwargs['pk']])
-
-message_create = MessageCreateView.as_view()
 
 class CSSView(TemplateView):
     template_name = 'core/style.css'
