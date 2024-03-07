@@ -17,6 +17,11 @@
     </header>
     <main>
       {{ object.text }}
+      {% if object.image %}
+      <img src="{{ object.image.url}}" alt="{{ post.title }}">
+      {% else %}
+      No Image Post 
+      {% endif %}
     </main>
     {% if request.user == object.owner %}
       <nav>

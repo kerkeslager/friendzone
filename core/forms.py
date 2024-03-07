@@ -118,10 +118,11 @@ class PostForm(forms.ModelForm):
         help_text='This post will be visible to these circles.',
         widget=CircleWidget,
     )
+    image = forms.ImageField(required=False)
 
     class Meta:
         model = models.Post
-        fields = ('circles', 'text')
+        fields = ('circles', 'image', 'text')
         widgets = {
             'text': forms.Textarea(
                 attrs={

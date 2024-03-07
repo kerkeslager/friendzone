@@ -18,11 +18,14 @@
             {% include 'snippets/user.svg' %}
           </section>
         {% endif %}
-
         <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a> said:
       </header>
       <main>
         {{ post.text | markdown }}
+        {% if post.image %}
+          {% include 'widgets/crop_apply.html' with img_url=post.image.url width='10rem' height='10rem' %}
+        {% endif %}
+
       </main>
       <nav>
         <a href='{% url "post_detail" pk=post.pk %}'>View</a>

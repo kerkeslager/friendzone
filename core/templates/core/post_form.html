@@ -4,7 +4,7 @@
 
 {% block main %}
 <a href='{% url "post_delete" pk=form.instance.pk %}'>delete</a>
-<form method='post'>
+<form method='post' enctype='multipart/form-data'>
   {% csrf_token %}
   {{ form }}
   <button type='submit'>save</button>

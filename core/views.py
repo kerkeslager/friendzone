@@ -526,6 +526,7 @@ class PostCreateView(CreateView):
 
     def form_valid(self, form):
         post = form.save(commit=False)
+        post.image = form.cleaned_data['image']
         post.owner = self.request.user
         post.save()
         circle_ids = set(
@@ -561,7 +562,6 @@ class PostEditView(UpdateView):
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
-
         return result
 
     def get_object(self):
@@ -572,18 +572,20 @@ class PostEditView(UpdateView):
         )
 
     def form_valid(self, form):
-        post = form.save(commit=False)
-        post.owner = self.request.user
-        post.save()
-        circle_ids = set(
-            uuid.UUID(circle_id)
-            for circle_id in form.data.getlist('circles')
-        )
-        circles = self.request.user.circles.filter(
-            pk__in=circle_ids,
-        )
-        form.instance.publish(circles=circles)
-        return super().form_valid(form)
+        if form.has_changed():
+            post = form.save(commit=False)
+            post.owner = self.request.user
+            post.image = form.cleaned_data['image']
+            post.save()
+
+            circle_ids = {uuid.UUID(circle_id)
+                          for circle_id in form.data.getlist('circles')}
+            circles = self.request.user.circles.filter(pk__in=circle_ids)
+
+            form.instance.publish(circles=circles)
+            return super().form_valid(form)
+        else:
+            return redirect(self.get_success_url())
 
 post_edit = PostEditView.as_view()
 
