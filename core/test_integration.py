@@ -276,7 +276,7 @@ class IntegrationTests(object):
         create_button = self.wait.until(EC.element_to_be_clickable(
             (By.XPATH, "//button[contains(text(), 'create')]")))
         create_button.click()
-
+        time.sleep(5)
         self.browser.find_element(By.LINK_TEXT, "View").click()
         self.browser.find_element(By.LINK_TEXT, "Edit").click()
         friends_circle_label = self.browser.find_element(

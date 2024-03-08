@@ -6,9 +6,9 @@
   {% if request.user.is_authenticated %}
     <section>
       <h3>Post to your feed</h3>
-      <form method='post' action='{% url "post_create" %}'>
+      <form method='post' enctype='multipart/form-data' action='{% url "post_create" %}'>
         {% csrf_token %}
-        {{ post_form }}
+        {{ post_form.as_p }}
         <button type='submit'>create</button>
       </form>
     </section>
