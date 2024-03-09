@@ -4,6 +4,7 @@ import zoneinfo
 
 from django.conf import settings
 from django.db import models, transaction
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
 import django.contrib.auth.models as auth_models
@@ -576,7 +577,6 @@ class Message(models.Model):
     @property
     def to_user(self):
         return self.connection.other_user
-
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_utc = models.DateTimeField(auto_now_add=True)
@@ -590,10 +590,16 @@ class Post(models.Model):
         'Circle',
         related_name='+',
     )
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
+
+    def clean(self):
+        # Ensure that a post has either text, an image, TODO
+        if not self.text and not self.image:
+            raise ValidationError('A post must have either text or an image.')
 
     def publish(self, *, circles):
         for circle in circles:
-            PostCircle.objects.create(circle=circle, post=self)
+            PostCircle.objects.get_or_create(circle=circle, post=self)
 
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.pk)])

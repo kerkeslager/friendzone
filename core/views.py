@@ -521,13 +521,14 @@ class PostCreateView(CreateView):
 
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
+        result['files'] = self.request.FILES
         result['circles'] = self.request.user.circles
         return result
 
     def form_valid(self, form):
         post = form.save(commit=False)
-        post.owner = self.request.user
-        post.save()
+        form.instance.owner = self.request.user
+        form.save()
         circle_ids = set(
             uuid.UUID(circle_id)
             for circle_id in form.data.getlist('circles')
@@ -561,7 +562,6 @@ class PostEditView(UpdateView):
     def get_form_kwargs(self):
         result = super().get_form_kwargs()
         result['circles'] = self.request.user.circles
-
         return result
 
     def get_object(self):
@@ -572,18 +572,20 @@ class PostEditView(UpdateView):
         )
 
     def form_valid(self, form):
-        post = form.save(commit=False)
-        post.owner = self.request.user
-        post.save()
-        circle_ids = set(
-            uuid.UUID(circle_id)
-            for circle_id in form.data.getlist('circles')
-        )
-        circles = self.request.user.circles.filter(
-            pk__in=circle_ids,
-        )
-        form.instance.publish(circles=circles)
-        return super().form_valid(form)
+        if form.has_changed():
+            post = form.save(commit=False)
+            post.owner = self.request.user
+            post.image = form.cleaned_data['image']
+            post.save()
+
+            circle_ids = {uuid.UUID(circle_id)
+                          for circle_id in form.data.getlist('circles')}
+            circles = self.request.user.circles.filter(pk__in=circle_ids)
+
+            form.instance.publish(circles=circles)
+            return super().form_valid(form)
+        else:
+            return redirect(self.get_success_url())
 
 post_edit = PostEditView.as_view()
 
@@ -597,6 +599,27 @@ class PostDetailView(DetailView):
         )
 
 post_detail = PostDetailView.as_view()
+
+
+class UserPhotoView(DetailView):
+    model = models.User
+    template_name = 'core/user_photos.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        context['photos'] = models.Post.objects.filter(
+            owner=user).exclude(
+            image='').order_by('-created_utc')
+        return context
+
+    def get_object(self):
+        return get_object_or_404(
+            models.User,
+            pk=self.kwargs['pk'],
+        )
+
+user_photos = UserPhotoView.as_view()
 
 class SettingsView(UpdateView):
     form_class = forms.SettingsForm
@@ -642,11 +665,14 @@ class UserDetailView(DetailView):
         if 'pk' not in self.kwargs:
             return self.request.user
 
-        return get_object_or_404(
-            # Ensure that user is viewing a user they're connected with
-            self.request.user.connected_users,
-            pk=self.kwargs['pk'],
-        )
+        user = get_object_or_404(models.User, pk=self.kwargs['pk'])
+
+        # Check if the user is the request.user or if they are connected
+        if self.request.user == user or self.request.user.is_connected_with(
+                user):
+            return user
+        else:
+            raise Http404()
 
     def get_context_data(self, *args, **kwargs):
         result = super().get_context_data(*args, **kwargs)

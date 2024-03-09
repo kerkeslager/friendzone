@@ -5,7 +5,6 @@
 {% block main %}
   <section class='post'>
     <date>{{ object.created_utc|date:"l, F j, Y g:ia T" }}</date>
-    <header>
       {% if object.owner.avatar %}
         {% include 'widgets/crop_apply.html' with img_url=object.owner.avatar.url crop=object.owner.avatar_crop width='10rem' height='10rem' %}
       {% else %}
@@ -13,10 +12,16 @@
           {% include 'snippets/user.svg' %}
         </section>
       {% endif %}
-      <a href='{% url "user_detail" pk=object.owner.pk %}'>{{ object.owner.display_name }}</a> said:
-    </header>
+      <header>
+        <a href='{% url "user_detail" pk=post.owner.pk %}'>{{ post.owner.display_name }}</a> said:
+      </header>
     <main>
       {{ object.text }}
+      {% if object.image %}
+      <img src="{{ object.image.url}}" alt="{{ post.title }}">
+      {% else %}
+      No Image Post 
+      {% endif %}
     </main>
     {% if request.user == object.owner %}
       <nav>

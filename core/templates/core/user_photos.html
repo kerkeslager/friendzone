@@ -1,0 +1,24 @@
+
+{% extends 'core/base.html' %}
+
+{% block title %}{{ object.display_name }}{% endblock %}
+
+{% block main %}
+
+<h1>{{ object.display_name}}'s Photos</h1>
+<div class="photo-gallery">
+    {% for photo in photos %}
+        <div class="photo">
+            <img src="{{ photo.image.url }}" alt="A photo uploaded by {{ object.display_name}}">
+        </div>
+    {% empty %}
+        <p>No photos to display.</p>
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+
+
+

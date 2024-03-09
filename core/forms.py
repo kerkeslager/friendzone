@@ -118,10 +118,11 @@ class PostForm(forms.ModelForm):
         help_text='This post will be visible to these circles.',
         widget=CircleWidget,
     )
+    image = forms.ImageField(required=False)
 
     class Meta:
         model = models.Post
-        fields = ('circles', 'text')
+        fields = ('circles', 'image', 'text')
         widgets = {
             'text': forms.Textarea(
                 attrs={
@@ -135,6 +136,13 @@ class PostForm(forms.ModelForm):
         circles = kwargs.pop('circles')
         super().__init__(*args, **kwargs)
         self.fields['circles'].queryset = circles
+        self.fields['text'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not cleaned_data['image'] and not cleaned_data['text']:
+            raise ValidationError('Post must have either an image or text.')
+        return cleaned_data
 
 
 class ProfileForm(forms.ModelForm):

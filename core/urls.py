@@ -80,6 +80,7 @@ urlpatterns = [
         views.edit_connection_circles,
         name='edit_connection_circles',
     ),
+    path('users/<uuid:pk>/photos', views.user_photos, name='user_photos'),
 
     path('welcome', views.welcome, name='welcome'),
     path('why', views.why, name='why'),
