@@ -1,4 +1,4 @@
-Django==4.2.10
+Django==4.2.11
 markdown-it-py==3.0.0
 pillow==10.2.0
 PyQRCode==1.2.1
