@@ -577,6 +577,14 @@ class Message(models.Model):
     def to_user(self):
         return self.connection.other_user
 
+    @property
+    def from_user_avatar(self):
+        return self.connection.owner.avatar
+
+    @property
+    def to_user_avatar(self):
+        return self.connection.other_user.avatar
+
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_utc = models.DateTimeField(auto_now_add=True)

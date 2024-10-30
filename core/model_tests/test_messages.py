@@ -32,6 +32,8 @@ class MessageTests(TransactionTestCase):
         self.assertEqual(message.text, text)
         self.assertEqual(message.from_user, sending_user)
         self.assertEqual(message.to_user, receiving_user)
+        self.assertEqual(message.from_user_avatar, sending_user.avatar)
+        self.assertEqual(message.to_user_avatar, receiving_user.avatar)
 
         self.assertEqual(sending_user.connections.count(), 1)
         sending_connection = sending_user.connections.first()
