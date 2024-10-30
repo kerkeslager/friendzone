@@ -292,6 +292,11 @@ class Invitation(models.Model):
     def get_absolute_url(self):
         return reverse('invite_detail', args=[str(self.pk)])
 
+    def is_accepted(self):
+        return self.owner.connections.filter(
+            other_user__in=self.circles.values_list('owner', flat=True)
+        ).exists()
+
 class Intro(models.Model):
     '''
     An Intro is created by `owner` and sent to ONE user, `receiver`.
