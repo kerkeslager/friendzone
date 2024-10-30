@@ -413,6 +413,7 @@ class InvitationDetailView(DetailView):
                 data['qr'] = mark_safe(
                     qr_buffer.getvalue().decode('utf-8'),
                 )
+                data['acceptance_status'] = self.object.is_accepted()
             else:
                 data['form'] = forms.InvitationAcceptForm(
                     circles=self.request.user.circles.all(),
@@ -525,7 +526,7 @@ class PostCreateView(CreateView):
         return result
 
     def form_valid(self, form):
-        post = form.save(commit=False)
+        post = form.save(commit(False)
         post.owner = self.request.user
         post.save()
         circle_ids = set(

@@ -23,6 +23,15 @@
   {% endfor %}
 
   The following message will be displayed to other users who visit this page:
+
+  <p>
+    <strong>Acceptance Status:</strong>
+    {% if object.is_accepted %}
+      Accepted
+    {% else %}
+      Not Accepted
+    {% endif %}
+  </p>
 {% endif %}
 
 <p>
