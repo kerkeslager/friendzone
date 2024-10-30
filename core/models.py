@@ -179,6 +179,8 @@ class User(auth_models.AbstractUser):
         return Message.objects.create(
             connection=self.connections.get(other_user=other_user),
             text=text,
+            from_user_avatar=self.avatar,
+            to_user_avatar=other_user.avatar,
         )
 
     @property
@@ -568,6 +570,7 @@ class Message(models.Model):
     created_utc = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     text = models.CharField(max_length=1024)
+    from_user_avatar = models.TextField(null=True, blank=True)
 
     @property
     def from_user(self):
