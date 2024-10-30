@@ -53,3 +53,46 @@ class MessageTests(TransactionTestCase):
         )
         self.assertEqual(receiving_connection.messages.count(), 1)
         self.assertEqual(receiving_connection.messages.first(), message)
+
+    def test_from_user_avatar(self):
+        user = models.User.objects.create_user(
+            username='testuser',
+            password='12345',
+        )
+        user.avatar = 'path/to/avatar.jpg'
+        user.save()
+
+        message = models.Message.objects.create(
+            connection=models.Connection.objects.create(
+                owner=user,
+                other_user=models.User.objects.create_user(
+                    username='otheruser',
+                    password='12345',
+                ),
+            ),
+            text='Test message',
+        )
+
+        self.assertEqual(message.from_user_avatar, 'path/to/avatar.jpg')
+
+    def test_to_user_avatar(self):
+        user = models.User.objects.create_user(
+            username='testuser',
+            password='12345',
+        )
+        other_user = models.User.objects.create_user(
+            username='otheruser',
+            password='12345',
+        )
+        other_user.avatar = 'path/to/other_avatar.jpg'
+        other_user.save()
+
+        message = models.Message.objects.create(
+            connection=models.Connection.objects.create(
+                owner=user,
+                other_user=other_user,
+            ),
+            text='Test message',
+        )
+
+        self.assertEqual(message.to_user_avatar, 'path/to/other_avatar.jpg')

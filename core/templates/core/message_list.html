@@ -8,8 +8,8 @@
   {% for message in object_list %}
     {% if message.from_user == request.user %}
       <section class='message outgoing'>
-        {% if message.from_user.avatar %}
-          {% include 'widgets/crop_apply.html' with img_url=message.from_user.avatar.url crop=message.from_user.avatar_crop width='5rem' height='5rem' %}
+        {% if message.from_user_avatar %}
+          <img src="{{ message.from_user_avatar.url }}" alt="From User Avatar" width="5rem" height="5rem">
         {% else %}
           <section class='avatar-placeholder'>
             {% include 'snippets/user.svg' %}
@@ -19,8 +19,8 @@
       </section>
     {% else %}
       <section class='message incoming'>
-        {% if message.from_user.avatar %}
-          {% include 'widgets/crop_apply.html' with img_url=message.from_user.avatar.url crop=message.from_user.avatar_crop width='5rem' height='5rem' %}
+        {% if message.to_user_avatar %}
+          <img src="{{ message.to_user_avatar.url }}" alt="To User Avatar" width="5rem" height="5rem">
         {% else %}
           <section class='avatar-placeholder'>
             {% include 'snippets/user.svg' %}

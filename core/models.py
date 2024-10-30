@@ -179,6 +179,8 @@ class User(auth_models.AbstractUser):
         return Message.objects.create(
             connection=self.connections.get(other_user=other_user),
             text=text,
+            from_user_avatar=self.avatar,
+            to_user_avatar=other_user.avatar,
         )
 
     @property
@@ -568,6 +570,8 @@ class Message(models.Model):
     created_utc = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     text = models.CharField(max_length=1024)
+    from_user_avatar = models.ImageField(null=True, blank=True)
+    to_user_avatar = models.ImageField(null=True, blank=True)
 
     @property
     def from_user(self):
@@ -576,14 +580,6 @@ class Message(models.Model):
     @property
     def to_user(self):
         return self.connection.other_user
-
-    @property
-    def from_user_avatar(self):
-        return self.connection.owner.avatar
-
-    @property
-    def to_user_avatar(self):
-        return self.connection.other_user.avatar
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
