@@ -570,8 +570,7 @@ class Message(models.Model):
     created_utc = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     text = models.CharField(max_length=1024)
-    from_user_avatar = models.ImageField(null=True, blank=True)
-    to_user_avatar = models.ImageField(null=True, blank=True)
+    from_user_avatar = models.TextField(null=True, blank=True)
 
     @property
     def from_user(self):

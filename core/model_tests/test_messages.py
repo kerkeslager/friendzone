@@ -71,6 +71,7 @@ class MessageTests(TransactionTestCase):
                 ),
             ),
             text='Test message',
+            from_user_avatar=user.avatar,
         )
 
         self.assertEqual(message.from_user_avatar, 'path/to/avatar.jpg')
@@ -93,6 +94,7 @@ class MessageTests(TransactionTestCase):
                 other_user=other_user,
             ),
             text='Test message',
+            to_user_avatar=other_user.avatar,
         )
 
         self.assertEqual(message.to_user_avatar, 'path/to/other_avatar.jpg')
