@@ -731,3 +731,16 @@ nav.dropdown:has(> label > .open-state:checked) {
     z-index: 0;
   }
 }
+
+/* P07d9 */
+/* Pf2ad */
+a:link,
+a:visited {
+  transition: transform 0.2s ease-in-out;
+}
+
+a:link:hover,
+a:visited:hover {
+  transform: scale(1.1);
+  z-index: 1;
+}
